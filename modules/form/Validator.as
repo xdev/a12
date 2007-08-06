@@ -1,25 +1,28 @@
 class com.a12.modules.form.Validator
 {
 			
-	private function Validator()
+	public function Validator()
 	{
 	
 	}
 	
-	public static function validateObject(formData)
+	public function validateObject(formData)
 	{
 	
 		//iterate through the obj and get field objects , values and validation states
 		var errorData = [];
 		
-		for(var i in formData){
+		for(var i=0; i<formData.length; i++){
 			
 			var obj = formData[i];
 			
-			if(_validateField(obj)){
+			var tV = validateField(obj);
+						
+			if(tV.valid == true){
 			
 			}else{
 				//as we find stuff add it to the errorObj
+				obj.message = tV.message;
 				errorData.push(obj);
 			}	
 		
@@ -35,50 +38,63 @@ class com.a12.modules.form.Validator
 	
 	}
 	
-	public static function _validateField(obj)
-	{	
-	
-		
+	public function validateField(obj)
+	{			
+		trace('in here');
 		var mode = obj.mode;
-		var value = obj.value;
-		
-		trace(mode + '--' + value + '--' + obj.name);
-		
-		
-		if(mode == 'equal'){
-			if(obj.value == obj.value2){
-				return true;
-			}else{
-				return false;
-			}		
-		}
-		
+				
 		if(mode == 'empty'){
-			if(value != ''){
-				if(value != 'please enter your ' + obj.name){
-					return true;
-				}
-			}else{
-				return false;
-			}
+			return vEmpty(obj);
 		}
 	
 		if(mode == 'email'){
-			if (value.length>=7) {
-				if (value.indexOf("@")>0) {
-					if ((value.indexOf("@")+2)<value.lastIndexOf(".")) {
-						if (value.lastIndexOf(".")<(value.length-2)) {
-							return true;
-						}
+			return vEmail(obj);		
+		}	
+	
+	}
+	
+	private function vEmpty(obj)
+	{
+		var value = obj.value;
+		var tObj = {};
+				
+		if(value != '' && value != undefined && value != null){
+			tObj.valid = true;			
+		}else{
+			tObj.valid = false;
+			tObj.message = 'value not set';
+		}
+		
+		return tObj;
+	}
+	
+	private function vEmail(obj)
+	{
+	
+		var value = obj.value;
+		var tObj = {};
+		
+		if (value.length>=7) {
+			if (value.indexOf("@")>0) {
+				if ((value.indexOf("@")+2)<value.lastIndexOf(".")) {
+					if (value.lastIndexOf(".")<(value.length-2)) {
+						tObj.valid = true;
+					}else{
+						tObj.message = 'invalid domain';
 					}
 				}
 			}
-			
-			return false;
-		
 		}
-	
+		
+		if(tObj.valid == undefined){
+			tObj.valid = false;
+			if(tObj.message == undefined){
+				tObj.message = 'invalid email';
+			}
+		}
+		
+		return tObj;
 	
 	}
-
+	
 }

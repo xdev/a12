@@ -42,8 +42,17 @@ class com.a12.modules.mediaplayback.CPController extends AbstractController
 		obj.pauseStream();
 	}
 	
+	public function toggle()
+	{
+		var obj = getModel();
+		obj.toggleStream();
+	}
 	
-	
+	public function play()
+	{
+		var obj = getModel();
+		obj.playStream();
+	}	
 	
 	public function findSeek(percent:Number) : Void
 	{

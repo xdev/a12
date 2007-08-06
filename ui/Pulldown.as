@@ -43,11 +43,21 @@ class com.a12.ui.Pulldown implements com.a12.ui.UIElement
 	private	var	scrollObj		: Scrollbar;
 	private	var scrollListener	: Object;
 	
+	private	var mouseListener	: Object;
+	
 	
 	public function Pulldown(clip:MovieClip,xml:XMLNode,config:Object,tabindex:Number){
 		_ref = clip;
 		selectionTemp = undefined;
 		mouseMode = undefined;
+		
+		mouseListener = new Object();
+		
+		mouseListener.onMouseDown = function()
+		{
+		
+		
+		}
 		
 		broadcaster = new EventBroadcaster();
 		
@@ -144,6 +154,7 @@ class com.a12.ui.Pulldown implements com.a12.ui.UIElement
 		
 		_ref.control._scope = this;
 		_ref.control.onPress = function() {
+			trace('onPress ' + this._parent);
 			//trace(this._parent);
 			Selection.setFocus(this._parent);
 			//trace("Focus is " + Selection.getFocus());
@@ -158,29 +169,33 @@ class com.a12.ui.Pulldown implements com.a12.ui.UIElement
 		_ref._scope = this;
 		
 		_ref.onSetFocus = function(oldFocus){
-			
-			
-			Utils.changeColor(this.control.back,this._scope.configObj.clr_focus);
-			Utils.changeColor(this.control.arrows,this._scope.configObj.clr_primary);
-			Key.addListener(this._scope);	
-			
-			this._scope.broadcaster.broadcastMessage("onSetFocus",this);
+			this._scope._onSetFocus();			
 		}
 		
 		_ref.onKillFocus = function(newFocus){
-			
-			trace('I lost focus');
-			Utils.changeColor(this.control.back,this._scope.configObj.clr_primary);
-			Utils.changeColor(this.control.arrows,this._scope.configObj.clr_focus);
-			Key.removeListener(this._scope);
-			this._scope.hidePulldown();
-			
-			this._scope.broadcaster.broadcastMessage("onKillFocus",this);
-			
+			this._scope._onKillFocus();			
 		}
 										
 		buildOptions();
 		
+	}
+	
+	private function _onKillFocus()
+	{
+		Utils.changeColor(_ref.control.back,configObj.clr_primary);
+		Utils.changeColor(_ref.control.arrows,configObj.clr_focus);
+		Key.removeListener(this);
+		hidePulldown();
+		Mouse.removeListener(this);
+		broadcaster.broadcastMessage("onKillFocus",_ref);
+	}
+	
+	private function _onSetFocus()
+	{
+		Utils.changeColor(_ref.control.back,configObj.clr_focus);
+		Utils.changeColor(_ref.control.arrows,configObj.clr_primary);
+		Key.addListener(this);	
+		broadcaster.broadcastMessage("onSetFocus",_ref);
 	}
 	
 	private function onKeyDown()
@@ -211,19 +226,15 @@ class com.a12.ui.Pulldown implements com.a12.ui.UIElement
 		}
 	}
 	
-	private function onMouseDown()
+	public function onMouseDown()
 	{
 		
-		
+		//trace('onMouseDown' + Selection.getFocus() + '  '  + mouseMode);
+				
 		if(mouseMode == 'simple'){
 			if((_ref._xmouse > configObj._width + 10) || (_ref._xmouse < -10) || (_ref._ymouse < 0) || (_ref._ymouse > configObj.unitSize)){
 			  
-			   //force the focus to be lost or something here
-			   //this._ref.focusEnabled = false;
-			   if(Selection.getFocus() == null){
-					Selection.setFocus(null);
-				}
-			   Mouse.removeListener(this);
+			   _onKillFocus();
 			   
 			}
 		
@@ -258,19 +269,13 @@ class com.a12.ui.Pulldown implements com.a12.ui.UIElement
 			
 			}
 			
-			if(hide){
-				if(Selection.getFocus() == null){
-					Selection.setFocus(null);
-				}
+			
+			if(hide == true){
 				
-				
-				if(eval(Selection.getFocus()) == _ref){
-					
-				}
-				
-				hidePulldown();
+				_onKillFocus();
 				
 			}
+			
 		
 		
 		}
@@ -672,6 +677,7 @@ class com.a12.ui.Pulldown implements com.a12.ui.UIElement
 		Mouse.addListener(this);
 		
 		_ref.control.onPress = function() {
+			trace('onPress ' + this._parent);
 			Selection.setFocus(this._parent);
 			this._scope.displayPulldown();
 		};

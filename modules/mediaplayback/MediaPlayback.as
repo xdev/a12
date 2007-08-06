@@ -26,5 +26,5 @@ class com.a12.modules.mediaplayback.MediaPlayback
 	{
 		mp_model.kill();
 	}
-
+	
 }

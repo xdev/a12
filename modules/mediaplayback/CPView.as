@@ -11,6 +11,7 @@ class com.a12.modules.mediaplayback.CPView extends AbstractView
 	private var _ref		: MovieClip;
 	private	var	height		: Number;
 	private	var width		: Number;
+	private	var stripW		: Number;
 
 	public function CPView(m:Observable,c:Controller)
 	{
@@ -18,6 +19,8 @@ class com.a12.modules.mediaplayback.CPView extends AbstractView
 		super(m,c);
 		width = 320;
 		height = 240;
+		
+		stripW = 120;
 		
 		var obj = getModel();
 		_ref = obj.getRef();		
@@ -65,7 +68,7 @@ class com.a12.modules.mediaplayback.CPView extends AbstractView
 		_ref.controls.timeline.label.displayText.text = label;
 		
 		
-		var factor = (width-120) / 100;
+		var factor = (width-stripW) / 100;
 		
 		//if dragging false
 		if(infoObj.time_percent){
@@ -89,7 +92,7 @@ class com.a12.modules.mediaplayback.CPView extends AbstractView
 		
 		_ref.video.onPress = function()
 		{
-			CPController(this._scope.getController()).pause();
+			CPController(this._scope.getController()).toggle();
 		}
 		
 		Utils.createmc(_ref,"controls",5,{_y:240});
@@ -105,7 +108,7 @@ class com.a12.modules.mediaplayback.CPView extends AbstractView
 		_ref.controls.icon_playpause.onPress = function()
 		{
 			
-			CPController(this._scope.getController()).pause();
+			CPController(this._scope.getController()).toggle();
 		}
 		
 		

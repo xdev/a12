@@ -171,12 +171,14 @@ class com.a12.modules.mediaplayback.VideoModel extends Observable
 	
 	public function playStream()
 	{
-		stream_ns.pause();
+		stream_ns.pause(false);
+		mode = 'pause';
+		changeStatus();
 	}
 	
-	public function pauseStream()
+	private function changeStatus()
 	{
-		stream_ns.pause();
+		
 		var icon = '';
 		switch(true){
 			case mode == 'play':
@@ -196,6 +198,22 @@ class com.a12.modules.mediaplayback.VideoModel extends Observable
 		
 		setChanged();
 		notifyObservers(tObj);
+		
+		
+	}
+	
+	public function toggleStream()
+	{
+		stream_ns.pause();
+		changeStatus();
+		
+	}
+	
+	public function pauseStream()
+	{
+		stream_ns.pause(true);
+		mode = 'play';
+		changeStatus();
 	}
 	
 	public function stopStream()

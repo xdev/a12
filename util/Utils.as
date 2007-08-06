@@ -1,4 +1,4 @@
-﻿/*
+/*
 
 Class: Utils
 
@@ -438,13 +438,39 @@ class com.a12.util.Utils
 	
 	public static function padZero(num) : String
 	{
-	
 		if(num < 10){
 			return '0' + num;
 		}else{
 			return String(num);
 		}
 	
+	}
+	
+	/*
+	
+	Function: findReplace
+	
+	Find and replace for a string
+	
+	Parameters:
+	
+		str - haystack
+		pattern - needle
+		replacement - replacement
+	
+	Returns: 
+		
+		modified haystack
+		
+	Author:
+	
+		http://www.flzone.com/ShowDetail.asp?NewsId=7678
+	
+	*/
+	
+	public static function findReplace (str, pattern, replacement) : String
+	{
+		 return str.split(pattern).join(replacement);
 	}
 	
 	/*
