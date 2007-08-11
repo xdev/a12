@@ -9,52 +9,79 @@ import com.a12.util.*;
 class com.a12.effects.TextEffects
 {
 	
-	private	var	_tf 		: TextField;
-	private	var amount		: Number;
-	private	var	delay		: Number;
-	private	var tempText	: String;
-	private	var	html		: String;
-	private	var charCount	: Number;	
-	public	var	myBroadcaster	: Object;
-	
-	private	var myInterval	: Number;
+	private	var	_tf 			: TextField;
+	private	var _amount			: Number;
+	private	var	_freq			: Number;
+	private var _delay			: Number;
+	private	var _tempText		: String;
+	private	var	_html			: String;
+	private	var _charCount		: Number;
+	private	var _freqInterval	: Number;
+	private	var _delayInterval	: Number;
+	public	var	_fxBroadcaster	: Object;
 	
 	public function TextEffects(tfObj:TextField)
 	{
 		_tf = tfObj;
-		myBroadcaster = new EventBroadcaster();
+		_fxBroadcaster = new EventBroadcaster();
 	}
 	
 	public function _addListener(obj)
 	{
-		myBroadcaster.addListener(obj);	
+		_fxBroadcaster.addListener(obj);	
 	}
 	
 	public function _removeListener(obj)
 	{
-		myBroadcaster.removeListener(obj);	
+		_fxBroadcaster.removeListener(obj);	
 	}
 	
-	public function stuffit(_amount:Number, _delay:Number) : Void
+	public function stuffit(amount:Number, freq:Number, delay:Number) : Void
 	{
-		
-		amount = _amount ? _amount : 1;
-		delay = _delay ? _delay : 10;
-		tempText = _tf.text;
-		html = _tf.htmlText;
-		charCount = 0;
+		//trace('--stuffit');
+		_amount = amount ? amount : 1;
+		_freq = freq ? freq : 10;
+		_delay = delay ? delay : 10;
+		_tempText = _tf.text;
+		_html = _tf.htmlText;
+		_charCount = 0;
 		_tf.text = "";
-		//trace(tfObj + '-' + amount + '-' + delay);
-
-		clearInterval(myInterval);
-		myInterval = setInterval(this,"doStuff",delay);
+		
+		//trace(tfObj + '-' + _amount + '-' + _freq + '-' + _delay);
+		
+		clearInterval(_delayInterval);
+		_delayInterval = setInterval(this, "startStuff", _delay);
+		
+	}
+	
+	public function startStuff() :Void 
+	{
+		clearInterval(_delayInterval);
+		
+		clearInterval(_freqInterval);
+		_freqInterval = setInterval(this, "stuffText", _freq);
+	}
+	
+	private function stuffText()
+	{
+		//trace('--stuffText');
+		if (_tf.length < _tempText.length) {
+			_tf.text += _tempText.substring(_charCount, _charCount + _amount);
+			_charCount += _amount;
+		} else {
+			
+			_fxBroadcaster.broadcastMessage("onComplete",_tf);
+			//_tf.htmlText = _html;
+			//tfObj.htmlText = _html;
+			kill();
+		}
 	}
 	
 	public function kill()
 	{
-		//trace('done');
-		myBroadcaster.broadcastMessage("onClose",_tf);
-		clearInterval(myInterval);
+		//trace('--kill');
+		_fxBroadcaster.broadcastMessage("onClose", _tf);
+		clearInterval(_freqInterval);
 	}
 	
 	private function fillHtml()
@@ -62,34 +89,20 @@ class com.a12.effects.TextEffects
 	
 	}
 	
-	private function doStuff()
-	{
-		if (_tf.length < tempText.length) {
-			_tf.text += tempText.substring(charCount, charCount + amount);
-			charCount += amount;
-		} else {
-			
-			myBroadcaster.broadcastMessage("onComplete",_tf);
-			//_tf.htmlText = html;
-			//tfObj.htmlText = html;
-			kill();
-		}
-	}
-	
 	/*
 	// DOESN"T WORK!!! Check against original
-	public function unstuffit(tfObj:TextField, amount:Number, delay:Number) : Void
+	public function unstuffit(tfObj:TextField, amount:Number, freq:Number) : Void
 	{
-		var amount = amount ? amount : 1;
-		var delay = delay ? delay : 10;
-		//var tempText = tfObj.text;
-		var charCount = 0;
+		var _amount = amount ? amount : 1;
+		var _freq = freq ? freq : 10;
+		//var _tempText = tfObj.text;
+		var _charCount = 0;
 		
 		//tfObj.text = "";
 		var intID = setInterval(function(){
 			//trace("stuffitInt");
 			if (tfObj.length > 0) {
-				tfObj.text += tfObj.text.substring(0, 0 - amount);
+				tfObj.text += tfObj.text.substring(0, 0 - _amount);
 			} else {
 				clearInterval(intID);
 			}
