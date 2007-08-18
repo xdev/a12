@@ -26,7 +26,7 @@ class com.a12.util.MotionController
 		return MotionController._instance;
 	}
 	
-	public function changeProps(mc:MovieClip, props:Object, duration:Number, easeMath:String, easeType:String, easeParam:Object, delay:Number, freq:Number, callback:Object) : Motion 
+	public function changeProps(mc:MovieClip, props:Object, duration:Number, easeMath:String, easeType:String, easeParam:Array, delay:Number, freq:Number, callback:Object) : Motion 
 	{
 		//trace("--changeProps");
 		var motionObj = new Motion(this, mc, props, duration, easeMath, easeType, easeParam, delay, freq, callback);

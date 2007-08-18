@@ -22,7 +22,7 @@ class com.a12.util.Motion
 	private var $duration:Number;
 	private var $easeMath:Object;
 	private var $easeType:String;
-	private var $easeParam:Object;
+	private var $easeParam:Array;
 	private var $delay:Number;
 	private var $freq:Number;
 	private var $callback:Object;
@@ -36,7 +36,7 @@ class com.a12.util.Motion
 	private var thisObj:Motion;
 	private var moveFlag:Boolean;
 	
-	public function Motion(c:MotionController, mc:MovieClip, props:Object, duration:Number, easeMath:String, easeType:String, easeParam:Object, delay:Number, freq:Number, callback:Object)
+	public function Motion(c:MotionController, mc:MovieClip, props:Object, duration:Number, easeMath:String, easeType:String, easeParam:Array, delay:Number, freq:Number, callback:Object)
 	{
 		
 		controller = c;
@@ -162,9 +162,19 @@ class com.a12.util.Motion
 			var b:Number = propList[i][1];
 			var c:Number = propList[i][2] - propList[i][1];
 			var d:Number = $duration;
+			var args = [t, b, c, d];
+			
+			// add easeParams
+			if ($easeParam != undefined) {
+				var len = $easeParam.length;
+				for (var j=0;j<len;j++) {
+					args.push($easeParam[j]);
+				}
+			}
+			
 			moveFlag = true;
 			if (t <= d) {
-				$mc[prop] = Math.floor(ease(t, b, c, d));
+				$mc[prop] = Math.floor(ease.apply(this, args));
 				updateAfterEvent();
 			} else {
 				$mc[prop] = propList[i][2];
