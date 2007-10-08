@@ -506,8 +506,9 @@ class com.a12.modules.form.Form
 			
 		}
 		
+		var validata = new Validator();
 		
-		var errors = Validator.validateObject(vData);
+		var errors = validata.validateObject(vData);
 		if(errors == false){
 			return true;
 		}else{

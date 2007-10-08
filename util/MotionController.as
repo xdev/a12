@@ -9,11 +9,17 @@ class com.a12.util.MotionController
 	 * Create class instance through "init" method.
 	 */
 	
-	private static var _instance:MotionController = null;
-	private var objList:Array = [];
-	private var result:Function = update;
+	private static var _instance	: MotionController = null;
+	private var objList				: Array = [];
+	private var result				: Function = update;
+	private	var	frequency			: Number;
 	
 	private function MotionController() {
+	}
+	
+	public function setFrequency(freq) : Void
+	{
+		frequency = freq;
 	}
 	
 	public static function getInstance() : MotionController
@@ -29,6 +35,10 @@ class com.a12.util.MotionController
 	public function changeProps(mc:MovieClip, props:Object, duration:Number, easeMath:String, easeType:String, easeParam:Array, delay:Number, freq:Number, callback:Object) : Motion 
 	{
 		//trace("--changeProps");
+		if(freq == undefined && frequency != undefined){
+			freq = frequency;
+		}
+		
 		var motionObj = new Motion(this, mc, props, duration, easeMath, easeType, easeParam, delay, freq, callback);
 		
 		objList.push(motionObj);

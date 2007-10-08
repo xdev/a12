@@ -103,6 +103,10 @@ class com.a12.ui.RadioSet implements com.a12.ui.UIElement
 		//take the string here, loop through items and set the state for the active one.. doh!
 	}
 	
+	public function reset()
+	{
+		
+	}
 	
 	public function setRadios(name,mc) : Void
 	{
