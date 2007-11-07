@@ -8,9 +8,12 @@ import com.a12.modules.mediaplayback.*;
 class com.a12.modules.mediaplayback.CPController extends AbstractController
 {
 	
+	private	var	mod:Object;
+	
 	public function CPController(m:Observable)
 	{
-		super(m);		
+		super(m);
+		mod = getModel();	
 		
 	}
 	
@@ -18,7 +21,7 @@ class com.a12.modules.mediaplayback.CPController extends AbstractController
 	{
 		//
 				
-		var mod = getModel();
+		//var mod = getModel();
 		
 		switch(true){
 		
@@ -38,26 +41,35 @@ class com.a12.modules.mediaplayback.CPController extends AbstractController
 	
 	public function pause()
 	{
-		var obj = getModel();
-		obj.pauseStream();
+		//var obj = getModel();
+		mod.pauseStream();
 	}
+	
+	
 	
 	public function toggle()
 	{
-		var obj = getModel();
-		obj.toggleStream();
+		//var obj = getModel();
+		mod.toggleStream();
 	}
 	
 	public function play()
 	{
-		var obj = getModel();
-		obj.playStream();
+		//var obj = getModel();
+		mod.playStream();
 	}	
+	
+	public function stop()
+	{
+		//var obj = getModel();
+		mod.stopStream();
+	}	
+	
 	
 	public function findSeek(percent:Number) : Void
 	{
-		var obj = getModel();
-		obj.seekStreamPercent(percent);
+		//var obj = getModel();
+		mod.seekStreamPercent(percent);
 			
 	}
 	

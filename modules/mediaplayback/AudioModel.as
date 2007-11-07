@@ -52,7 +52,7 @@ class com.a12.modules.mediaplayback.AudioModel extends Observable
 		
 		
 		clearInterval(streamInterval);
-		streamInterval = setInterval(this,"getStreamInfo",500);
+		streamInterval = setInterval(this,"getStreamInfo",200);
 		
 		clearInterval(loadInterval);
 		//loadInterval = setInterval(this,"renderLoading",30);
@@ -66,21 +66,24 @@ class com.a12.modules.mediaplayback.AudioModel extends Observable
 		
 		soundController = new Sound();
 		soundController.loadSound(_file,true);
-		
-				
+		var _scope = this;		
 		soundController.onSoundComplete = function()
 		{
-					
-		}
+			_scope.onComplete();
+		};
 		
 		setChanged();
 		notifyObservers(tObj);
 	}
 	
-	public function mediaComplete()
+	private function onComplete()
 	{
-		//kill all kinds of stuff
-		clearInterval(streamInterval);
+		trace('COMPLETE' + newline + newline);
+		var tObj = {};
+		tObj.action = 'mediaComplete';
+		setChanged();
+		notifyObservers(tObj);
+		delete tObj;
 	}
 	
 	private function getStreamInfo()
@@ -125,7 +128,7 @@ class com.a12.modules.mediaplayback.AudioModel extends Observable
 	
 	public function playStream()
 	{
-		//stream_ns.pause();
+		soundController.start(0);
 	}
 	
 	public function pauseStream()

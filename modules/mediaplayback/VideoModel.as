@@ -46,6 +46,7 @@ class com.a12.modules.mediaplayback.VideoModel extends Observable
 		connection_nc = new NetConnection();
 		connection_nc.connect(null);
 		stream_ns = new NetStream(connection_nc);
+		trace('playMedia-' + _file);
 		stream_ns.play(_file);
 		
 		stream_ns._scope = this;

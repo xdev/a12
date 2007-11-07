@@ -25,7 +25,7 @@ class com.a12.modules.mediaplayback.CPView extends AbstractView
 		var obj = getModel();
 		_ref = obj.getRef();		
 		
-		renderUI();
+		//renderUI();
 		
 				
 	}
