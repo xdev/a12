@@ -6,15 +6,24 @@ class com.a12.managers.MWManager
 	private	var	Main				: Object;
 	private	var	_callback			: Object;
 	public	var broadcaster 		: EventBroadcaster;
+	private	var	debugMode			: Boolean;
 	
 	public function MWManager(m)
 	{
 		Main = m;
+		debugMode = true;
 	}
 	
-	private function setDebug(deb:Boolean)
+	public function setDebug(deb:Boolean)
 	{
-		
+		debugMode = deb;
+	}
+	
+	private function debug(t)
+	{
+		if(debugMode == true){
+			trace(t);
+		}
 	}
 	
 	public function transfer(data,obj,result,args)
@@ -50,7 +59,7 @@ class com.a12.managers.MWManager
 		
 		requestXML.contentType="application/xml";
 		
-		trace(requestXML);
+		debug(requestXML);
 		
 		
 		var responseXML = new XML();
@@ -76,7 +85,7 @@ class com.a12.managers.MWManager
 	
 	private function applyCallback(xml)
 	{
-		trace(xml);
+		debug(xml);
 		var args = _callback.args;
 		var result = _callback.result;
 		var obj = _callback.obj;

@@ -40,7 +40,6 @@ class com.a12.modules.form.Validator
 	
 	public function validateField(obj)
 	{			
-		trace('in here');
 		var mode = obj.mode;
 				
 		if(mode == 'empty'){

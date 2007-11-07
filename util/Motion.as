@@ -175,7 +175,7 @@ class com.a12.util.Motion
 			moveFlag = true;
 			if (t <= d) {
 				$mc[prop] = Math.floor(ease.apply(this, args));
-				updateAfterEvent();
+				//updateAfterEvent();
 			} else {
 				$mc[prop] = propList[i][2];
 				done = 1;
