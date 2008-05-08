@@ -45,6 +45,10 @@ class com.a12.modules.mediaplayback.CPController extends AbstractController
 		mod.pauseStream();
 	}
 	
+	public function getMode()
+	{
+		return mod.getMode();
+	}
 	
 	
 	public function toggle()

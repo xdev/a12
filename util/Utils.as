@@ -99,7 +99,7 @@ class com.a12.util.Utils
 			var done = true;
 			for (var prop in objProps) {
 				this[prop] = (this[prop] - ((this[prop] - objProps[prop]) / easing));
-				if ((Math.abs(this[prop] - objProps[prop]) > 2)) { // ***this test needs to be improved
+				if ((Math.abs(this[prop] - objProps[prop]) > 1)) { // ***this test needs to be improved
 					done = false;
 				}
 			}
@@ -377,6 +377,43 @@ class com.a12.util.Utils
 	public static function sortByNumber(a, b) : Object 
 	{
 		return (a > b);
+	}
+	
+	/* 
+	
+	Function: getPositionByOffset
+	
+	Finds location in array starting from index based on offset
+	
+	Parameters:
+	
+		ind - index
+		len - length of array
+		offset - distance (+/-)
+	
+	Returns: 
+		
+		number
+	
+	*/
+	
+	public static function getPositionByOffset(ind,len,offset)
+	{
+		var t = ind+offset;
+		
+		switch(true)
+		{
+			case (t < 0) && (offset<1):
+				t = (len)-Math.abs(t);
+			break;
+		
+			case (t > (len-1)) && (offset>-1):
+				t = t-len;
+			break;
+		
+		}
+		
+		return t;
 	}
 	
 	/* 

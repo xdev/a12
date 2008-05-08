@@ -1,8 +1,8 @@
 import com.a12.pattern.observer.Observable;
-
 import com.a12.modules.mediaplayback.*;
-
 import com.a12.util.*;
+
+import mx.utils.Delegate;
 
 class com.a12.modules.mediaplayback.AudioModel extends Observable
 {
@@ -40,17 +40,18 @@ class com.a12.modules.mediaplayback.AudioModel extends Observable
 		clearInterval(streamInterval);
 	}
 	
+	public function getMode() : String
+	{
+		return mode;
+	}
+	
 	
 	private function playMedia()
 	{
-		
-		
 		mode = 'play';
 		
 		metaData = {};
-		
-		
-		
+				
 		clearInterval(streamInterval);
 		streamInterval = setInterval(this,"getStreamInfo",200);
 		
@@ -63,14 +64,10 @@ class com.a12.modules.mediaplayback.AudioModel extends Observable
 		
 		Utils.createmc(_ref,"audio",20001);
 		
-		
 		soundController = new Sound();
 		soundController.loadSound(_file,true);
-		var _scope = this;		
-		soundController.onSoundComplete = function()
-		{
-			_scope.onComplete();
-		};
+		soundController.onSoundComplete = Delegate.create(this, onComplete);
+		soundController.onLoad = Delegate.create(this, onLoad);
 		
 		setChanged();
 		notifyObservers(tObj);
@@ -86,6 +83,16 @@ class com.a12.modules.mediaplayback.AudioModel extends Observable
 		delete tObj;
 	}
 	
+	private function onLoad()
+	{
+		trace('onLoad' + newline + newline);
+		var tObj = {};
+		tObj.action = 'onLoad';
+		setChanged();
+		notifyObservers(tObj);
+		delete tObj;
+	}
+	
 	private function getStreamInfo()
 	{
 		//convert time in seconds to 00:00
@@ -94,19 +101,14 @@ class com.a12.modules.mediaplayback.AudioModel extends Observable
 		tObj.action = "updateView";
 		
 		tObj.time_current = Utils.convertSeconds(Math.floor(soundController.position/1000));
-		
-			tObj.time_duration = Utils.convertSeconds(Math.floor(soundController.duration/1000));
-			tObj.time_percent = Math.floor(((soundController.position/1000) / Math.floor(soundController.duration/1000)) * 100);
-		
-		
+		tObj.time_duration = Utils.convertSeconds(Math.floor(soundController.duration/1000));
+		tObj.time_percent = Math.floor(((soundController.position/1000) / Math.floor(soundController.duration/1000)) * 100);
 		tObj.loaded_percent = Math.floor((soundController.getBytesLoaded() / soundController.getBytesTotal()) * 100);
-
-		
+				
 		setChanged();
 		notifyObservers(tObj);
 		
-		delete tObj;
-		
+		delete tObj;		
 		
 	}
 	

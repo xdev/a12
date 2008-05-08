@@ -1,4 +1,5 @@
-import AsBroadcaster;
+import com.a12.util.EventBroadcaster;
+import mx.utils.Delegate;
 
 class com.a12.util.PreLoader
 {
@@ -7,12 +8,18 @@ class com.a12.util.PreLoader
 	private	var _callback			: Object;
 	private	var _obj				: Object;
 	private	var _args				: Array;
-	private	var _myBroadcaster		: Object;
+	private	var _myBroadcaster		: EventBroadcaster;
 	private	var _intID				: Number;
 	private	var _percent			: Number;
 	
 	/*
 	 * Updates:
+	 *
+	 * - 1.11.08
+	 *		- Used Delegate to solve scope issue to work in FP 9
+	 * - 1.4.08
+	 *		- DOES NOT WORK WHEN PUBLISHED FOR FlashPlayer 9!!!
+	 *
 	 * - 5.25.07
 	 *		- Self terminates if movieclips no longer exist
 	 *		- Added 'onKill' event
@@ -33,8 +40,7 @@ class com.a12.util.PreLoader
 	{
 		//trace("--Preloader:Preloader");
 		
-		_myBroadcaster = new Object();
-		AsBroadcaster.initialize(_myBroadcaster);
+		_myBroadcaster = new EventBroadcaster();
 		
 		if (mc) {
 			preload(mc, callback, obj, args);
@@ -61,24 +67,25 @@ class com.a12.util.PreLoader
 		_myBroadcaster.broadcastMessage("onStart");
 		
 		clearInterval(_intID);
-		_intID = setInterval(this, "calculate", 15);
+		_intID = setInterval(Delegate.create(this, calculate), 15);
+		
 	}
 	
 	public function _addListener(obj) : Void
 	{
 		//trace("--Preloader:_addListener");
-		_myBroadcaster.addListener(obj);
+		_myBroadcaster._addListener(obj);
 	}
 	
 	public function _removeListener(obj) 
 	{
 		//trace("--Preloader:_removeListener");
-		_myBroadcaster.removeListener(obj);
+		_myBroadcaster._removeListener(obj);
 	}
 	
 	public function addItems(mc) : Void
 	{
-		trace("--Preloader:addItems");
+		//trace("--Preloader:addItems");
 		
 		if (mc instanceof Array) {
 			//trace("isArray");
@@ -122,7 +129,9 @@ class com.a12.util.PreLoader
 		}
 		
 		var _percent = Math.floor(100 * (bytesLoaded / bytesTotal));
-		_myBroadcaster.broadcastMessage("onPercent", _percent);
+		if(_percent > 0){
+			_myBroadcaster.broadcastMessage("onPercent", _percent);
+		}
 		
 		if(_percent == 100 && wCheck == true) {
 			finish();

@@ -13,6 +13,7 @@ class com.a12.util.MotionController
 	private var objList				: Array = [];
 	private var result				: Function = update;
 	private	var	frequency			: Number;
+	public	var	debug				: Boolean;
 	
 	private function MotionController() {
 	}
@@ -32,12 +33,13 @@ class com.a12.util.MotionController
 		return MotionController._instance;
 	}
 	
-	public function changeProps(mc:MovieClip, props:Object, duration:Number, easeMath:String, easeType:String, easeParam:Array, delay:Number, freq:Number, callback:Object) : Motion 
+	public function changeProps(mc:MovieClip, props:Object, duration:Number, easeMath:String, easeType:String, easeParam:Array, delay:Number, freq:Number, callback:Object, d:Boolean) : Motion 
 	{
 		//trace("--changeProps");
 		if(freq == undefined && frequency != undefined){
 			freq = frequency;
 		}
+		debug = d;
 		
 		var motionObj = new Motion(this, mc, props, duration, easeMath, easeType, easeParam, delay, freq, callback);
 		

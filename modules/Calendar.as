@@ -13,17 +13,21 @@ class com.a12.modules.Calendar
 	public var _lang:String;
 	public var _monthDays:Array;
 	private var _monthNames:Object = {};
+	private var _monthNamesShort:Object = {};
 	private var _dayNames:Object = {};
 	
 	public function Calendar(year:Number, month:Number, day:Number, lang:String)
 	{
+		
 		var today = new Date();
-		if (year == undefined) _year = today.getFullYear();
-		if (month == undefined) _month = today.getMonth();
-		if (day == undefined) _day = today.getDate();
+		(year == undefined) ? _year = today.getFullYear() : _year = year;
+		(month == undefined) ? _month = today.getMonth() : _month = month;
+		(day == undefined) ? _day = today.getDate() : _day = day;
 		if (lang == undefined) _lang = "en";
 		
+		
 		_monthNames.en = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+		_monthNamesShort.en = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 		_monthNames.es = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "deciembre"];
 		_dayNames.en = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 		_dayNames.es = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
@@ -37,6 +41,12 @@ class com.a12.modules.Calendar
 	public function get year() : Number
 	{
 		return(_year);
+	}
+	
+	public function get year2() : Number
+	{	
+		var t = _year.toString();
+		return t.substr(2,2);
 	}
 	
 	public function set month(month:Number) : Void
@@ -80,9 +90,22 @@ class com.a12.modules.Calendar
 		return _monthDays[month];
 	}
 	
+	public function getFirstDayInMonth(year:Number, month:Number) : Number
+	{	
+		if (year == undefined) year = _year;
+		if (month == undefined) month = _month;
+		
+		var tempDate = new Date();
+		tempDate.setYear(year);
+		tempDate.setMonth(month);
+		tempDate.setDate(1);
+		
+		return tempDate.getDay();
+	}
+	
 	public function advanceMonth(direction:Number) : Void
 	{
-	
+		//trace('advanceMonth ' + direction);
 		if ((_month == 11) && (direction == 1)) {
 			_year++;
 			_month = 0;
@@ -129,6 +152,21 @@ class com.a12.modules.Calendar
 		}
 	}
 	
+	public function getMonthNameShort(month:Number) : String
+	{
+		if (month == undefined) month = _month;
+		if (_lang == "es") {
+			return(_monthNames.es[month]);
+		} else {
+			return(_monthNamesShort.en[month]);
+		}
+	}
+	
+	public function getDayNameSimple(day:Number) : String
+	{
+		return(_dayNames.en[day]);
+	}
+	
 	public function getDayName(year:Number, month:Number, day:Number, type:String) : String
 	{
 		if (year == undefined) year = _year;
@@ -173,6 +211,42 @@ class com.a12.modules.Calendar
 		var dtArray:Array = dateTime.split(" ");
 		var tArray:Array = dtArray[1].split(":");
 		return(tArray);
+	}
+	
+	public function formatDateTime(dateTime:String) : Object
+	{
+		//
+		var tObj = {};
+		tObj.year = parseYear(dateTime);
+		tObj.month = parseMonth(dateTime);
+		tObj.monthName = getMonthName(tObj.month-1);
+		tObj.monthNameShort = getMonthNameShort(tObj.month-1);
+		tObj.day = parseDay(dateTime);
+		tObj.dayName = getDayName(tObj.year,(tObj.month-1),tObj.day);
+		var t_time = parseTime(dateTime);
+		
+		tObj.hour = t_time[0];
+		tObj.meridiem = 'AM';
+		tObj.minute = t_time[1];
+		tObj.second = t_time[2];
+		
+		if(t_time[0] >= 12){
+			tObj.meridiem = 'PM';
+			if(t_time[0] > 12){
+				tObj.hour = t_time[0] - 12;
+			}
+		}
+				
+		if(t_time[0] == 0){
+			tObj.hour = 12;
+		}
+		
+		var d = dateTime.split(" ");
+		tObj.date = d[0];
+		tObj.time = t_time.join(':');
+		
+		return tObj;
+		
 	}
 
 }

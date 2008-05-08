@@ -27,4 +27,19 @@ class com.a12.modules.mediaplayback.MediaPlayback
 		mp_model.kill();
 	}
 	
+	public function stop()
+	{
+		mp_model.stopStream();
+	}
+	
+	public function pause()
+	{
+		mp_model.pauseStream();
+	}
+	
+	public function play()
+	{
+		mp_model.playStream();
+	}
+	
 }

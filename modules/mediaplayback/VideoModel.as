@@ -1,8 +1,8 @@
 import com.a12.pattern.observer.Observable;
-
 import com.a12.modules.mediaplayback.*;
-
 import com.a12.util.*;
+
+import mx.utils.Delegate;
 
 class com.a12.modules.mediaplayback.VideoModel extends Observable
 {
@@ -12,7 +12,6 @@ class com.a12.modules.mediaplayback.VideoModel extends Observable
 	private	var	stream_ns		: NetStream;
 	private	var	connection_nc	: NetConnection;
 	private	var	streamInterval	: Number;
-	private	var	loadInterval	: Number;
 	private	var metaData		: Object;
 	private	var soundController	: Sound;
 	private	var	mode			: String;
@@ -21,6 +20,7 @@ class com.a12.modules.mediaplayback.VideoModel extends Observable
 	{
 		_ref = ref;
 		_file = file;
+		metaData = {};
 		playMedia();
 	}
 	
@@ -29,6 +29,11 @@ class com.a12.modules.mediaplayback.VideoModel extends Observable
 	public function getRef() : MovieClip
 	{
 		return _ref;
+	}
+	
+	public function getMode() : String
+	{
+		return mode;
 	}
 	
 	public function kill()
@@ -40,55 +45,49 @@ class com.a12.modules.mediaplayback.VideoModel extends Observable
 		clearInterval(streamInterval);
 	}
 	
-	private function playMedia()
+	private function onMetaData(obj)
 	{
-		
-		connection_nc = new NetConnection();
-		connection_nc.connect(null);
-		stream_ns = new NetStream(connection_nc);
-		trace('playMedia-' + _file);
-		stream_ns.play(_file);
-		
-		stream_ns._scope = this;
-		stream_ns.onStatus = function(obj)
-		{
-			this._scope.streamStatus(obj);
-		}
-		
-		mode = 'play';
-		
-		metaData = {};
-		
-		stream_ns.onMetaData = function(obj)
-		{
-			for(var i in obj){
-				this._scope.metaData[i] = obj[i];
-				
-				if(i == 'duration'){
-					this._scope.metaData.durationObj = Utils.convertSeconds(Math.floor(obj[i]));
-				}
-			}
-			
+		//should run only once!
+		if(obj.width && metaData.width == undefined){
 			var tObj = {};
 			tObj.action = 'updateSize';
 			tObj.width =  obj.width;
 			tObj.height = obj.height;
-						
-			this._scope._ref.video.myvideo._width = obj.width;
-			this._scope._ref.video.myvideo._height = obj.height;
-			
-			this._scope.setChanged();
-			this._scope.notifyObservers(tObj);
-				
+					
+			_ref.video.myvideo._width = obj.width;
+			_ref.video.myvideo._height = obj.height;
+		
+			setChanged();
+			notifyObservers(tObj);
 		}
+		
+		for(var i in obj){
+			metaData[i] = obj[i];			
+			if(i == 'duration'){
+				metaData.durationObj = Utils.convertSeconds(Math.floor(obj[i]));
+			}
+		}
+		
+		
+	}
+	
+	private function playMedia()
+	{
+		trace('playMedia-' + _file);
+		
+		connection_nc = new NetConnection();
+		connection_nc.connect(null);
+		
+		stream_ns = new NetStream(connection_nc);
+		stream_ns.play(_file);
+		stream_ns.onStatus = Delegate.create(this, streamStatus);
+		stream_ns.onMetaData = Delegate.create(this, onMetaData);
+		
+		mode = 'play';	
 		
 		clearInterval(streamInterval);
 		streamInterval = setInterval(this,"getStreamInfo",500);
-		
-		clearInterval(loadInterval);
-		//loadInterval = setInterval(this,"renderLoading",30);
-		
-		
+				
 		var tObj = {};
 		tObj.stream = stream_ns;
 		tObj.mode = mode;
@@ -104,6 +103,7 @@ class com.a12.modules.mediaplayback.VideoModel extends Observable
 		setChanged();
 		notifyObservers(tObj);
 		
+		delete tObj;		
 		
 	}
 	
@@ -120,25 +120,22 @@ class com.a12.modules.mediaplayback.VideoModel extends Observable
 		if(metaData.durationObj != undefined){
 			tObj.time_duration = metaData.durationObj;
 			tObj.time_percent = Math.floor((stream_ns.time / metaData.duration) * 100);
-			
+			tObj.time_remaining = Utils.convertSeconds(metaData.duration - Math.floor(stream_ns.time));
 			//this is specifically for flv files encoded in 3rd party tools that do not produce the 
 			//Netstream.Play.Stop command
+			//Need to add another condition that checks the playstate			
+			
 			if(Math.ceil(stream_ns.time) == Math.ceil(metaData.duration)){
-				onComplete();
+				//onComplete();
 			}
 		}
 		
-		tObj.loaded_percent = Math.floor((stream_ns.bytesLoaded / stream_ns.bytesTotal) * 100);
-	
-		
+		tObj.loaded_percent = Math.floor((stream_ns.bytesLoaded / stream_ns.bytesTotal) * 100);		
 		
 		setChanged();
 		notifyObservers(tObj);
 		
 		delete tObj;
-		
-		
-		
 		
 	}
 	
@@ -153,11 +150,10 @@ class com.a12.modules.mediaplayback.VideoModel extends Observable
 	
 	public function streamStatus(obj)
 	{
-		trace(obj.code);
+		//trace('i has status ' + obj.code);
 		if(obj.code == "NetStream.Play.Stop"){
 			onComplete();
 		}
-		
 	}
 	
 	public function seekStream(time:Number)
@@ -221,7 +217,5 @@ class com.a12.modules.mediaplayback.VideoModel extends Observable
 	{
 		stream_ns.close();
 	}
-	
-	
 	
 }

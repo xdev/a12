@@ -175,9 +175,15 @@ class com.a12.util.Motion
 			moveFlag = true;
 			if (t <= d) {
 				$mc[prop] = Math.floor(ease.apply(this, args));
+				if(controller.debug == true){
+					trace('updating '  + prop + '=' + $mc[prop]);
+				}
 				//updateAfterEvent();
 			} else {
 				$mc[prop] = propList[i][2];
+				if(controller.debug == true){
+					trace('done ' + prop + '=' + $mc[prop]);
+				}
 				done = 1;
 			}
 		}

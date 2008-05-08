@@ -25,7 +25,7 @@ class com.a12.modules.mediaplayback.CPView extends AbstractView
 		var obj = getModel();
 		_ref = obj.getRef();		
 		
-		//renderUI();
+		renderUI();
 		
 				
 	}
@@ -49,7 +49,7 @@ class com.a12.modules.mediaplayback.CPView extends AbstractView
 			updateView(infoObj);
 		}
 		if(infoObj.action == 'mediaComplete'){
-			_ref.controls.icon_playpause.gotoAndStop("icon_pause");
+			_ref.controls.icon_playpause.gotoAndStop("icon_play");
 		}
 
 	}	
@@ -70,8 +70,11 @@ class com.a12.modules.mediaplayback.CPView extends AbstractView
 		
 		var factor = (width-stripW) / 100;
 		
+		//trace('updateView  - factor='+factor + ' perc=' + infoObj.time_percent);
+		
+		
 		//if dragging false
-		if(infoObj.time_percent){
+		if(infoObj.time_percent != undefined){
 			if(_ref.controls.timeline.scrubber.dragging == false){
 				_ref.controls.timeline.scrubber._x = infoObj.time_percent * factor;
 			}
@@ -84,7 +87,7 @@ class com.a12.modules.mediaplayback.CPView extends AbstractView
 	
 	private function renderUI()
 	{
-		
+		trace('CPView renderUI')
 		
 		_ref.video._scope = this;
 		
@@ -154,7 +157,7 @@ class com.a12.modules.mediaplayback.CPView extends AbstractView
 		tf.size = 8;
 		tf.color = 0x000000;
 		
-		Utils.createmc(_ref.controls.timeline,"label",3,{_x:204,_y:-5});
+		Utils.createmc(_ref.controls.timeline,"label",3,{_x:204,_y:-8});
 		Utils.makeTextbox(_ref.controls.timeline.label,"00:00/00:00",tf,{selectable: false});
 	
 		//attach audio buttons
