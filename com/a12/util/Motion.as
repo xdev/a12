@@ -29,7 +29,7 @@ package com.a12.util
 		private var $props:Object;
 		private var $duration:Number;
 		private var $easeMath:Object;
-		//private var $easeType:String;
+		private var $easeType:String;
 		private var $easeParam:Array;
 		private var $delay:Number;
 		private var $freq:Number;
@@ -43,20 +43,22 @@ package com.a12.util
 		private var checkStatusID:Number;
 		private var thisObj:Motion;
 		private var moveFlag:Boolean;
-	
-		public function Motion(c:MotionController, mc:MovieClip, props:Object, duration:Number, easeMath:Function, easeParam:Array = null, delay:Number = 0, freq:Number = 1000/30, callback:Object = null)
-		{
 		
+		public function Motion(c:MotionController, mc:MovieClip, props:Object, duration:Number, easeMath:String = 'Cubic', easeType:String = 'easeOut', easeParam:Array = null, delay:Number = 0, freq:Number = 1000/30, callback:Object = null)
+		{
+			
+			Back,Bounce,Circ,Cubic,Elastic,Expo,Linear,Quad,Quart,Quint,Sine;
+			
 			controller = c;
 			thisObj = this;
 			$mc = mc;
 			$duration = duration;
 		
-			//var equation = easeMath ? easeMath : 'Cubic';		
-			//$easeMath = [equation];
 			$easeMath = easeMath;
-			//$easeType = easeType ? easeType : 'easeOut';
-			$easeParam = easeParam ? easeParam : undefined;
+			$easeType = easeType;
+			
+		
+			$easeParam = easeParam;
 			$freq = freq;
 			$delay = delay;
 		
@@ -163,10 +165,12 @@ package com.a12.util
 		
 			// Ease interface
 			// t-elapsed time; b-start value; c-change value; d-duration
-		
+			
+			var ease:Function = getDefinitionByName("com.a12.math.easing." + $easeMath)[$easeType];
+			
 			for (var i in propList) {
 				var prop:String = propList[i][0];
-				//var ease:Function = $easeMath;//$easeMath[$easeType];
+				//$easeMath[$easeType];
 				var t:Number = getTimer() - startTime;
 				var b:Number = propList[i][1];
 				var c:Number = propList[i][2] - propList[i][1];
@@ -174,7 +178,7 @@ package com.a12.util
 				var args = [t, b, c, d];
 			
 				// add easeParams
-				if ($easeParam != undefined) {
+				if ($easeParam != null) {
 					var len = $easeParam.length;
 					for (var j=0;j<len;j++) {
 						args.push($easeParam[j]);
@@ -183,7 +187,8 @@ package com.a12.util
 			
 				moveFlag = true;
 				if (t <= d) {
-					$mc[prop] = $easeMath(t,b,c,d);//Math.floor(ease.apply(this, args));
+					$mc[prop] = ease(t,b,c,d);//Math.floor(ease.apply(this, args));
+					//
 					
 					if(controller.debug == true){
 						trace('updating '  + prop + '=' + $mc[prop]);
@@ -208,7 +213,7 @@ package com.a12.util
 		private function update() : void
 		{
 			controller.update(thisObj);
-			if ($callback != undefined){						
+			if ($callback != null){						
 				$callback.method.apply($callback.obj, $callback.args);
 			}
 		}

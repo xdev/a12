@@ -36,7 +36,7 @@ package com.a12.util
 			return MotionController._instance;
 		}
 	
-		public function changeProps(mc:MovieClip, props:Object, duration:Number, easeMath:Function, easeParam:Array = null, delay:Number = 0, freq:Number = 1000/30, callback:Object = null, d:Boolean = false) : Motion 
+		public function changeProps(mc:MovieClip, props:Object, duration:Number, easeMath:String, easeType:String, easeParam:Array = null, delay:Number = 0, freq:Number = 1000/30, callback:Object = null, d:Boolean = false) : Motion 
 		{
 			//trace("--changeProps");
 			/*
@@ -47,7 +47,7 @@ package com.a12.util
 			freq = 1000/30;
 			debug = d;
 		
-			var motionObj = new Motion(this, mc, props, duration, easeMath, easeParam, delay, freq, callback);
+			var motionObj = new Motion(this, mc, props, duration, easeMath, easeType, easeParam, delay, freq, callback);
 		
 			objList.push(motionObj);
 			return(motionObj);

@@ -13,11 +13,11 @@ package com.a12.math.easing
 			}
 		}
 		public static function easeIn (t:Number, b:Number, c:Number, d:Number):Number {
-			return c - com.robertpenner.easing.Bounce.easeOut (d-t, 0, c, d) + b;
+			return c - com.a12.math.easing.Bounce.easeOut (d-t, 0, c, d) + b;
 		}
 		public static function easeInOut (t:Number, b:Number, c:Number, d:Number):Number {
-			if (t < d/2) return com.robertpenner.easing.Bounce.easeIn (t*2, 0, c, d) * .5 + b;
-			else return com.robertpenner.easing.Bounce.easeOut (t*2-d, 0, c, d) * .5 + c*.5 + b;
+			if (t < d/2) return com.a12.math.easing.Bounce.easeIn (t*2, 0, c, d) * .5 + b;
+			else return com.a12.math.easing.Bounce.easeOut (t*2-d, 0, c, d) * .5 + c*.5 + b;
 		}
 	}
 }
