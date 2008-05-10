@@ -1,3 +1,5 @@
+/* $Id$ */
+
 package com.a12.util
 {
 	

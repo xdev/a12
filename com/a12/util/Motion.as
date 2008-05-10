@@ -1,15 +1,4 @@
-// updated 02.13.2007
-
-/**
- * Added getPropList 
- * Methods to add:
- * - none right now!
- *
- * Added:
- * - now checks constantly to see if MovieClip still exists
- * 
- *
- */
+/* $Id$ */
 
 package com.a12.util
 {
