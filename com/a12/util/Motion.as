@@ -7,7 +7,6 @@ package com.a12.util
 	import com.a12.math.easing.*;
 	
 	import flash.display.MovieClip;
-	import flash.display.MovieClip;
 	
 	import flash.utils.*;
 
