@@ -13,12 +13,12 @@ package com.a12.pattern.mvc
 	  private var model:Observable;
 	  private var controller:Controller;
 
-	  public function AbstractView (m:Observable, c:Controller) {
+	  public function AbstractView (m:Observable, c:Controller=null) {
 	    // Set the model.
 	    setModel(m);
 	    // If a controller was supplied, use it. Otherwise let the first
 	    // call to getController() create the default controller.
-	    if (c !== undefined) {
+	    if (c !== null) {
 	      setController(c);
 	    }
 	  }
@@ -59,7 +59,7 @@ package com.a12.pattern.mvc
 	   */
 	  public function getController ():Controller {
 	    // If a controller hasn't been defined yet...
-	    if (controller === undefined) {
+	    if (controller === null) {
 	      // ...make one. Note that defaultController() is normally overridden 
 	      // by the AbstractView subclass so that it returns the appropriate
 	      // controller for the view.

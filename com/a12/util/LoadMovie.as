@@ -9,7 +9,7 @@ package com.a12.util
 	
 	public class LoadMovie
 	{
-		private	var	loader	: Loader;
+		public	var	loader	: Loader;
 		private	var	_ref	: Object;
 		
 		public function LoadMovie(r:Object,asset:String)

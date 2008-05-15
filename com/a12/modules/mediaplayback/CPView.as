@@ -115,7 +115,8 @@ package com.a12.modules.mediaplayback
 			Utils.drawRect(b,320,20,0xFFFFFF,100);
 		
 			//attach play/pause button
-			_controls.attachMovie("icons","icon_playpause",1,{_x:10,_y:10,_scope:this,mode:'pause'});
+			//_controls.attachMovie("icons","icon_playpause",1,{_x:10,_y:10,_scope:this,mode:'pause'});
+			/*
 			_ref.controls.icon_playpause.gotoAndStop("icon_pause");
 		
 			_ref.controls.icon_playpause.onPress = function()
@@ -123,6 +124,7 @@ package com.a12.modules.mediaplayback
 			
 				CPController(this._scope.getController()).toggle();
 			}
+			*/
 		
 		
 		

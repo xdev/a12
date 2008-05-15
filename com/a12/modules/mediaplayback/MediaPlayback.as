@@ -24,8 +24,8 @@ package com.a12.modules.mediaplayback
 				mp_model = new AudioModel(ref,file);
 			}
 				
-			mp_view = new CPView(mp_model,undefined);
-			mp_model.addObserver(mp_view);
+			//mp_view = new CPView(mp_model,undefined);
+			//mp_model.addObserver(mp_view);
 		
 						
 		}

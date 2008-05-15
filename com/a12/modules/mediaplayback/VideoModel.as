@@ -5,8 +5,11 @@ package com.a12.modules.mediaplayback
 
 	import flash.display.MovieClip;
 	import flash.utils.*;
-	import flash.net.*;
-	import flash.media.*;
+	import flash.events.*;
+    import flash.media.Video;
+	import flash.media.Sound;
+    import flash.net.NetConnection;
+    import flash.net.NetStream;
 		
 	import com.a12.pattern.observer.Observable;
 	import com.a12.modules.mediaplayback.*;
@@ -29,7 +32,13 @@ package com.a12.modules.mediaplayback
 			_ref = ref;
 			_file = file;
 			metaData = {};
-			playMedia();
+			
+			connection_nc = new NetConnection();
+			connection_nc.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
+            connection_nc.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
+			connection_nc.connect(null);
+			
+			//playMedia();
 		}
 	
 	
@@ -47,14 +56,20 @@ package com.a12.modules.mediaplayback
 		public function kill()
 		{
 			stream_ns.close();
-			//delete stream_ns;
-			//delete connection_nc;
-			//delete soundController;
+			stream_ns = null;
+			connection_nc = null;
+			soundController = null;
 			clearInterval(streamInterval);
 		}
-	
-		private function onMetaData(obj)
+		
+		private function cuePointHandler(obj:Object) : void
 		{
+			
+		}
+		
+		private function onMetaData(obj:Object) : void
+		{
+					
 			//should run only once!
 			if(obj.width && metaData.width == undefined){
 				var tObj = {};
@@ -62,8 +77,8 @@ package com.a12.modules.mediaplayback
 				tObj.width =  obj.width;
 				tObj.height = obj.height;
 					
-				_ref.video.myvideo._width = obj.width;
-				_ref.video.myvideo._height = obj.height;
+				Utils.$(_ref,'myvideo').width = obj.width;
+				Utils.$(_ref,'myvideo').height = obj.height;
 		
 				setChanged();
 				notifyObservers(tObj);
@@ -78,20 +93,58 @@ package com.a12.modules.mediaplayback
 		
 		
 		}
+		
+		private function netStatusHandler(event:NetStatusEvent):void {
+			switch (event.info.code) {
+				case "NetConnection.Connect.Success":
+					playMedia();
+					break;
+				case "NetStream.Play.StreamNotFound":
+					//trace("Unable to locate video: " + videoURL);
+					break;
+			}
+		}
+		
+		private function securityErrorHandler(event:SecurityErrorEvent):void {
+            trace("securityErrorHandler: " + event);
+        }
+
+        private function asyncErrorHandler(event:AsyncErrorEvent):void {
+            // ignore AsyncErrorEvent events.
+        }
+
+		private function connectStream() : void
+		{
+			
+		}
 	
 		private function playMedia()
 		{
 			trace('playMedia-' + _file);
 		
-			connection_nc = new NetConnection();
-			connection_nc.connect(null);
+			
 		
 			stream_ns = new NetStream(connection_nc);
+			stream_ns.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
+            stream_ns.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
+			
+			var clientObj = {};
+			clientObj.onMetaData = onMetaData;
+			clientObj.onCuePoint = cuePointHandler;
+			stream_ns.client = clientObj;
+			
 			stream_ns.play(_file);
+			/*
+			stream_ns.onMetaData = function(obj) {
+				trace('meta data' + obj.toString());
+				//onMetaData(obj);
+				//duration = obj.duration;
+			}
+			*/
 			
 			//stream_ns.onStatus = Delegate.create(this, streamStatus);
 			//stream_ns.onMetaData = Delegate.create(this, onMetaData);
-		
+			
 			mode = 'play';	
 		
 			clearInterval(streamInterval);
@@ -101,19 +154,22 @@ package com.a12.modules.mediaplayback
 			tObj.stream = stream_ns;
 			tObj.mode = mode;
 		
-			Utils.createmc(_ref,"audio",20001);
+			//var a = Utils.createmc(_ref,"audio");
 		
-			soundController = new Sound(_ref.audio);
-			_ref.audio.attachAudio(stream_ns);
-		
-			_ref.attachMovie("video","video",1);
-			_ref.video.myvideo.attachVideo(stream_ns);
+			//soundController = new Sound(a);
+			//a.attachAudio(stream_ns);
 						
+			var video:Video = new Video();
+			video.attachNetStream(stream_ns);
+			var v = _ref.addChild(video);
+			v.name = 'myvideo';
+			
+			//Utils.$(vh,'myvideo').attachNetStream(stream_ns);
+									
 			setChanged();
 			notifyObservers(tObj);
 		
-			delete tObj;		
-		
+			
 		}
 	
 	
@@ -144,7 +200,7 @@ package com.a12.modules.mediaplayback
 			setChanged();
 			notifyObservers(tObj);
 		
-			delete tObj;
+			
 		
 		}
 	
@@ -154,7 +210,7 @@ package com.a12.modules.mediaplayback
 			tObj.action = 'mediaComplete';
 			setChanged();
 			notifyObservers(tObj);
-			delete tObj;
+			
 		}
 	
 		public function streamStatus(obj)
@@ -177,7 +233,7 @@ package com.a12.modules.mediaplayback
 	
 		public function playStream()
 		{
-			stream_ns.pause(false);
+			stream_ns.resume();
 			mode = 'pause';
 			changeStatus();
 		}
@@ -210,14 +266,14 @@ package com.a12.modules.mediaplayback
 	
 		public function toggleStream()
 		{
-			stream_ns.pause();
+			stream_ns.togglePause();
 			changeStatus();
 		
 		}
 	
 		public function pauseStream()
 		{
-			stream_ns.pause(true);
+			stream_ns.pause();
 			mode = 'play';
 			changeStatus();
 		}

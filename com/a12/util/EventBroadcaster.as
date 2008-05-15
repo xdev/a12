@@ -3,7 +3,8 @@
 package com.a12.util
 {
 
-	import AsBroadcaster;
+	//import AsBroadcaster;
+	import com.a12.util.CustomEvent;
 
 	public class EventBroadcaster
 	{
@@ -14,7 +15,7 @@ package com.a12.util
 		public function EventBroadcaster()
 		{
 			_myBroadcaster = new Object();
-			AsBroadcaster.initialize(_myBroadcaster);
+			//AsBroadcaster.initialize(_myBroadcaster);
 			_objA = new Array();
 		}
 	

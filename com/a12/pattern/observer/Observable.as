@@ -72,7 +72,7 @@ package com.a12.pattern.observer
 	   */
 	  public function notifyObservers(infoObj:Object):void {
 	    // Use a null infoObject if none is supplied.
-	    if (infoObj == undefined) {
+	    if (infoObj == null) {
 	      infoObj = null;
 	    }
 
