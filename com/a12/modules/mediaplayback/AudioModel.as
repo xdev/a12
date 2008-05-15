@@ -34,7 +34,6 @@ package com.a12.modules.mediaplayback
 			_ref = ref;
 			_file = file;
 			playMedia();
-
 		}
 	
 	
@@ -99,24 +98,22 @@ package com.a12.modules.mediaplayback
 			notifyObservers(tObj);
 		}
 	
-		private function onComplete()
+		private function onComplete(e:Event) : void
 		{
 			trace('COMPLETE');
 			var tObj = {};
 			tObj.action = 'mediaComplete';
 			setChanged();
 			notifyObservers(tObj);
-			tObj = null;
 		}
 	
-		private function onLoad()
+		private function onLoad(e:Event) : void
 		{
 			trace('onLoad');
 			var tObj = {};
 			tObj.action = 'onLoad';
 			setChanged();
 			notifyObservers(tObj);
-			tObj = null;
 		}
 		
 		private function progressHandler(e:Event)
