@@ -11,7 +11,7 @@ package com.a12.util
 	
 		}
 	
-		public function validateObject(formData:Array) : Array
+		public function validateObject(formData:Array):Array
 		{
 	
 			//iterate through the obj and get field objects , values and validation states
@@ -35,7 +35,7 @@ package com.a12.util
 			return errorData;	
 		}
 	
-		public function validateField(obj:Object) : Object
+		public function validateField(obj:Object):Object
 		{			
 			var mode = obj.mode;
 				
@@ -55,7 +55,7 @@ package com.a12.util
 	
 		}
 		
-		private function vNumber(obj:Object) : Object
+		private function vNumber(obj:Object):Object
 		{
 			
 			//check boundary range? 
@@ -73,7 +73,7 @@ package com.a12.util
 			
 		}
 	
-		private function vEmpty(obj:Object) : Object
+		private function vEmpty(obj:Object):Object
 		{
 			var value = obj.value;
 			var tObj = {};
@@ -88,7 +88,7 @@ package com.a12.util
 			return tObj;
 		}
 	
-		private function vEmail(obj:Object) : Object
+		private function vEmail(obj:Object):Object
 		{
 			var value = obj.value;
 			var tObj = {};

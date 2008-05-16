@@ -13,21 +13,21 @@ package com.a12.modules.mediaplayback
 	import com.a12.modules.mediaplayback.*;
 	import com.a12.util.*;
 
-	public class AudioModel extends Observable
+	public class AudioModel extends Observable implements IMediaModel
 	{
 	
-		private	var	_ref			: MovieClip;
-		private	var	_file			: String;
-		private	var	stream_ns		: NetStream;
-		private	var	connection_nc	: NetConnection;
-		private	var	streamInterval	: Number;
-		private	var	loadInterval	: Number;
-		private	var metaData		: Object;
-		private	var soundController	: Sound;
-		private	var soundChannel	: SoundChannel;
-		private	var positionTimer	: Timer;
-		private	var	mode			: String;
-		private	var	position		: Number;
+		private var _ref:MovieClip;
+		private var _file:String;
+		private var stream_ns:NetStream;
+		private var connection_nc:NetConnection;
+		private var streamInterval:Number;
+		private var loadInterval:Number;
+		private var metaData:Object;
+		private var soundController:Sound;
+		private var soundChannel:SoundChannel;
+		private var positionTimer:Timer;
+		private var mode:String;
+		private var position:Number;
 	
 		public function AudioModel(ref,file)
 		{
@@ -35,14 +35,73 @@ package com.a12.modules.mediaplayback
 			_file = file;
 			playMedia();
 		}
+		
+		// --------------------------------------------------------------------
+		// Interface Methods
+		// --------------------------------------------------------------------
+		
+		public function streamStatus(obj):void
+		{
+			trace(obj.code);
+		}
 	
+		public function seekStream(time:Number):void
+		{
+			soundController.play(time);
+		}
 	
-		public function getRef() : MovieClip
+		public function seekStreamPercent(percent:Number):void
+		{
+			seekStream( Math.round(percent * (soundController.length/1000)) );
+		}
+	
+		public function playStream():void
+		{
+			soundController.play(0);
+		}
+		
+		public function toggleStream():void
+		{
+			pauseStream();
+		}
+	
+		public function pauseStream():void
+		{
+			var icon = '';
+			switch(true){
+				case mode == 'play':
+					position = soundChannel.position;
+					soundChannel.stop();
+					icon = 'play';
+					mode = 'pause';
+				break;
+			
+				case mode == 'pause':
+					mode = 'play';
+					icon = 'pause';
+					soundController.play(Math.floor(position/1000));
+				break;
+			}
+		
+			var tObj = {};
+			tObj.mode = mode;
+			tObj.icon = icon;
+		
+			setChanged();
+			notifyObservers(tObj);
+		}
+	
+		public function stopStream():void
+		{
+			soundChannel.stop();
+		}
+	
+		public function getRef():MovieClip
 		{
 			return _ref;
 		}
 	
-		public function kill()
+		public function kill():void
 		{
 			soundChannel.stop();
 			//delete soundController;
@@ -50,13 +109,16 @@ package com.a12.modules.mediaplayback
 			clearInterval(streamInterval);
 		}
 	
-		public function getMode() : String
+		public function getMode():String
 		{
 			return mode;
 		}
-	
-	
-		private function playMedia()
+		
+		// --------------------------------------------------------------------
+		// Class Methods
+		// --------------------------------------------------------------------
+			
+		private function playMedia():void
 		{
 			mode = 'play';
 		
@@ -98,7 +160,7 @@ package com.a12.modules.mediaplayback
 			notifyObservers(tObj);
 		}
 	
-		private function onComplete(e:Event) : void
+		private function onComplete(e:Event):void
 		{
 			trace('COMPLETE');
 			var tObj = {};
@@ -107,7 +169,7 @@ package com.a12.modules.mediaplayback
 			notifyObservers(tObj);
 		}
 	
-		private function onLoad(e:Event) : void
+		private function onLoad(e:Event):void
 		{
 			trace('onLoad');
 			var tObj = {};
@@ -116,17 +178,17 @@ package com.a12.modules.mediaplayback
 			notifyObservers(tObj);
 		}
 		
-		private function progressHandler(e:Event)
+		private function progressHandler(e:Event):void
 		{
 			
 		}
 		
-		private function id3Handler(e:Event)
+		private function id3Handler(e:Event):void
 		{
 			
 		}
 	
-		private function getStreamInfo(e:TimerEvent)
+		private function getStreamInfo(e:TimerEvent):void
 		{
 			//convert time in seconds to 00:00
 			var tObj = {};
@@ -144,60 +206,6 @@ package com.a12.modules.mediaplayback
 			tObj = null;
 		
 		}
-	
-	
-		public function streamStatus(obj)
-		{
-			trace(obj.code);
-		}
-	
-		public function seekStream(time:Number)
-		{
-			soundController.play(time);
-		}
-	
-		public function seekStreamPercent(percent:Number)
-		{
-			seekStream(Math.round(percent * (soundController.length/1000)) );
-		}
-	
-		public function playStream()
-		{
-			soundController.play(0);
-		}
-	
-		public function pauseStream()
-		{
-			var icon = '';
-			switch(true){
-				case mode == 'play':
-					position = soundChannel.position;
-					soundChannel.stop();
-					icon = 'play';
-					mode = 'pause';
-				break;
-			
-				case mode == 'pause':
-					mode = 'play';
-					icon = 'pause';
-					soundController.play(Math.floor(position/1000));
-				break;
-			}
-		
-			var tObj = {};
-			tObj.mode = mode;
-			tObj.icon = icon;
-		
-			setChanged();
-			notifyObservers(tObj);
-		}
-	
-		public function stopStream()
-		{
-			soundChannel.stop();
-		}
-	
-	
 	
 	}
 

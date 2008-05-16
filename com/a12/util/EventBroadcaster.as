@@ -9,8 +9,8 @@ package com.a12.util
 	public class EventBroadcaster
 	{
 
-		private	var	_myBroadcaster		: Object;
-		private	var _objA				: Array;
+		private var _myBroadcaster:Object;
+		private var _objA:Array;
 	
 		public function EventBroadcaster()
 		{
@@ -19,20 +19,20 @@ package com.a12.util
 			_objA = new Array();
 		}
 	
-		public function broadcastMessage(message,args)
+		public function broadcastMessage(message,args):void
 		{
 			//trace(message + '___' + args);
 			_myBroadcaster.broadcastMessage(message,args);
 		}
 	
-		public function _addListener(obj)
+		public function _addListener(obj):void
 		{
 			_myBroadcaster.addListener(obj);
 			//trace('addListener' + obj);
 			_objA.push(obj);
 		}
 	
-		public function _removeListener(obj)
+		public function _removeListener(obj):void
 		{
 			_myBroadcaster.removeListener(obj);
 			for(var i=0;i<_objA.length;i++){
@@ -42,7 +42,7 @@ package com.a12.util
 			}	
 		}
 	
-		public function removeAll()
+		public function removeAll():void
 		{
 			for(var i in _objA){
 				_myBroadcaster.removeListener(_objA[i]);

@@ -32,40 +32,40 @@ package com.a12.modules
 		
 		}
 	
-		public function set year(year:Number) : void
+		public function set year(year:Number):void
 		{
 			_year = year;
 		}
-		public function get year() : Number
+		public function get year():Number
 		{
 			return _year;
 		}
 	
-		public function get year2() : Number
+		public function get year2():Number
 		{	
 			var t = _year.toString();
 			return t.substr(2,2);
 		}
 	
-		public function set month(month:Number) : void
+		public function set month(month:Number):void
 		{
 			_month = month;
 		}
-		public function get month() : Number
+		public function get month():Number
 		{
 			return _month;
 		}
 	
-		public function set day(day:Number) : void
+		public function set day(day:Number):void
 		{
 			_day = day;
 		}
-		public function get day() : Number
+		public function get day():Number
 		{
 			return _day;
 		}
 	
-		public function set lang(lang:String) : void
+		public function set lang(lang:String):void
 		{
 			_lang = lang;
 		}
@@ -74,7 +74,7 @@ package com.a12.modules
 			return _lang;
 		}
 	
-		public function getDaysInMonth(year:Number=NaN, month:Number=NaN) : Number
+		public function getDaysInMonth(year:Number=NaN, month:Number=NaN):Number
 		{
 			isNaN(year) ? year = _year : year = year;
 			isNaN(month) ? month = _month : month = month;
@@ -88,7 +88,7 @@ package com.a12.modules
 			return _monthDays[month];
 		}
 	
-		public function getFirstDayInMonth(year:Number=NaN, month:Number=NaN) : Number
+		public function getFirstDayInMonth(year:Number=NaN, month:Number=NaN):Number
 		{	
 			isNaN(year) ? year = _year : year = year;
 			isNaN(month) ? month = _month : month = month;
@@ -101,7 +101,7 @@ package com.a12.modules
 			return tempDate.getDay();
 		}
 	
-		public function advanceMonth(direction:Number) : void
+		public function advanceMonth(direction:Number):void
 		{
 			//trace('advanceMonth ' + direction);
 			if ((_month == 11) && (direction == 1)) {
@@ -118,7 +118,7 @@ package com.a12.modules
 	
 		}
 	
-		public function isInMonth(dateTime:String, year:Number=NaN, month:Number=NaN) : Boolean
+		public function isInMonth(dateTime:String, year:Number=NaN, month:Number=NaN):Boolean
 		{
 			isNaN(year) ? year = _year : year = year;
 			isNaN(month) ? month = _month : month = month;
@@ -130,7 +130,7 @@ package com.a12.modules
 			}
 		}
 	
-		public function parseDateTime(dateTime:String) : Array
+		public function parseDateTime(dateTime:String):Array
 		{
 			var year = parseYear(dateTime);
 			var month = parseMonth(dateTime);
@@ -140,7 +140,7 @@ package com.a12.modules
 			return(dateTimeArray);
 		}
 	
-		public function getMonthName(month:Number=NaN) : String
+		public function getMonthName(month:Number=NaN):String
 		{
 			isNaN(month) ? month = _month : month = month;
 			if (_lang == "es") {
@@ -150,7 +150,7 @@ package com.a12.modules
 			}
 		}
 	
-		public function getMonthNameShort(month:Number=NaN) : String
+		public function getMonthNameShort(month:Number=NaN):String
 		{
 			isNaN(month) ? month = _month : month = month;
 			if (_lang == "es") {
@@ -160,12 +160,12 @@ package com.a12.modules
 			}
 		}
 	
-		public function getDayNameSimple(day:Number) : String
+		public function getDayNameSimple(day:Number):String
 		{
 			return(_dayNames.en[day]);
 		}
 	
-		public function getDayName(year:Number=NaN, month:Number=NaN, day:Number=NaN, type:String='') : String
+		public function getDayName(year:Number=NaN, month:Number=NaN, day:Number=NaN, type:String=''):String
 		{
 			isNaN(year) ? year = _year : year = year;
 			isNaN(month) ? month = _month : month = month;
@@ -183,35 +183,35 @@ package com.a12.modules
 			}
 		}
 	
-		public function parseYear(dateTime:String) : Number
+		public function parseYear(dateTime:String):Number
 		{
 			var dtArray:Array = dateTime.split(" ");
 			var dArray:Array = dtArray[0].split("-");
 			return(Number(dArray[0]));
 		}
 	
-		public function parseMonth(dateTime:String) : Number
+		public function parseMonth(dateTime:String):Number
 		{
 			var dtArray:Array = dateTime.split(" ");
 			var dArray:Array = dtArray[0].split("-");
 			return(Number(dArray[1]));
 		}
 	
-		public function parseDay(dateTime:String) : Number
+		public function parseDay(dateTime:String):Number
 		{
 			var dtArray:Array = dateTime.split(" ");
 			var dArray:Array = dtArray[0].split("-");
 			return(Number(dArray[2]));
 		}
 	
-		public function parseTime(dateTime:String) : Array
+		public function parseTime(dateTime:String):Array
 		{
 			var dtArray:Array = dateTime.split(" ");
 			var tArray:Array = dtArray[1].split(":");
 			return(tArray);
 		}
 	
-		public function formatDateTime(dateTime:String) : Object
+		public function formatDateTime(dateTime:String):Object
 		{
 			//
 			var tObj = {};

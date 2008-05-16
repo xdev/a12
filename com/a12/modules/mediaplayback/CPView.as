@@ -17,12 +17,13 @@ package com.a12.modules.mediaplayback
 	public class CPView extends AbstractView
 	{
 
-		public var _ref			: MovieClip;
-		public	var	height		: Number;
-		public	var width		: Number;
-		public	var stripW		: Number;
+		public var _ref				: MovieClip;
+		public	var	height			: Number;
+		public	var width			: Number;
+		public	var stripW			: Number;
 		
-		private	var	_controls	: MovieClip;
+		private	var originalSize	: Object;
+		private	var	_controls		: MovieClip;
 
 		public function CPView(m:Observable,c:Controller)
 		{
@@ -36,9 +37,34 @@ package com.a12.modules.mediaplayback
 			var obj = getModel();
 			_ref = obj.getRef();		
 		
-			renderUI();
+		}
 		
-				
+		public function setScale(s:Number) : void
+		{
+			//find height and width based upon scale
+			var tW,tH;
+			
+			if(s<100){
+				tW = Math.floor((s/100) * originalSize.width);
+				tH = Math.floor((s/100) * originalSize.height);
+			}else{
+				tW = originalSize.width;
+				tH = originalSize.height;
+			}		
+
+			_ref.frame._xscale = s;
+			_ref.frame._yscale = s;
+
+			updateSize({width:tW,height:tH});
+		}
+
+		public function getDimensions(mode:Boolean) : Object
+		{
+			if(mode == false){
+				return {height:height,width:width};
+			}else{
+				return {height:originalSize.height,width:originalSize.width};
+			}
 		}
 	
 	
@@ -56,6 +82,15 @@ package com.a12.modules.mediaplayback
 			if(infoObj.mode != undefined){
 				_ref.controls.icon_playpause.gotoAndStop("icon_" + infoObj.icon);
 			}
+			
+			if(infoObj.action == 'updateSize'){
+				originalSize = {};
+				originalSize.height = infoObj.height;
+				originalSize.width = infoObj.width;
+				updateSize(infoObj);
+				//broadcaster.broadcastMessage("onUpdateSize");
+			}
+			
 			if(infoObj.action == 'updateView'){
 				updateView(infoObj);
 			}
@@ -63,6 +98,13 @@ package com.a12.modules.mediaplayback
 				_ref.controls.icon_playpause.gotoAndStop("icon_play");
 			}
 
+		}
+		
+		private function updateSize(infoObj)
+		{
+			width = infoObj.width;
+			height = infoObj.height;
+			renderUI();
 		}	
 	
 		private function updateView(infoObj)

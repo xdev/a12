@@ -10,12 +10,11 @@ package com.a12.modules.mediaplayback
 	import flash.media.Sound;
     import flash.net.NetConnection;
     import flash.net.NetStream;
-		
 	import com.a12.pattern.observer.Observable;
 	import com.a12.modules.mediaplayback.*;
 	import com.a12.util.*;
 
-	public class VideoModel extends Observable
+	public class VideoModel extends Observable implements IMediaModel
 	{
 	
 		private	var	_ref			: MovieClip;
@@ -36,13 +35,13 @@ package com.a12.modules.mediaplayback
 			connection_nc = new NetConnection();
 			connection_nc.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
             connection_nc.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
-			connection_nc.connect(null);
-			
-			//playMedia();
+			connection_nc.connect(null);			
 		}
-	
-	
-	
+		
+		// --------------------------------------------------------------------
+		// Interface Methods
+		// --------------------------------------------------------------------
+		
 		public function getRef() : MovieClip
 		{
 			return _ref;
@@ -53,7 +52,7 @@ package com.a12.modules.mediaplayback
 			return mode;
 		}
 	
-		public function kill()
+		public function kill() : void
 		{
 			stream_ns.close();
 			stream_ns = null;
@@ -62,6 +61,52 @@ package com.a12.modules.mediaplayback
 			clearInterval(streamInterval);
 		}
 		
+		public function toggleStream() : void
+		{
+			stream_ns.togglePause();
+			changeStatus();
+		}
+	
+		public function pauseStream() : void
+		{
+			stream_ns.pause();
+			mode = 'play';
+			changeStatus();
+		}
+	
+		public function stopStream() : void
+		{
+			stream_ns.close();
+		}
+		
+		public function playStream() : void
+		{
+			stream_ns.resume();
+			mode = 'pause';
+			changeStatus();
+		}
+		
+		public function streamStatus(obj) : void
+		{
+			if(obj.code == "NetStream.Play.Stop"){
+				onComplete();
+			}
+		}
+	
+		public function seekStream(time:Number) : void
+		{
+			stream_ns.seek(time);
+		}
+	
+		public function seekStreamPercent(percent:Number) : void
+		{
+			seekStream(Math.round(percent * metaData.duration) );
+		}
+		
+		// --------------------------------------------------------------------
+		// Class Methods
+		// --------------------------------------------------------------------
+		
 		private function cuePointHandler(obj:Object) : void
 		{
 			
@@ -69,7 +114,6 @@ package com.a12.modules.mediaplayback
 		
 		private function onMetaData(obj:Object) : void
 		{
-					
 			//should run only once!
 			if(obj.width && metaData.width == undefined){
 				var tObj = {};
@@ -90,8 +134,6 @@ package com.a12.modules.mediaplayback
 					metaData.durationObj = Utils.convertSeconds(Math.floor(obj[i]));
 				}
 			}
-		
-		
 		}
 		
 		private function netStatusHandler(event:NetStatusEvent):void {
@@ -120,10 +162,6 @@ package com.a12.modules.mediaplayback
 	
 		private function playMedia()
 		{
-			trace('playMedia-' + _file);
-		
-			
-		
 			stream_ns = new NetStream(connection_nc);
 			stream_ns.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
             stream_ns.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
@@ -168,11 +206,7 @@ package com.a12.modules.mediaplayback
 									
 			setChanged();
 			notifyObservers(tObj);
-		
-			
 		}
-	
-	
 	
 		private function getStreamInfo()
 		{
@@ -199,9 +233,6 @@ package com.a12.modules.mediaplayback
 		
 			setChanged();
 			notifyObservers(tObj);
-		
-			
-		
 		}
 	
 		private function onComplete()
@@ -210,37 +241,10 @@ package com.a12.modules.mediaplayback
 			tObj.action = 'mediaComplete';
 			setChanged();
 			notifyObservers(tObj);
-			
-		}
-	
-		public function streamStatus(obj)
-		{
-			//trace('i has status ' + obj.code);
-			if(obj.code == "NetStream.Play.Stop"){
-				onComplete();
-			}
-		}
-	
-		public function seekStream(time:Number)
-		{
-			stream_ns.seek(time);
-		}
-	
-		public function seekStreamPercent(percent:Number)
-		{
-			seekStream(Math.round(percent * metaData.duration) );
-		}
-	
-		public function playStream()
-		{
-			stream_ns.resume();
-			mode = 'pause';
-			changeStatus();
 		}
 	
 		private function changeStatus()
 		{
-		
 			var icon = '';
 			switch(true){
 				case mode == 'play':
@@ -260,27 +264,6 @@ package com.a12.modules.mediaplayback
 		
 			setChanged();
 			notifyObservers(tObj);
-		
-		
-		}
-	
-		public function toggleStream()
-		{
-			stream_ns.togglePause();
-			changeStatus();
-		
-		}
-	
-		public function pauseStream()
-		{
-			stream_ns.pause();
-			mode = 'play';
-			changeStatus();
-		}
-	
-		public function stopStream()
-		{
-			stream_ns.close();
 		}
 	
 	}

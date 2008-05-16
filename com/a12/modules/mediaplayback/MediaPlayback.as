@@ -23,18 +23,26 @@ package com.a12.modules.mediaplayback
 			if(ext == 'mp3'){
 				mp_model = new AudioModel(ref,file);
 			}
+			
+			//mp_model = null;
 				
-			//mp_view = new CPView(mp_model,undefined);
-			//mp_model.addObserver(mp_view);
-		
+			mp_view = new CPView(mp_model,undefined);
+			mp_model.addObserver(mp_view);
 						
 		}
-	
-		public function kill()
+		
+		/* API Methods */
+		
+		public function setScale(s:Number) : void
 		{
-			mp_model.kill();
+			mp_view.setScale(s);
 		}
-	
+
+		public function getDimensions(mode:Boolean=true) : Object
+		{
+			return mp_view.getDimensions(mode);
+		}
+			
 		public function stop()
 		{
 			mp_model.stopStream();
@@ -48,6 +56,11 @@ package com.a12.modules.mediaplayback
 		public function play()
 		{
 			mp_model.playStream();
+		}
+		
+		public function kill()
+		{
+			mp_model.kill();
 		}
 	
 	}

@@ -32,7 +32,9 @@ package com.a12.util
 		private var thisObj:Motion;
 		private var moveFlag:Boolean;
 		
-		public function Motion(c:MotionController, mc:MovieClip, props:Object, duration:Number, easeMath:String = 'Cubic', easeType:String = 'easeOut', easeParam:Array = null, delay:Number = 0, freq:Number = 1000/30, callback:Object = null)
+		public function Motion(c:MotionController, mc:MovieClip, props:Object, duration:Number, 
+			easeMath:String = 'Cubic', easeType:String = 'easeOut', easeParam:Array = null, 
+			delay:Number = 0, freq:Number = 1000/30, callback:Object = null)
 		{
 			
 			Back,Bounce,Circ,Cubic,Elastic,Expo,Linear,Quad,Quart,Quint,Sine;
@@ -66,30 +68,30 @@ package com.a12.util
 		
 		}
 	
-		public function getmc() : MovieClip
+		public function getmc():MovieClip
 		{
 			//trace("M:getMC");
 			return $mc;
 		}
 	
-		public function getProps() : Object
+		public function getProps():Object
 		{
 			//trace("--M:getProps");
 			return $props;
 		}
 	
-		public function getPropList() : Array
+		public function getPropList():Array
 		{
 			return propList;
 		}
 	
-		private function checkConflicts() : void
+		private function checkConflicts():void
 		{
 			//trace("--M:checkConflicts");
 			controller.checkConflicts(thisObj);
 		}
 	
-		public function startMove() : void
+		public function startMove():void
 		{
 			//trace("--M:startMove");
 			propList = new Array();
@@ -103,7 +105,7 @@ package com.a12.util
 			intID = setInterval(move, $freq);
 		}
 	
-		public function stopMove() : void
+		public function stopMove():void
 		{
 			//trace("--M:stopMove");
 			clearInterval(delayID);
@@ -112,7 +114,7 @@ package com.a12.util
 			delete this;
 		}
 	
-		public function stopProp(prop) : void
+		public function stopProp(prop):void
 		{
 			//trace("--M:stopProp: " + prop);
 			var len = propList.length;
@@ -125,7 +127,7 @@ package com.a12.util
 			}
 		}
 	
-		public function isMoving()
+		public function isMoving():Boolean
 		{
 			//trace("--M:isMoving");
 			//trace('Move Flag' + this + ' - ' + moveFlag);
@@ -136,7 +138,8 @@ package com.a12.util
 			}
 		}
 	
-		private function checkStatus() : void {
+		private function checkStatus():void
+		{
 			//trace("M:checkStatus");
 			// stop move operation if MovieClip is removed
 			if ($mc.valueOf() == undefined || $mc.valueOf() == "") {
@@ -147,7 +150,8 @@ package com.a12.util
 			}
 		}
 	
-		private function move() : void {
+		private function move():void
+		{
 			//trace("--move:" + $mc.valueOf());
 			var done = 0;
 		
@@ -198,7 +202,7 @@ package com.a12.util
 			}
 		}
 	
-		private function update() : void
+		private function update():void
 		{
 			controller.update(thisObj);
 			if ($callback != null){						

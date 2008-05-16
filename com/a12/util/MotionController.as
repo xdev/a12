@@ -15,19 +15,19 @@ package com.a12.util
 		 * Create class instance through "init" method.
 		 */
 	
-		private static var _instance	: MotionController = null;
-		private var objList				: Array = [];
-		private var result				: Function = update;
-		private	var	frequency			: Number;
-		public	var	debug				: Boolean;
+		private static var _instance:MotionController = null;
+		private var objList:Array = [];
+		private var result:Function = update;
+		private var frequency:Number;
+		public var debug:Boolean;
 	
 	
-		public function setFrequency(freq) : void
+		public function setFrequency(freq:Number):void
 		{
 			frequency = freq;
 		}
 	
-		public static function getInstance() : MotionController
+		public static function getInstance():MotionController
 		{
 			if (MotionController._instance == null) {
 				MotionController._instance = new MotionController();
@@ -37,7 +37,8 @@ package com.a12.util
 			return MotionController._instance;
 		}
 	
-		public function changeProps(mc:MovieClip, props:Object, duration:Number, easeMath:String, easeType:String, easeParam:Array = null, delay:Number = 0, freq:Number = 1000/30, callback:Object = null, d:Boolean = false) : Motion 
+		public function changeProps(mc:MovieClip, props:Object, duration:Number, easeMath:String, easeType:String,
+			easeParam:Array = null, delay:Number = 0, freq:Number = 1000/30, callback:Object = null, d:Boolean = false):Motion 
 		{
 			//trace("--changeProps");
 			/*
@@ -54,7 +55,7 @@ package com.a12.util
 			return(motionObj);
 		}
 	
-		public function checkConflicts(motionObj)
+		public function checkConflicts(motionObj):void
 		{
 			//trace("--checkConflicts");
 		
@@ -88,7 +89,7 @@ package com.a12.util
 			motionObj.startMove();
 		}
 	
-		public function stopMove(mc:MovieClip) : void
+		public function stopMove(mc:MovieClip):void
 		{
 			var len:Number = objList.length;
 			for (var i=0; i<len; i++) {
@@ -100,7 +101,7 @@ package com.a12.util
 			}
 		}
 	
-		public function update(motionObj) : void
+		public function update(motionObj):void
 		{
 			//trace("--receiveUpdate");
 		
@@ -115,7 +116,7 @@ package com.a12.util
 			//trace('list' + objList);
 		}
 	
-		public function getStatus(mc:MovieClip) : Boolean
+		public function getStatus(mc:MovieClip):Boolean
 		{
 			var statusFlag = 0;
 			var len:Number = objList.length;

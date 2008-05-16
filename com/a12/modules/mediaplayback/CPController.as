@@ -22,7 +22,7 @@ package com.a12.modules.mediaplayback
 		
 		}
 	
-		public function toggleSound()
+		public function toggleSound():void
 		{
 			//
 				
@@ -44,38 +44,38 @@ package com.a12.modules.mediaplayback
 		
 		}
 	
-		public function pause()
+		public function pause():void
 		{
 			//var obj = getModel();
 			mod.pauseStream();
 		}
 	
-		public function getMode()
+		public function getMode():String
 		{
 			return mod.getMode();
 		}
 	
 	
-		public function toggle()
+		public function toggle():void
 		{
 			//var obj = getModel();
 			mod.toggleStream();
 		}
 	
-		public function play()
+		public function play():void
 		{
 			//var obj = getModel();
 			mod.playStream();
 		}	
 	
-		public function stop()
+		public function stop():void
 		{
 			//var obj = getModel();
 			mod.stopStream();
 		}	
 	
 	
-		public function findSeek(percent:Number) : void
+		public function findSeek(percent:Number):void
 		{
 			//var obj = getModel();
 			mod.seekStreamPercent(percent);

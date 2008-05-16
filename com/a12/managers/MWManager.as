@@ -11,10 +11,10 @@ package com.a12.managers
 	public class MWManager
 	{
 
-		private	var	_callback			: Object;
-		private	var	debugMode			: Boolean;
-		private	var	gateway				: String;
-		private	var	loader				: URLLoader;
+		private var _callback:Object;
+		private var debugMode:Boolean;
+		private var gateway:String;
+		private var loader:URLLoader;
 	
 		public function MWManager(g:String)
 		{
@@ -22,19 +22,19 @@ package com.a12.managers
 			debugMode = true;
 		}
 	
-		public function setDebug(deb:Boolean)
+		public function setDebug(deb:Boolean):void
 		{
 			debugMode = deb;
 		}
 	
-		private function debug(t:Object)
+		private function debug(t:Object):void
 		{
 			if(debugMode == true){
 				trace(t);
 			}
 		}
 	
-		public function transfer(data:Object,obj:Object,result:Object,args:Array=null)
+		public function transfer(data:Object,obj:Object,result:Object,args:Array=null):void
 		{
 	
 			var myXML = '<Request Type="' + data.action + '">';
@@ -81,12 +81,12 @@ package com.a12.managers
 			
 		}
 	
-		private function process(e:Event)
+		private function process(e:Event):void
 		{
 			applyCallback(loader.data);	
 		}
 	
-		private function applyCallback(xml)
+		private function applyCallback(xml):void
 		{
 			debug(xml);
 			var args = _callback.args;
@@ -103,7 +103,7 @@ package com.a12.managers
 			result.apply(obj,args);
 		}
 	
-		public function parseParams(rawxml:String) : Array
+		public function parseParams(rawxml:String):Array
 		{
 			var txml = new XML();
 			txml.ignoreWhite = true;

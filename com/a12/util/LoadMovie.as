@@ -9,8 +9,8 @@ package com.a12.util
 	
 	public class LoadMovie
 	{
-		public	var	loader	: Loader;
-		private	var	_ref	: Object;
+		public var loader:Loader;
+		private var _ref:Object;
 		
 		public function LoadMovie(r:Object,asset:String)
 		{
@@ -22,7 +22,7 @@ package com.a12.util
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,handleLoad);
 		}
 		
-		private function handleLoad(e:Event)
+		private function handleLoad(e:Event):void
 		{
 			_ref.addChild(loader.content);
 		}

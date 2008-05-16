@@ -8,11 +8,10 @@ package com.a12.util
 	
 	public class XMLLoader
 	{
-		
-		private	var	loader	: URLLoader;
-		private	var	result	: Function;
-		private	var	obj		: Object;
-		private	var	args	: Array;
+		private	var	loader:URLLoader;
+		private	var	result:Function;
+		private	var	obj:Object;
+		private	var	args:Array;
 		
 		public function XMLLoader(xmlsrc:String,r:Function,o:Object)
 		{
@@ -25,7 +24,7 @@ package com.a12.util
 			loader.addEventListener(Event.COMPLETE,handleLoad);			
 		}
 		
-		private function handleLoad(e:Event)
+		private function handleLoad(e:Event):void
 		{
 			result.apply(obj, [loader.data]);
 		}			
