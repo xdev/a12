@@ -3,9 +3,10 @@
 package com.a12.modules.mediaplayback
 {
 	
-	import flash.display.MovieClip;
+	import flash.display.*;
 	import flash.text.*;
 	import flash.utils.*;
+	import flash.events.*;
 	
 	import com.a12.pattern.observer.*;
 	import com.a12.pattern.mvc.*;
@@ -17,13 +18,13 @@ package com.a12.modules.mediaplayback
 	public class CPView extends AbstractView
 	{
 
-		public var _ref				: MovieClip;
-		public	var	height			: Number;
-		public	var width			: Number;
-		public	var stripW			: Number;
+		public var _ref:MovieClip;
+		public var height:Number;
+		public var width:Number;
+		public var stripW:Number;
 		
-		private	var originalSize	: Object;
-		private	var	_controls		: MovieClip;
+		private var originalSize:Object;
+		private var _controls:MovieClip;
 
 		public function CPView(m:Observable,c:Controller)
 		{
@@ -39,7 +40,7 @@ package com.a12.modules.mediaplayback
 		
 		}
 		
-		public function setScale(s:Number) : void
+		public function setScale(s:Number):void
 		{
 			//find height and width based upon scale
 			var tW,tH;
@@ -52,13 +53,10 @@ package com.a12.modules.mediaplayback
 				tH = originalSize.height;
 			}		
 
-			_ref.frame._xscale = s;
-			_ref.frame._yscale = s;
-
 			updateSize({width:tW,height:tH});
 		}
 
-		public function getDimensions(mode:Boolean) : Object
+		public function getDimensions(mode:Boolean):Object
 		{
 			if(mode == false){
 				return {height:height,width:width};
@@ -68,19 +66,20 @@ package com.a12.modules.mediaplayback
 		}
 	
 	
-		public override function defaultController(m:Observable) : Controller
+		public override function defaultController(m:Observable):Controller
 		{
 			return new CPController(m);
 		}
 		
-		public override function update(o:Observable, infoObj:Object) : void
-		{
+		public override function update(o:Observable, infoObj:Object):void
+		{	
+			
 			if(infoObj.stream != undefined){
 			
 			
 			}
 			if(infoObj.mode != undefined){
-				_ref.controls.icon_playpause.gotoAndStop("icon_" + infoObj.icon);
+				//_ref.controls.icon_playpause.gotoAndStop("icon_" + infoObj.icon);
 			}
 			
 			if(infoObj.action == 'updateSize'){
@@ -92,24 +91,24 @@ package com.a12.modules.mediaplayback
 			}
 			
 			if(infoObj.action == 'updateView'){
-				updateView(infoObj);
+				//updateView(infoObj);
 			}
 			if(infoObj.action == 'mediaComplete'){
-				_ref.controls.icon_playpause.gotoAndStop("icon_play");
+				//_ref.controls.icon_playpause.gotoAndStop("icon_play");
 			}
-
+			
 		}
 		
-		private function updateSize(infoObj)
+		private function updateSize(infoObj):void
 		{
 			width = infoObj.width;
-			height = infoObj.height;
+			height = infoObj.height;			
 			renderUI();
 		}	
 	
-		private function updateView(infoObj)
+		private function updateView(infoObj):void
 		{
-		
+			/*
 			var label = '';
 		
 			label += Utils.padZero(infoObj.time_current.minutes) + ':' + Utils.padZero(infoObj.time_current.seconds);
@@ -135,49 +134,54 @@ package com.a12.modules.mediaplayback
 		
 			Utils.createmc(_ref.controls.timeline,"loader",{_y:-2.5});
 			Utils.drawRect(_ref.controls.timeline.loader,infoObj.loaded_percent * factor,5,0x73CDE7,100);
+			*/
+		}
 		
+		private function mouseHandler(e:MouseEvent):void
+		{
+			trace('woooo');
+			CPController(getController()).toggle();
 		}
 	
-		private function renderUI()
+		private function renderUI():void
 		{
-			trace('CPView renderUI')
-		
-			_ref.video._scope = this;
-		
-		
-		
-			_ref.video.onPress = function()
-			{
-				CPController(this._scope.getController()).toggle();
-			}
-		
-			_controls = Utils.createmc(_ref,"controls",{y:240});
-		
-			var b = Utils.createmc(_controls,"back",{alpha:.9});
-			Utils.drawRect(b,320,20,0xFFFFFF,100);
-		
-			//attach play/pause button
-			//_controls.attachMovie("icons","icon_playpause",1,{_x:10,_y:10,_scope:this,mode:'pause'});
-			/*
-			_ref.controls.icon_playpause.gotoAndStop("icon_pause");
-		
-			_ref.controls.icon_playpause.onPress = function()
-			{
+			_ref.addEventListener(MouseEvent.CLICK,mouseHandler);			
 			
-				CPController(this._scope.getController()).toggle();
-			}
-			*/
+			_controls = Utils.createmc(_ref,"controls",{y:height});
 		
-		
-		
-			//attach timeline
-		
-			var t = Utils.createmc(_controls,"timeline",{x:30,y:10});
+			var b = Utils.createmc(_controls,"back",{alpha:0.75});
+			Utils.drawRect(b,width,20,0x404040,100);
+			
+			var i,mc;
+			
+			i = new icons();
+			i.gotoAndStop('video_start');
+			mc = _controls.addChild(i);
+			mc.name = 'video_start';
+			mc.x = 10;
+			mc.y = 10;
+			mc.addEventListener(MouseEvent.ROLL_OVER,mouseHandler);
+			mc.addEventListener(MouseEvent.ROLL_OUT,mouseHandler);
+			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
+			
+			i = new icons();
+			i.gotoAndStop('video_play');
+			mc = _controls.addChild(i);
+			mc.name = 'video_play';
+			mc.x = 30;
+			mc.y = 10;
+			mc.addEventListener(MouseEvent.ROLL_OVER,mouseHandler);
+			mc.addEventListener(MouseEvent.ROLL_OUT,mouseHandler);
+			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
+			//CPController(this._scope.getController()).toggle();
+			
+			//timeline
+			var t = Utils.createmc(_controls,"timeline",{x:40,y:10});
 			var s = Utils.createmc(t,"strip",{y:-2.5,_scope:this});
-			Utils.drawRect(s,200,5,0xCCCCCC,100);
+			Utils.drawRect(s,width-95,5,0xCCCCCC,100);
 		
 			var h = Utils.createmc(t,"strip_hit",{y:-5});
-			Utils.drawRect(h,200,10,0xCCCCCC,0);
+			Utils.drawRect(h,width-95,10,0xCCCCCC,0);
 		
 			s.hitArea = h;
 			/*
@@ -187,6 +191,7 @@ package com.a12.modules.mediaplayback
 			}
 			*/
 			
+			//scrubber			
 			/*
 			_ref.controls.timeline.attachMovie("icons","scrubber",10,{_scope:this,dragging:false});
 			_ref.controls.timeline.scrubber.gotoAndStop("icon_scrub");
@@ -207,23 +212,27 @@ package com.a12.modules.mediaplayback
 				//reactivate the scrubber for time updates
 			}
 			*/
-			//attach scrubber
+			
 			var tf = new TextFormat();
-			tf.font = "standard 07_55";
-			tf.size = 8;
-			tf.color = 0x000000;
+			tf.font = "Akzidenz Grotesk";
+			tf.size = 10;
+			tf.color = 0xFFFFFF;
 		
-			var l = Utils.createmc(t,"label",{x:204,y:-8});
-			Utils.makeTextfield(l,"00:00/00:00",tf,{selectable: false});
+			var l = Utils.createmc(_controls,"label",{x:width-50,y:2});
+			Utils.makeTextfield(l,"00:00",tf,{selectable: false});
 	
 			//attach audio buttons
-			var icons = new icons();
-			var ic = _controls.addChild(icons);
-			ic.name = "icon_audio";
-			ic.x = 305;
-			ic.y = 10;
-			//_ref.controls.attachMovie("icons","icon_audio",10,{_x:305,_y:10,_scope:this});
-			ic.gotoAndStop("icon_audio");
+			i = new icons();
+			i.gotoAndStop('audio3');
+			mc = _controls.addChild(i);
+			mc.name = 'audio';
+			mc.x = width-10;
+			mc.y = 10;
+			mc.addEventListener(MouseEvent.ROLL_OVER,mouseHandler);
+			mc.addEventListener(MouseEvent.ROLL_OUT,mouseHandler);
+			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
+			
+			
 			/*
 			_ref.controls.icon_audio.onPress = function()
 			{

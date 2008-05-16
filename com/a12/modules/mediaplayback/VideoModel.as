@@ -17,19 +17,19 @@ package com.a12.modules.mediaplayback
 	public class VideoModel extends Observable implements IMediaModel
 	{
 	
-		private	var	_ref			: MovieClip;
-		private	var	_file			: String;
-		private	var	stream_ns		: NetStream;
-		private	var	connection_nc	: NetConnection;
-		private	var	streamInterval	: Number;
-		private	var metaData		: Object;
-		private	var soundController	: Sound;
-		private	var	mode			: String;
+		private var _ref:MovieClip;
+		private var _file:String;
+		private var stream_ns:NetStream;
+		private var connection_nc:NetConnection;
+		private var streamInterval:Number;
+		private var metaData:Object;
+		private var soundController:Sound;
+		private var mode:String;
 	
-		public function VideoModel(ref,file)
+		public function VideoModel(_ref,_file)
 		{
-			_ref = ref;
-			_file = file;
+			this._ref = _ref;
+			this._file = _file;
 			metaData = {};
 			
 			connection_nc = new NetConnection();
@@ -42,17 +42,17 @@ package com.a12.modules.mediaplayback
 		// Interface Methods
 		// --------------------------------------------------------------------
 		
-		public function getRef() : MovieClip
+		public function getRef():MovieClip
 		{
 			return _ref;
 		}
 	
-		public function getMode() : String
+		public function getMode():String
 		{
 			return mode;
 		}
 	
-		public function kill() : void
+		public function kill():void
 		{
 			stream_ns.close();
 			stream_ns = null;
@@ -61,44 +61,44 @@ package com.a12.modules.mediaplayback
 			clearInterval(streamInterval);
 		}
 		
-		public function toggleStream() : void
+		public function toggleStream():void
 		{
 			stream_ns.togglePause();
 			changeStatus();
 		}
 	
-		public function pauseStream() : void
+		public function pauseStream():void
 		{
 			stream_ns.pause();
 			mode = 'play';
 			changeStatus();
 		}
 	
-		public function stopStream() : void
+		public function stopStream():void
 		{
 			stream_ns.close();
 		}
 		
-		public function playStream() : void
+		public function playStream():void
 		{
 			stream_ns.resume();
 			mode = 'pause';
 			changeStatus();
 		}
 		
-		public function streamStatus(obj) : void
+		public function streamStatus(obj):void
 		{
 			if(obj.code == "NetStream.Play.Stop"){
 				onComplete();
 			}
 		}
 	
-		public function seekStream(time:Number) : void
+		public function seekStream(time:Number):void
 		{
 			stream_ns.seek(time);
 		}
 	
-		public function seekStreamPercent(percent:Number) : void
+		public function seekStreamPercent(percent:Number):void
 		{
 			seekStream(Math.round(percent * metaData.duration) );
 		}
@@ -107,12 +107,12 @@ package com.a12.modules.mediaplayback
 		// Class Methods
 		// --------------------------------------------------------------------
 		
-		private function cuePointHandler(obj:Object) : void
+		private function cuePointHandler(obj:Object):void
 		{
 			
 		}
 		
-		private function onMetaData(obj:Object) : void
+		private function onMetaData(obj:Object):void
 		{
 			//should run only once!
 			if(obj.width && metaData.width == undefined){
@@ -136,7 +136,8 @@ package com.a12.modules.mediaplayback
 			}
 		}
 		
-		private function netStatusHandler(event:NetStatusEvent):void {
+		private function netStatusHandler(event:NetStatusEvent):void
+		{
 			switch (event.info.code) {
 				case "NetConnection.Connect.Success":
 					playMedia();
@@ -147,7 +148,8 @@ package com.a12.modules.mediaplayback
 			}
 		}
 		
-		private function securityErrorHandler(event:SecurityErrorEvent):void {
+		private function securityErrorHandler(event:SecurityErrorEvent):void
+		{
             trace("securityErrorHandler: " + event);
         }
 
@@ -155,12 +157,12 @@ package com.a12.modules.mediaplayback
             // ignore AsyncErrorEvent events.
         }
 
-		private function connectStream() : void
+		private function connectStream():void
 		{
 			
 		}
 	
-		private function playMedia()
+		private function playMedia():void
 		{
 			stream_ns = new NetStream(connection_nc);
 			stream_ns.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
@@ -171,17 +173,7 @@ package com.a12.modules.mediaplayback
 			clientObj.onCuePoint = cuePointHandler;
 			stream_ns.client = clientObj;
 			
-			stream_ns.play(_file);
-			/*
-			stream_ns.onMetaData = function(obj) {
-				trace('meta data' + obj.toString());
-				//onMetaData(obj);
-				//duration = obj.duration;
-			}
-			*/
-			
-			//stream_ns.onStatus = Delegate.create(this, streamStatus);
-			//stream_ns.onMetaData = Delegate.create(this, onMetaData);
+			stream_ns.play(_file);		
 			
 			mode = 'play';	
 		
@@ -208,7 +200,7 @@ package com.a12.modules.mediaplayback
 			notifyObservers(tObj);
 		}
 	
-		private function getStreamInfo()
+		private function getStreamInfo():void
 		{
 			//convert time in seconds to 00:00
 			var tObj = {};
@@ -235,7 +227,7 @@ package com.a12.modules.mediaplayback
 			notifyObservers(tObj);
 		}
 	
-		private function onComplete()
+		private function onComplete():void
 		{
 			var tObj = {};
 			tObj.action = 'mediaComplete';
@@ -243,7 +235,7 @@ package com.a12.modules.mediaplayback
 			notifyObservers(tObj);
 		}
 	
-		private function changeStatus()
+		private function changeStatus():void
 		{
 			var icon = '';
 			switch(true){
