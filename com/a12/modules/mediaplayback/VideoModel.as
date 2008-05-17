@@ -6,8 +6,7 @@ package com.a12.modules.mediaplayback
 	import flash.display.MovieClip;
 	import flash.utils.*;
 	import flash.events.*;
-    import flash.media.Video;
-	import flash.media.Sound;
+    import flash.media.*;
     import flash.net.NetConnection;
     import flash.net.NetStream;
 	import com.a12.pattern.observer.Observable;
@@ -22,8 +21,7 @@ package com.a12.modules.mediaplayback
 		private var stream_ns:NetStream;
 		private var connection_nc:NetConnection;
 		private var streamInterval:Number;
-		private var metaData:Object;
-		private var soundController:Sound;
+		private var metaData:Object;		
 		private var mode:String;
 	
 		public function VideoModel(_ref,_file)
@@ -42,38 +40,6 @@ package com.a12.modules.mediaplayback
 		// Interface Methods
 		// --------------------------------------------------------------------
 		
-		public function getRef():MovieClip
-		{
-			return _ref;
-		}
-	
-		public function getMode():String
-		{
-			return mode;
-		}
-	
-		public function kill():void
-		{
-			stream_ns.close();
-			stream_ns = null;
-			connection_nc = null;
-			soundController = null;
-			clearInterval(streamInterval);
-		}
-		
-		public function toggleStream():void
-		{
-			stream_ns.togglePause();
-			changeStatus();
-		}
-	
-		public function pauseStream():void
-		{
-			stream_ns.pause();
-			mode = 'play';
-			changeStatus();
-		}
-	
 		public function stopStream():void
 		{
 			stream_ns.close();
@@ -84,7 +50,20 @@ package com.a12.modules.mediaplayback
 			stream_ns.resume();
 			mode = 'pause';
 			changeStatus();
+		}		
+	
+		public function pauseStream():void
+		{
+			stream_ns.pause();
+			mode = 'play';
+			changeStatus();
 		}
+		
+		public function toggleStream():void
+		{
+			stream_ns.togglePause();
+			changeStatus();
+		}	
 		
 		public function streamStatus(obj):void
 		{
@@ -101,6 +80,37 @@ package com.a12.modules.mediaplayback
 		public function seekStreamPercent(percent:Number):void
 		{
 			seekStream(Math.round(percent * metaData.duration) );
+		}
+		
+		public function toggleAudio():void
+		{
+			
+		}
+		
+		public function setVolume(value:Number):void
+		{
+			var transform:SoundTransform = new SoundTransform();
+			transform.volume = value;
+			stream_ns.soundTransform = transform;
+		}
+		
+		public function getRef():MovieClip
+		{
+			return _ref;
+		}
+	
+		public function getMode():String
+		{
+			return mode;
+		}
+	
+		public function kill():void
+		{
+			stream_ns.close();
+			stream_ns = null;
+			connection_nc = null;
+			//soundController = null;
+			clearInterval(streamInterval);
 		}
 		
 		// --------------------------------------------------------------------
@@ -178,7 +188,7 @@ package com.a12.modules.mediaplayback
 			mode = 'play';	
 		
 			clearInterval(streamInterval);
-			streamInterval = setInterval(getStreamInfo,500);
+			streamInterval = setInterval(getStreamInfo,200);
 				
 			var tObj = {};
 			tObj.stream = stream_ns;
@@ -194,10 +204,9 @@ package com.a12.modules.mediaplayback
 			var v = _ref.addChild(video);
 			v.name = 'myvideo';
 			
-			//Utils.$(vh,'myvideo').attachNetStream(stream_ns);
-									
 			setChanged();
 			notifyObservers(tObj);
+			
 		}
 	
 		private function getStreamInfo():void

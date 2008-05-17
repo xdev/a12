@@ -7,6 +7,7 @@ package com.a12.modules.mediaplayback
 	import flash.text.*;
 	import flash.utils.*;
 	import flash.events.*;
+	import flash.geom.Rectangle;
 	
 	import com.a12.pattern.observer.*;
 	import com.a12.pattern.mvc.*;
@@ -21,10 +22,13 @@ package com.a12.modules.mediaplayback
 		public var _ref:MovieClip;
 		public var height:Number;
 		public var width:Number;
-		public var stripW:Number;
 		
 		private var originalSize:Object;
 		private var _controls:MovieClip;
+		
+		private var timeMode:Boolean;
+		private var soundLevel:Number;
+		private var soundLevelA:Array;
 
 		public function CPView(m:Observable,c:Controller)
 		{
@@ -32,12 +36,18 @@ package com.a12.modules.mediaplayback
 			super(m,c);
 			width = 320;
 			height = 240;
-		
-			stripW = 120;
-		
+			
+			timeMode = true;
+			soundLevelA = [0.0,0.3,0.6,1.0];
+			soundLevel = 3;
+			
 			var obj = getModel();
-			_ref = obj.getRef();		
-		
+			_ref = obj.getRef();
+			
+			if(obj as AudioModel){
+				renderUI();
+			}
+					
 		}
 		
 		public function setScale(s:Number):void
@@ -73,13 +83,14 @@ package com.a12.modules.mediaplayback
 		
 		public override function update(o:Observable, infoObj:Object):void
 		{	
-			
+			var mc;
 			if(infoObj.stream != undefined){
 			
 			
 			}
-			if(infoObj.mode != undefined){
-				//_ref.controls.icon_playpause.gotoAndStop("icon_" + infoObj.icon);
+			if(infoObj.icon != undefined){
+				mc = Utils.$(_controls,'video_play');
+				mc.gotoAndStop('video_'+infoObj.icon);				
 			}
 			
 			if(infoObj.action == 'updateSize'){
@@ -91,62 +102,158 @@ package com.a12.modules.mediaplayback
 			}
 			
 			if(infoObj.action == 'updateView'){
-				//updateView(infoObj);
+				updateView(infoObj);
 			}
 			if(infoObj.action == 'mediaComplete'){
-				//_ref.controls.icon_playpause.gotoAndStop("icon_play");
+				mc = Utils.$(_controls,'video_play');
+				mc.gotoAndStop('video_play');
 			}
 			
 		}
 		
-		private function updateSize(infoObj):void
+		private function updateSize(infoObj:Object):void
 		{
 			width = infoObj.width;
 			height = infoObj.height;			
 			renderUI();
 		}	
-	
-		private function updateView(infoObj):void
+		
+		private function toggleTime():void
 		{
-			/*
-			var label = '';
+			timeMode = !timeMode;
+		}
 		
-			label += Utils.padZero(infoObj.time_current.minutes) + ':' + Utils.padZero(infoObj.time_current.seconds);
-		
-			if(infoObj.time_duration != undefined){
-				label += '/' + Utils.padZero(infoObj.time_duration.minutes) + ':' + Utils.padZero(infoObj.time_duration.seconds);
+		private function toggleAudio():void
+		{
+			if(soundLevel < soundLevelA.length){
+				soundLevel++;
 			}
+			if(soundLevel == soundLevelA.length){
+				soundLevel = 0;
+			}
+			
+			//set the audio icon position
+			var mc = Utils.$(_controls,'audio');
+			mc.gotoAndStop('audio'+soundLevel);
+			//controller setVolume
+			CPController(getController()).setVolume(soundLevelA[soundLevel]);
+		}
 		
-			_ref.controls.timeline.label.displayText.text = label;
+		private function updateView(infoObj:Object):void
+		{
+			//check the mode for display
+			var txt:String = '';
+			
+			switch(timeMode)
+			{
+				case true:
+					txt = '-' + Utils.padZero(infoObj.time_remaining.minutes) + ':' + Utils.padZero(Math.ceil(infoObj.time_remaining.seconds));
+				break;
+				
+				case false:
+					txt = Utils.padZero(infoObj.time_current.minutes) + ':' + Utils.padZero(infoObj.time_current.seconds);
+				break;
+				/*
+				case 'progress':
+					txt = Utils.padZero(infoObj.time_current.minutes) + ':' + Utils.padZero(infoObj.time_current.seconds) + '/';
+					txt += Utils.padZero(infoObj.time_duration.minutes) + ':' + Utils.padZero(infoObj.time_duration.seconds);
+				break;
+				*/
+			}
+			
+			var l = Utils.$(_controls,'label');
+			var tf = Utils.$(l,'displayText');
+			
+			tf.text = txt;
 		
-		
-			var factor = (width-stripW) / 100;
+			
+			var factor:Number = (width-95) / 100;
 		
 			//trace('updateView  - factor='+factor + ' perc=' + infoObj.time_percent);
-		
-		
+			
+			
 			//if dragging false
 			if(infoObj.time_percent != undefined){
-				if(_ref.controls.timeline.scrubber.dragging == false){
-					_ref.controls.timeline.scrubber._x = infoObj.time_percent * factor;
+				var mc = Utils.$(Utils.$(Utils.$(_controls,'timeline'),'strip'),'scrubber');
+				if(mc.dragging == false){
+					mc.x = infoObj.time_percent * factor;
 				}
 			}
 		
-			Utils.createmc(_ref.controls.timeline,"loader",{_y:-2.5});
-			Utils.drawRect(_ref.controls.timeline.loader,infoObj.loaded_percent * factor,5,0x73CDE7,100);
-			*/
+			//Utils.createmc(_ref.controls.timeline,"loader",{_y:-2.5});
+			//Utils.drawRect(_ref.controls.timeline.loader,infoObj.loaded_percent * factor,5,0x73CDE7,100);
+			
 		}
 		
 		private function mouseHandler(e:MouseEvent):void
 		{
-			trace('woooo');
-			CPController(getController()).toggle();
+			var mc = DisplayObject(e.target);
+			
+			if(e.type == MouseEvent.ROLL_OVER){
+				
+			}
+			if(e.type == MouseEvent.ROLL_OUT){
+				
+			}
+			if(e.type == MouseEvent.CLICK){
+				if(mc.name == 'video_play'){
+					CPController(getController()).toggle();
+				}
+				if(mc.name == 'video_start'){
+					trace('need to redefine stop vs. close');
+					CPController(getController()).stop();
+				}
+				if(mc.name == 'label'){
+					toggleTime();
+				}
+				if(mc.name == 'strip'){
+					CPController(getController()).findSeek(mc.mouseX / (width-95));
+				}
+				if(mc.name == 'audio'){
+					toggleAudio();//CPController(getController()).toggleSound();
+				}
+			}
+			if(e.type == MouseEvent.MOUSE_DOWN){
+				var rect = new Rectangle();
+				rect.top = 0;
+				rect.bottom = 0;
+				rect.left = 0;
+				rect.right = (width-95)-8;
+				mc.startDrag(false,rect);
+				mc.dragging = true;
+				
+				mc.mode = CPController(getController()).getMode();
+				CPController(getController()).pause();
+				
+				//set up special stage tracker
+				_ref.stage.addEventListener(MouseEvent.MOUSE_UP,mouseHandler);
+			}
+			if(e.type == MouseEvent.MOUSE_UP){
+				
+				mc = Utils.$(Utils.$(Utils.$(_controls,'timeline'),'strip'),'scrubber');
+				//mc = Utils.findChild(_controls,['timeline','strip','scrubber']);
+				
+				mc.dragging = false;
+				mc.stopDrag();
+				CPController(getController()).findSeek(mc.x / (width-95));
+				
+				if(mc.mode == 'play'){			
+					CPController(getController()).play();
+				}
+				
+				_ref.stage.removeEventListener(MouseEvent.MOUSE_UP,mouseHandler);
+			}
+			if(e.type == MouseEvent.MOUSE_MOVE){
+				if(mc.dragging == true){
+					CPController(getController()).findSeek(mc.x / (width-95));		
+				}
+			}
 		}
 	
 		private function renderUI():void
 		{
-			_ref.addEventListener(MouseEvent.CLICK,mouseHandler);			
-			
+			//make video screen clickable yo
+			//_ref.addEventListener(MouseEvent.CLICK,mouseHandler);			
 			_controls = Utils.createmc(_ref,"controls",{y:height});
 		
 			var b = Utils.createmc(_controls,"back",{alpha:0.75});
@@ -154,91 +261,73 @@ package com.a12.modules.mediaplayback
 			
 			var i,mc;
 			
+			//VCR stop (back to beginning)
 			i = new icons();
 			i.gotoAndStop('video_start');
 			mc = _controls.addChild(i);
 			mc.name = 'video_start';
+			mc.buttonMode = true;
 			mc.x = 10;
 			mc.y = 10;
 			mc.addEventListener(MouseEvent.ROLL_OVER,mouseHandler);
 			mc.addEventListener(MouseEvent.ROLL_OUT,mouseHandler);
 			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
 			
+			//play/pause
 			i = new icons();
 			i.gotoAndStop('video_play');
 			mc = _controls.addChild(i);
 			mc.name = 'video_play';
+			mc.buttonMode = true;
 			mc.x = 30;
 			mc.y = 10;
 			mc.addEventListener(MouseEvent.ROLL_OVER,mouseHandler);
 			mc.addEventListener(MouseEvent.ROLL_OUT,mouseHandler);
 			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
-			//CPController(this._scope.getController()).toggle();
 			
 			//timeline
 			var t = Utils.createmc(_controls,"timeline",{x:40,y:10});
-			var s = Utils.createmc(t,"strip",{y:-2.5,_scope:this});
-			Utils.drawRect(s,width-95,5,0xCCCCCC,100);
+			mc = Utils.createmc(t,"strip",{y:-4,_scope:this,mouseEnabled:true});
+			mc.buttonMode = true;
+			Utils.drawRect(mc,width-95,8,0xFFFFFF,100);
 		
-			var h = Utils.createmc(t,"strip_hit",{y:-5});
-			Utils.drawRect(h,width-95,10,0xCCCCCC,0);
+			var h = Utils.createmc(t,"strip_hit",{y:-6});
+			Utils.drawRect(h,width-95,12,0xFF0000,0);
 		
-			s.hitArea = h;
-			/*
-			s.onPress = function()
-			{
-				CPController(this._scope.getController()).findSeek(this._xmouse / 200);
-			}
-			*/
+			mc.hitArea = h;
+			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
 			
-			//scrubber			
-			/*
-			_ref.controls.timeline.attachMovie("icons","scrubber",10,{_scope:this,dragging:false});
-			_ref.controls.timeline.scrubber.gotoAndStop("icon_scrub");
-		
-		
-			_ref.controls.timeline.scrubber.onPress = function(){
-				this.startDrag(false,0,0,200,0);
-				this.dragging = true;
-				//deactivate the scrubber from receiving time updates
-			}
-		
-			_ref.controls.timeline.scrubber.onRelease = function()
-			{	
-				this.dragging = false;
-				this.stopDrag();
-				CPController(this._scope.getController()).findSeek(this._x / 200);			
+			//scrubber
+			i = Utils.createmc(mc,"scrubber",{dragging:false,mouseEnabled:true});
+			Utils.drawRect(i,8,8,0x000000,100);
+			i.buttonMode = true;
+			i.addEventListener(MouseEvent.MOUSE_DOWN,mouseHandler);
+			//i.addEventListener(MouseEvent.MOUSE_UP,mouseHandler);
+			i.addEventListener(MouseEvent.MOUSE_MOVE,mouseHandler);
+			//i.addEventListener(MouseEvent.MOUSE_OUT,mouseHandler);
 			
-				//reactivate the scrubber for time updates
-			}
-			*/
-			
+			//progress label
 			var tf = new TextFormat();
 			tf.font = "Akzidenz Grotesk";
 			tf.size = 10;
 			tf.color = 0xFFFFFF;
 		
-			var l = Utils.createmc(_controls,"label",{x:width-50,y:2});
-			Utils.makeTextfield(l,"00:00",tf,{selectable: false});
-	
-			//attach audio buttons
+			var l = Utils.createmc(_controls,"label",{x:width-50,y:2.5,mouseEnabled:true});
+			t = Utils.makeTextfield(l,"00:00",tf,{selectable: false});
+			l.addEventListener(MouseEvent.CLICK,mouseHandler);
+			l.buttonMode = true;
+			
+			//audio controls
 			i = new icons();
 			i.gotoAndStop('audio3');
 			mc = _controls.addChild(i);
 			mc.name = 'audio';
+			mc.buttonMode = true;
 			mc.x = width-10;
 			mc.y = 10;
 			mc.addEventListener(MouseEvent.ROLL_OVER,mouseHandler);
 			mc.addEventListener(MouseEvent.ROLL_OUT,mouseHandler);
 			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
-			
-			
-			/*
-			_ref.controls.icon_audio.onPress = function()
-			{
-				CPController(this._scope.getController()).toggleSound();
-			}
-			*/
 		
 		}	
 

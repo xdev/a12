@@ -16,6 +16,10 @@ package com.a12.modules.mediaplayback
 		
 		function seekStreamPercent(percent:Number):void;		
 		
+		function toggleAudio():void;
+		
+		function setVolume(value:Number):void;
+		
 		function getMode():String;
 		
 		function getRef():MovieClip;

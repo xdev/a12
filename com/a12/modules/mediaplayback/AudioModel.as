@@ -18,13 +18,14 @@ package com.a12.modules.mediaplayback
 	
 		private var _ref:MovieClip;
 		private var _file:String;
-		private var stream_ns:NetStream;
-		private var connection_nc:NetConnection;
+		
 		private var streamInterval:Number;
 		private var loadInterval:Number;
 		private var metaData:Object;
-		private var soundController:Sound;
+		
+		private var soundObj:Sound;
 		private var soundChannel:SoundChannel;
+		private	var	soundVolume:Number;
 		private var positionTimer:Timer;
 		private var mode:String;
 		private var position:Number;
@@ -33,6 +34,7 @@ package com.a12.modules.mediaplayback
 		{
 			_ref = ref;
 			_file = file;
+			soundVolume = 1.0;
 			playMedia();
 		}
 		
@@ -40,31 +42,18 @@ package com.a12.modules.mediaplayback
 		// Interface Methods
 		// --------------------------------------------------------------------
 		
-		public function streamStatus(obj):void
+		public function stopStream():void
 		{
-			trace(obj.code);
-		}
-	
-		public function seekStream(time:Number):void
-		{
-			soundController.play(time);
-		}
-	
-		public function seekStreamPercent(percent:Number):void
-		{
-			seekStream( Math.round(percent * (soundController.length/1000)) );
-		}
-	
-		public function playStream():void
-		{
-			soundController.play(0);
+			soundChannel.stop();
 		}
 		
-		public function toggleStream():void
+		public function playStream():void
 		{
-			pauseStream();
+			soundChannel.stop();
+			soundChannel = soundObj.play(position);
+			_setVolume();
 		}
-	
+		
 		public function pauseStream():void
 		{
 			var icon = '';
@@ -79,7 +68,9 @@ package com.a12.modules.mediaplayback
 				case mode == 'pause':
 					mode = 'play';
 					icon = 'pause';
-					soundController.play(Math.floor(position/1000));
+					soundChannel.stop();
+					soundChannel = soundObj.play(position);
+					_setVolume();
 				break;
 			}
 		
@@ -90,10 +81,33 @@ package com.a12.modules.mediaplayback
 			setChanged();
 			notifyObservers(tObj);
 		}
-	
-		public function stopStream():void
+		
+		public function toggleStream():void
+		{
+			pauseStream();
+		}
+			
+		public function seekStream(time:Number):void
 		{
 			soundChannel.stop();
+			soundChannel = soundObj.play(time);
+			_setVolume();
+		}
+	
+		public function seekStreamPercent(percent:Number):void
+		{
+			seekStream(percent * soundObj.length);
+		}
+		
+		public function toggleAudio():void
+		{
+			
+		}
+		
+		public function setVolume(value:Number):void
+		{
+			soundVolume = value;
+			_setVolume();
 		}
 	
 		public function getRef():MovieClip
@@ -101,22 +115,35 @@ package com.a12.modules.mediaplayback
 			return _ref;
 		}
 	
-		public function kill():void
-		{
-			soundChannel.stop();
-			//delete soundController;
-			Utils.createmc(_ref,"audio",20001);
-			clearInterval(streamInterval);
-		}
-	
 		public function getMode():String
 		{
 			return mode;
 		}
 		
+		public function kill():void
+		{
+			soundChannel.stop();
+			soundChannel = null;
+			soundObj = null;
+			//delete soundObj;
+			//Utils.createmc(_ref,"audio",20001);
+			clearInterval(streamInterval);
+		}
+		
 		// --------------------------------------------------------------------
 		// Class Methods
 		// --------------------------------------------------------------------
+		private function _setVolume()
+		{
+			var transform:SoundTransform = new SoundTransform();
+			transform.volume = soundVolume;
+			soundChannel.soundTransform = transform;
+		}
+		
+		private function streamStatus(obj):void
+		{
+			trace(obj.code);
+		}
 			
 		private function playMedia():void
 		{
@@ -136,26 +163,21 @@ package com.a12.modules.mediaplayback
 		
 			Utils.createmc(_ref,"audio",20001);
 		
-			soundController = new Sound();
+			soundObj = new Sound();
 			var req:URLRequest = new URLRequest(_file);
 			//true
-			//soundController.play();
-			soundController.addEventListener(ProgressEvent.PROGRESS, progressHandler);
-			soundController.addEventListener(Event.COMPLETE, onComplete);
-			soundController.addEventListener(Event.ID3, id3Handler);
-			soundController.load(req);
 			
-			positionTimer = new Timer(50);
+			soundObj.addEventListener(ProgressEvent.PROGRESS, progressHandler);
+			soundObj.addEventListener(Event.COMPLETE, onComplete);
+			soundObj.addEventListener(Event.ID3, id3Handler);
+			soundObj.load(req);
+			
+			positionTimer = new Timer(200);
 			positionTimer.addEventListener(TimerEvent.TIMER, getStreamInfo);
 			positionTimer.start();
 			
-			soundChannel = soundController.play();
-			/*
-			soundController.loadSound(_file,true);
-			soundController.onSoundComplete = Delegate.create(this, onComplete);
-			soundController.onLoad = Delegate.create(this, onLoad);
-			*/
-		
+			soundChannel = soundObj.play();
+			
 			setChanged();
 			notifyObservers(tObj);
 		}
@@ -195,15 +217,14 @@ package com.a12.modules.mediaplayback
 		
 			tObj.action = "updateView";
 		
-//			tObj.time_current = Utils.convertSeconds(Math.floor(shoundChannel.position/1000));
-//			tObj.time_duration = Utils.convertSeconds(Math.floor(soundController.length/1000));
-//			tObj.time_percent = Math.floor(((shoundChannel.position/1000) / Math.floor(soundController.duration/1000)) * 100);
-			tObj.loaded_percent = Math.floor((soundController.bytesLoaded / soundController.bytesTotal) * 100);
+			tObj.time_current = Utils.convertSeconds(Math.floor(soundChannel.position/1000));
+			tObj.time_duration = Utils.convertSeconds(Math.floor(soundObj.length/1000));
+			tObj.time_remaining = Utils.convertSeconds(Math.floor(soundObj.length/1000) - Math.floor(soundChannel.position/1000));
+			tObj.time_percent = Math.floor(((soundChannel.position/1000) / Math.floor(soundObj.length/1000)) * 100);
+			tObj.loaded_percent = Math.floor((soundObj.bytesLoaded / soundObj.bytesTotal) * 100);
 				
 			setChanged();
-			notifyObservers(tObj);
-		
-			tObj = null;
+			notifyObservers(tObj);			
 		
 		}
 	
