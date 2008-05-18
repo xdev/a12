@@ -59,7 +59,6 @@ package com.a12.modules.mediaplayback
 		public function findSeek(percent:Number):void
 		{
 			mod.seekStreamPercent(percent);
-			
 		}
 
 	}

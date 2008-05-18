@@ -5,7 +5,6 @@ package com.a12.pattern.observer
 
 	import com.a12.pattern.observer.Observer;
 
-
 	/**
 	 * A Java-style Observable class used to represent the "subject"
 	 * of the Observer design pattern. Observers must implement the Observer

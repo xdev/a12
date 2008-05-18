@@ -5,17 +5,17 @@ package com.a12.modules.mediaplayback
 
 	import com.a12.pattern.observer.*;
 	import com.a12.modules.mediaplayback.*;
+	import flash.display.Sprite;
 
-
-	public class MediaPlayback
+	dynamic public class MediaPlayback extends Sprite
 	{
 		private var _model;
-		private var _view:CPView;
+		public var _view:CPView;
 	
 		public function MediaPlayback(ref,file)
 		{
 			var ext = file.substr(file.lastIndexOf('.')+1,file.length);
-		
+			
 			if(ext == 'mp4' || ext == 'mov' || ext == 'm4v' || ext == 'flv'){
 				_model = new VideoModel(ref,file);
 			}
@@ -31,14 +31,19 @@ package com.a12.modules.mediaplayback
 		
 		/* API Methods */
 		
-		public function setScale(s:Number):void
+		public function setScale(value:Number):void
 		{
-			_view.setScale(s);
+			_view.setScale(value);
 		}
 
 		public function getDimensions(mode:Boolean=true):Object
 		{
 			return _view.getDimensions(mode);
+		}
+		
+		public function setWidth(value:Number):void
+		{
+			_view.setWidth(value);
 		}
 			
 		public function stop():void

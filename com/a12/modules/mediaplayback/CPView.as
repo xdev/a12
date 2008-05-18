@@ -24,8 +24,9 @@ package com.a12.modules.mediaplayback
 		public var width:Number;
 		
 		private var _originalSize:Object;
-		private var _controls:MovieClip;
+		public var _controls:MovieClip;
 		
+		private var _timer:Timer;
 		private var _timeMode:Boolean;
 		private var _soundLevel:Number;
 		private var _soundLevelA:Array;
@@ -52,20 +53,29 @@ package com.a12.modules.mediaplayback
 					
 		}
 		
-		public function setScale(s:Number):void
+		public function setScale(value:Number):void
 		{
 			//find height and width based upon scale
 			var tW,tH;
 			
-			if(s<100){
-				tW = Math.floor((s/100) * _originalSize.width);
-				tH = Math.floor((s/100) * _originalSize.height);
+			if(value<100){
+				tW = Math.floor((value/100) * _originalSize.width);
+				tH = Math.floor((value/100) * _originalSize.height);
 			}else{
 				tW = _originalSize.width;
 				tH = _originalSize.height;
 			}		
-
-			updateSize({width:tW,height:tH});
+			
+			height = tH;
+			width = tW;
+			layoutUI();
+			//updateSize({width:tW,height:tH});
+		}
+		
+		public function setWidth(value:Number):void
+		{
+			width = value;
+			layoutUI();
 		}
 
 		public function getDimensions(mode:Boolean):Object
@@ -96,7 +106,7 @@ package com.a12.modules.mediaplayback
 				_originalSize.height = infoObj.height;
 				_originalSize.width = infoObj.width;
 				updateSize(infoObj);
-				//broadcaster.broadcastMessage("onUpdateSize");
+				dispatchEvent(new CustomEvent('onUpdateSize',true,false,infoObj));
 			}
 			
 			if(infoObj.action == 'updateView'){
@@ -169,7 +179,7 @@ package com.a12.modules.mediaplayback
 				
 			//if dragging false
 			if(infoObj.time_percent != undefined){
-				mc = Utils.$(Utils.$(Utils.$(_controls,'timeline'),'strip'),'scrubber');
+				mc = Utils.$(Utils.$(_controls,'timeline'),'scrubber');
 				if(mc.dragging == false){
 					mc.x = infoObj.time_percent * ((width-95)-_scrubberWidth) / 100;
 				}
@@ -181,10 +191,23 @@ package com.a12.modules.mediaplayback
 			}else{
 				mc.gotoAndStop('video_play');
 			}
-						
-			//Utils.createmc(_ref.controls.timeline,"loader",{_y:-2.5});
-			//Utils.drawRect(_ref.controls.timeline.loader,infoObj.loaded_percent * factor,5,0x73CDE7,100);
 			
+			if(infoObj.loaded_percent >= 0){
+				mc = Utils.$(Utils.$(_controls,'timeline'),'strip_load');
+				mc.scaleX = infoObj.loaded_percent / 100;
+			}
+			
+			if(infoObj.time_percent >= 0){
+				mc = Utils.$(Utils.$(_controls,'timeline'),'strip_progress');
+				mc.scaleX = infoObj.time_percent / 100;
+			}
+			
+		}
+		
+		private function trackScrubber(e:Event):void
+		{
+			var mc = Utils.$(Utils.$(_controls,'timeline'),'scrubber');
+			CPController(getController()).findSeek(mc.x / (width-95));
 		}
 		
 		// Consider moving this into the Controller
@@ -221,8 +244,8 @@ package com.a12.modules.mediaplayback
 			}
 			if(e.type == MouseEvent.MOUSE_DOWN){
 				var rect = new Rectangle();
-				rect.top = 0;
-				rect.bottom = 0;
+				rect.top = -4;
+				rect.bottom = -4;
 				rect.left = 0;
 				rect.right = (width-95)-_scrubberWidth;
 				mc.startDrag(false,rect);
@@ -233,10 +256,13 @@ package com.a12.modules.mediaplayback
 				
 				//set up special stage tracker
 				ref.stage.addEventListener(MouseEvent.MOUSE_UP,mouseHandler);
+				
+				//_timer.start();
+				mc.addEventListener(Event.ENTER_FRAME, trackScrubber);
 			}
 			if(e.type == MouseEvent.MOUSE_UP){
 				
-				mc = Utils.$(Utils.$(Utils.$(_controls,'timeline'),'strip'),'scrubber');
+				mc = Utils.$(Utils.$(_controls,'timeline'),'scrubber');
 				//mc = Utils.findChild(_controls,['timeline','strip','scrubber']);
 				
 				mc.dragging = false;
@@ -252,12 +278,50 @@ package com.a12.modules.mediaplayback
 				mc.playing = null;
 				
 				ref.stage.removeEventListener(MouseEvent.MOUSE_UP,mouseHandler);
+				
+				//_timer.stop();
+				mc.removeEventListener(Event.ENTER_FRAME, trackScrubber);
 			}
+			/*
 			if(e.type == MouseEvent.MOUSE_MOVE){
 				if(mc.dragging == true){
 					CPController(getController()).findSeek(mc.x / (width-95));		
 				}
 			}
+			*/
+		}
+		
+		private function layoutUI():void
+		{
+			var mc;
+			mc = Utils.$(_controls,"back");
+			mc.graphics.clear();
+			Utils.drawRect(mc,width,20,0x404040,100);
+			
+			var t = Utils.$(_controls,"timeline");
+			mc = Utils.$(t,"strip_back");
+			mc.graphics.clear();
+			Utils.drawRect(mc,width-95,8,0xCCCCCC,100);
+			
+			mc = Utils.$(t,"strip_hit");
+			mc.graphics.clear();
+			Utils.drawRect(mc,width-95,12,0xFF0000,0);
+			
+			mc = Utils.$(t,"strip_load");
+			mc.graphics.clear();
+			Utils.drawRect(mc,width-95,8,0xFFFFFF,100);
+			
+			mc = Utils.$(t,"strip_progress");
+			mc.graphics.clear();
+			Utils.drawRect(mc,width-95,8,0x808080,100);
+			
+			//move the label
+			mc = Utils.$(_controls,"label");
+			mc.x = width - 40;
+			
+			//move the audio
+			mc = Utils.$(_controls,"audio");
+			mc.x = width - 10;
 		}
 	
 		private function renderUI():void
@@ -297,24 +361,31 @@ package com.a12.modules.mediaplayback
 			
 			//timeline
 			var t = Utils.createmc(_controls,"timeline",{x:40,y:10});
-			mc = Utils.createmc(t,"strip",{y:-4,_scope:this,mouseEnabled:true});
+			mc = Utils.createmc(t,"strip_back",{y:-4,_scope:this,mouseEnabled:true});
 			mc.buttonMode = true;
-			Utils.drawRect(mc,width-95,8,0xFFFFFF,100);
+			Utils.drawRect(mc,width-95,8,0xCCCCCC,100);
 		
 			var h = Utils.createmc(t,"strip_hit",{y:-6});
 			Utils.drawRect(h,width-95,12,0xFF0000,0);
-		
+			
 			mc.hitArea = h;
 			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
 			
+			h = Utils.createmc(t,"strip_load",{y:-4,scaleX:0.0});
+			Utils.drawRect(h,width-95,8,0xFFFFFF,100);
+			
+			h = Utils.createmc(t,"strip_progress",{y:-4,scaleX:0.0});
+			Utils.drawRect(h,width-95,8,0x808080,100);		
+			
 			//scrubber
-			i = Utils.createmc(mc,"scrubber",{dragging:false,mouseEnabled:true});
+			i = Utils.createmc(t,"scrubber",{y:-4,dragging:false,mouseEnabled:true});
 			Utils.drawRect(i,_scrubberWidth,_scrubberWidth,0x000000,100);
 			i.buttonMode = true;
 			i.addEventListener(MouseEvent.MOUSE_DOWN,mouseHandler);
-			//i.addEventListener(MouseEvent.MOUSE_UP,mouseHandler);
-			i.addEventListener(MouseEvent.MOUSE_MOVE,mouseHandler);
-			//i.addEventListener(MouseEvent.MOUSE_OUT,mouseHandler);
+			
+			//_timer = new Timer(20);
+			//_timer.addEventListener(TimerEvent.TIMER, trackScrubber);			
+			//i.addEventListener(MouseEvent.MOUSE_MOVE,mouseHandler);
 			
 			//progress label
 			var tf = new TextFormat();

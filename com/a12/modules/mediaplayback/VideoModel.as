@@ -34,7 +34,8 @@ package com.a12.modules.mediaplayback
 			_connection = new NetConnection();
 			_connection.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
             _connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
-			_connection.connect(null);			
+			_connection.connect(null);
+					
 		}
 		
 		// --------------------------------------------------------------------
@@ -190,7 +191,7 @@ package com.a12.modules.mediaplayback
 			
 			_playing = true;	
 					
-			_timer = new Timer(200);
+			_timer = new Timer(20);
 			_timer.addEventListener(TimerEvent.TIMER, updateView);
 			_timer.start();
 				

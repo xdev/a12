@@ -162,7 +162,7 @@ package com.a12.modules.mediaplayback
 			_sound.addEventListener(Event.ID3, id3Handler);
 			_sound.load(req);
 			
-			_timer = new Timer(200);
+			_timer = new Timer(20);
 			_timer.addEventListener(TimerEvent.TIMER, updateView);
 			_timer.start();
 			

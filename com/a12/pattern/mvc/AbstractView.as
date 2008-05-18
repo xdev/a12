@@ -5,11 +5,13 @@ package com.a12.pattern.mvc
 
 	import com.a12.pattern.observer.*;
 	import com.a12.pattern.mvc.*;
+	import flash.events.EventDispatcher;
+	
 	/**
 	 * Provides basic services for the "view" of
 	 * a Model/View/Controller triad.
 	 */
-	public class AbstractView implements Observer, View {
+	public class AbstractView extends EventDispatcher implements Observer, View {
 	  private var model:Observable;
 	  private var controller:Controller;
 

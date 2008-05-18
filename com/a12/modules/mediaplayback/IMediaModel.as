@@ -4,6 +4,7 @@ package com.a12.modules.mediaplayback
 	
 	public interface IMediaModel
 	{
+		
 		function stopStream():void;
 		
 		function playStream():void;
@@ -27,5 +28,5 @@ package com.a12.modules.mediaplayback
 		function kill():void;
 		
 	}
-	
+		
 }
