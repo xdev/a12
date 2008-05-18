@@ -9,23 +9,23 @@ package com.a12.modules.mediaplayback
 
 	public class MediaPlayback
 	{
-		private var mp_model;
-		private var mp_view:CPView;
+		private var _model;
+		private var _view:CPView;
 	
 		public function MediaPlayback(ref,file)
 		{
 			var ext = file.substr(file.lastIndexOf('.')+1,file.length);
 		
 			if(ext == 'mp4' || ext == 'mov' || ext == 'm4v' || ext == 'flv'){
-				mp_model = new VideoModel(ref,file);
+				_model = new VideoModel(ref,file);
 			}
 		
 			if(ext == 'mp3'){
-				mp_model = new AudioModel(ref,file);
+				_model = new AudioModel(ref,file);
 			}
 							
-			mp_view = new CPView(mp_model,null);
-			mp_model.addObserver(mp_view);
+			_view = new CPView(_model,null);
+			_model.addObserver(_view);
 						
 		}
 		
@@ -33,32 +33,32 @@ package com.a12.modules.mediaplayback
 		
 		public function setScale(s:Number):void
 		{
-			mp_view.setScale(s);
+			_view.setScale(s);
 		}
 
 		public function getDimensions(mode:Boolean=true):Object
 		{
-			return mp_view.getDimensions(mode);
+			return _view.getDimensions(mode);
 		}
 			
 		public function stop():void
 		{
-			mp_model.stopStream();
+			_model.stopStream();
 		}
 	
 		public function pause():void
 		{
-			mp_model.pauseStream();
+			_model.pauseStream();
 		}
 	
 		public function play():void
 		{
-			mp_model.playStream();
+			_model.playStream();
 		}
 		
 		public function kill():void
 		{
-			mp_model.kill();
+			_model.kill();
 		}
 	
 	}

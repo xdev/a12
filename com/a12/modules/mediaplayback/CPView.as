@@ -19,16 +19,17 @@ package com.a12.modules.mediaplayback
 	public class CPView extends AbstractView
 	{
 
-		public var _ref:MovieClip;
+		public var ref:MovieClip;
 		public var height:Number;
 		public var width:Number;
 		
-		private var originalSize:Object;
+		private var _originalSize:Object;
 		private var _controls:MovieClip;
 		
-		private var timeMode:Boolean;
-		private var soundLevel:Number;
-		private var soundLevelA:Array;
+		private var _timeMode:Boolean;
+		private var _soundLevel:Number;
+		private var _soundLevelA:Array;
+		private var _scrubberWidth:Number;
 
 		public function CPView(m:Observable,c:Controller)
 		{
@@ -37,12 +38,13 @@ package com.a12.modules.mediaplayback
 			width = 320;
 			height = 240;
 			
-			timeMode = true;
-			soundLevelA = [0.0,0.3,0.6,1.0];
-			soundLevel = 3;
+			_timeMode = true;
+			_soundLevelA = [0.0,0.3,0.6,1.0];
+			_soundLevel = 3;
+			_scrubberWidth = 8;
 			
 			var obj = getModel();
-			_ref = obj.getRef();
+			ref = obj.getRef();
 			
 			if(obj as AudioModel){
 				renderUI();
@@ -56,11 +58,11 @@ package com.a12.modules.mediaplayback
 			var tW,tH;
 			
 			if(s<100){
-				tW = Math.floor((s/100) * originalSize.width);
-				tH = Math.floor((s/100) * originalSize.height);
+				tW = Math.floor((s/100) * _originalSize.width);
+				tH = Math.floor((s/100) * _originalSize.height);
 			}else{
-				tW = originalSize.width;
-				tH = originalSize.height;
+				tW = _originalSize.width;
+				tH = _originalSize.height;
 			}		
 
 			updateSize({width:tW,height:tH});
@@ -71,7 +73,7 @@ package com.a12.modules.mediaplayback
 			if(mode == false){
 				return {height:height,width:width};
 			}else{
-				return {height:originalSize.height,width:originalSize.width};
+				return {height:_originalSize.height,width:_originalSize.width};
 			}
 		}
 	
@@ -88,15 +90,11 @@ package com.a12.modules.mediaplayback
 			
 			
 			}
-			if(infoObj.icon != undefined){
-				mc = Utils.$(_controls,'video_play');
-				mc.gotoAndStop('video_'+infoObj.icon);				
-			}
 			
 			if(infoObj.action == 'updateSize'){
-				originalSize = {};
-				originalSize.height = infoObj.height;
-				originalSize.width = infoObj.width;
+				_originalSize = {};
+				_originalSize.height = infoObj.height;
+				_originalSize.width = infoObj.width;
 				updateSize(infoObj);
 				//broadcaster.broadcastMessage("onUpdateSize");
 			}
@@ -120,23 +118,23 @@ package com.a12.modules.mediaplayback
 		
 		private function toggleTime():void
 		{
-			timeMode = !timeMode;
+			_timeMode = !_timeMode;
 		}
 		
 		private function toggleAudio():void
 		{
-			if(soundLevel < soundLevelA.length){
-				soundLevel++;
+			if(_soundLevel < _soundLevelA.length){
+				_soundLevel++;
 			}
-			if(soundLevel == soundLevelA.length){
-				soundLevel = 0;
+			if(_soundLevel == _soundLevelA.length){
+				_soundLevel = 0;
 			}
 			
 			//set the audio icon position
 			var mc = Utils.$(_controls,'audio');
-			mc.gotoAndStop('audio'+soundLevel);
+			mc.gotoAndStop('audio'+_soundLevel);
 			//controller setVolume
-			CPController(getController()).setVolume(soundLevelA[soundLevel]);
+			CPController(getController()).setVolume(_soundLevelA[_soundLevel]);
 		}
 		
 		private function updateView(infoObj:Object):void
@@ -144,7 +142,7 @@ package com.a12.modules.mediaplayback
 			//check the mode for display
 			var txt:String = '';
 			
-			switch(timeMode)
+			switch(_timeMode)
 			{
 				case true:
 					txt = '-' + Utils.padZero(infoObj.time_remaining.minutes) + ':' + Utils.padZero(Math.ceil(infoObj.time_remaining.seconds));
@@ -163,28 +161,33 @@ package com.a12.modules.mediaplayback
 			
 			var l = Utils.$(_controls,'label');
 			var tf = Utils.$(l,'displayText');
-			
 			tf.text = txt;
-		
-			
+					
 			var factor:Number = (width-95) / 100;
-		
-			//trace('updateView  - factor='+factor + ' perc=' + infoObj.time_percent);
 			
-			
+			var mc;
+				
 			//if dragging false
 			if(infoObj.time_percent != undefined){
-				var mc = Utils.$(Utils.$(Utils.$(_controls,'timeline'),'strip'),'scrubber');
+				mc = Utils.$(Utils.$(Utils.$(_controls,'timeline'),'strip'),'scrubber');
 				if(mc.dragging == false){
-					mc.x = infoObj.time_percent * factor;
+					mc.x = infoObj.time_percent * ((width-95)-_scrubberWidth) / 100;
 				}
 			}
-		
+			
+			mc = Utils.$(_controls,'video_play');
+			if(infoObj.playing){
+				mc.gotoAndStop('video_pause');
+			}else{
+				mc.gotoAndStop('video_play');
+			}
+						
 			//Utils.createmc(_ref.controls.timeline,"loader",{_y:-2.5});
 			//Utils.drawRect(_ref.controls.timeline.loader,infoObj.loaded_percent * factor,5,0x73CDE7,100);
 			
 		}
 		
+		// Consider moving this into the Controller
 		private function mouseHandler(e:MouseEvent):void
 		{
 			var mc = DisplayObject(e.target);
@@ -200,14 +203,17 @@ package com.a12.modules.mediaplayback
 					CPController(getController()).toggle();
 				}
 				if(mc.name == 'video_start'){
-					trace('need to redefine stop vs. close');
 					CPController(getController()).stop();
 				}
 				if(mc.name == 'label'){
 					toggleTime();
 				}
 				if(mc.name == 'strip'){
+					var playing = CPController(getController()).getPlaying();
 					CPController(getController()).findSeek(mc.mouseX / (width-95));
+					if(!playing){
+						CPController(getController()).pause();
+					}
 				}
 				if(mc.name == 'audio'){
 					toggleAudio();//CPController(getController()).toggleSound();
@@ -218,15 +224,15 @@ package com.a12.modules.mediaplayback
 				rect.top = 0;
 				rect.bottom = 0;
 				rect.left = 0;
-				rect.right = (width-95)-8;
+				rect.right = (width-95)-_scrubberWidth;
 				mc.startDrag(false,rect);
 				mc.dragging = true;
 				
-				mc.mode = CPController(getController()).getMode();
+				mc.playing = CPController(getController()).getPlaying();
 				CPController(getController()).pause();
 				
 				//set up special stage tracker
-				_ref.stage.addEventListener(MouseEvent.MOUSE_UP,mouseHandler);
+				ref.stage.addEventListener(MouseEvent.MOUSE_UP,mouseHandler);
 			}
 			if(e.type == MouseEvent.MOUSE_UP){
 				
@@ -237,11 +243,15 @@ package com.a12.modules.mediaplayback
 				mc.stopDrag();
 				CPController(getController()).findSeek(mc.x / (width-95));
 				
-				if(mc.mode == 'play'){			
+				if(mc.playing == true){			
 					CPController(getController()).play();
+				}else{
+					CPController(getController()).pause();
 				}
 				
-				_ref.stage.removeEventListener(MouseEvent.MOUSE_UP,mouseHandler);
+				mc.playing = null;
+				
+				ref.stage.removeEventListener(MouseEvent.MOUSE_UP,mouseHandler);
 			}
 			if(e.type == MouseEvent.MOUSE_MOVE){
 				if(mc.dragging == true){
@@ -254,7 +264,7 @@ package com.a12.modules.mediaplayback
 		{
 			//make video screen clickable yo
 			//_ref.addEventListener(MouseEvent.CLICK,mouseHandler);			
-			_controls = Utils.createmc(_ref,"controls",{y:height});
+			_controls = Utils.createmc(ref,"controls",{y:height});
 		
 			var b = Utils.createmc(_controls,"back",{alpha:0.75});
 			Utils.drawRect(b,width,20,0x404040,100);
@@ -299,7 +309,7 @@ package com.a12.modules.mediaplayback
 			
 			//scrubber
 			i = Utils.createmc(mc,"scrubber",{dragging:false,mouseEnabled:true});
-			Utils.drawRect(i,8,8,0x000000,100);
+			Utils.drawRect(i,_scrubberWidth,_scrubberWidth,0x000000,100);
 			i.buttonMode = true;
 			i.addEventListener(MouseEvent.MOUSE_DOWN,mouseHandler);
 			//i.addEventListener(MouseEvent.MOUSE_UP,mouseHandler);
@@ -312,8 +322,8 @@ package com.a12.modules.mediaplayback
 			tf.size = 10;
 			tf.color = 0xFFFFFF;
 		
-			var l = Utils.createmc(_controls,"label",{x:width-50,y:2.5,mouseEnabled:true});
-			t = Utils.makeTextfield(l,"00:00",tf,{selectable: false});
+			var l = Utils.createmc(_controls,"label",{x:width-40,y:2.5,mouseEnabled:true});
+			t = Utils.makeTextfield(l,"00:00",tf,{autoSize:'right'});//
 			l.addEventListener(MouseEvent.CLICK,mouseHandler);
 			l.buttonMode = true;
 			

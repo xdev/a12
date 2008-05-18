@@ -19,7 +19,6 @@ package com.a12.modules.mediaplayback
 		{
 			super(m);
 			mod = getModel();	
-		
 		}
 		
 		public function toggleSound():void
@@ -37,9 +36,9 @@ package com.a12.modules.mediaplayback
 			mod.pauseStream();
 		}
 	
-		public function getMode():String
+		public function getPlaying():Boolean
 		{
-			return mod.getMode();
+			return mod.getPlaying();
 		}
 	
 		public function toggle():void

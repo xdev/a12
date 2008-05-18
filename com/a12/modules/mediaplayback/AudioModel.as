@@ -19,22 +19,23 @@ package com.a12.modules.mediaplayback
 		private var _ref:MovieClip;
 		private var _file:String;
 		
-		private var streamInterval:Number;
-		private var loadInterval:Number;
-		private var metaData:Object;
+		private var _metaData:Object;
 		
-		private var soundObj:Sound;
-		private var soundChannel:SoundChannel;
-		private	var	soundVolume:Number;
-		private var positionTimer:Timer;
-		private var mode:String;
-		private var position:Number;
+		private var _sound:Sound;
+		private var _channel:SoundChannel;
+		private	var	_volume:Number;
+		private var _timer:Timer;
+				
+		private var _playing:Boolean;		
+		private var _position:Number;
 	
-		public function AudioModel(ref,file)
+		public function AudioModel(_ref,_file)
 		{
-			_ref = ref;
-			_file = file;
-			soundVolume = 1.0;
+			this._ref = _ref;
+			this._file = _file;
+			_metaData = {};
+			_playing = false;
+			_volume = 1.0;	
 			playMedia();
 		}
 		
@@ -44,42 +45,40 @@ package com.a12.modules.mediaplayback
 		
 		public function stopStream():void
 		{
-			soundChannel.stop();
+			_channel.stop();
+			_position = 0;
+			_channel = _sound.play(_position);	
+			_playing = false;	
+			_channel.stop();
+			updateView();
 		}
 		
 		public function playStream():void
 		{
-			soundChannel.stop();
-			soundChannel = soundObj.play(position);
+			_channel.stop();
+			_channel = _sound.play(_position);
 			_setVolume();
+			_playing = true;
+			updateView();
 		}
 		
 		public function pauseStream():void
 		{
-			var icon = '';
 			switch(true){
-				case mode == 'play':
-					position = soundChannel.position;
-					soundChannel.stop();
-					icon = 'play';
-					mode = 'pause';
+				case _playing == true:
+					_position = _channel.position;
+					_channel.stop();
+					_playing = false;
 				break;
 			
-				case mode == 'pause':
-					mode = 'play';
-					icon = 'pause';
-					soundChannel.stop();
-					soundChannel = soundObj.play(position);
+				case _playing == false:
+					_channel.stop();
+					_channel = _sound.play(_position);
+					_playing = true;
 					_setVolume();
 				break;
 			}
-		
-			var tObj = {};
-			tObj.mode = mode;
-			tObj.icon = icon;
-		
-			setChanged();
-			notifyObservers(tObj);
+			updateView();
 		}
 		
 		public function toggleStream():void
@@ -89,14 +88,16 @@ package com.a12.modules.mediaplayback
 			
 		public function seekStream(time:Number):void
 		{
-			soundChannel.stop();
-			soundChannel = soundObj.play(time);
+			_channel.stop();
+			_channel = _sound.play(time);
+			_position = time;
 			_setVolume();
+			_playing = true;
 		}
 	
 		public function seekStreamPercent(percent:Number):void
 		{
-			seekStream(percent * soundObj.length);
+			seekStream(percent * _sound.length);
 		}
 		
 		public function toggleAudio():void
@@ -106,7 +107,7 @@ package com.a12.modules.mediaplayback
 		
 		public function setVolume(value:Number):void
 		{
-			soundVolume = value;
+			_volume = value;
 			_setVolume();
 		}
 	
@@ -115,19 +116,19 @@ package com.a12.modules.mediaplayback
 			return _ref;
 		}
 	
-		public function getMode():String
+		public function getPlaying():Boolean
 		{
-			return mode;
+			return _playing;
 		}
 		
 		public function kill():void
 		{
-			soundChannel.stop();
-			soundChannel = null;
-			soundObj = null;
-			//delete soundObj;
-			//Utils.createmc(_ref,"audio",20001);
-			clearInterval(streamInterval);
+			_channel.stop();
+			_channel = null;
+			_sound = null;
+			_playing = false;
+			_timer.stop();
+			_timer = null;
 		}
 		
 		// --------------------------------------------------------------------
@@ -136,8 +137,8 @@ package com.a12.modules.mediaplayback
 		private function _setVolume()
 		{
 			var transform:SoundTransform = new SoundTransform();
-			transform.volume = soundVolume;
-			soundChannel.soundTransform = transform;
+			transform.volume = _volume;
+			_channel.soundTransform = transform;
 		}
 		
 		private function streamStatus(obj):void
@@ -147,36 +148,26 @@ package com.a12.modules.mediaplayback
 			
 		private function playMedia():void
 		{
-			mode = 'play';
+			_metaData = {};		
 		
-			metaData = {};
-				
-			//clearInterval(streamInterval);
-			//streamInterval = setInterval(getStreamInfo,200);
-		
-			clearInterval(loadInterval);
-			//loadInterval = setInterval(this,"renderLoading",30);
-		
-		
-			var tObj = {};
-			tObj.mode = mode;
-		
+			var tObj = {};		
 			Utils.createmc(_ref,"audio",20001);
 		
-			soundObj = new Sound();
+			_sound = new Sound();
 			var req:URLRequest = new URLRequest(_file);
 			//true
 			
-			soundObj.addEventListener(ProgressEvent.PROGRESS, progressHandler);
-			soundObj.addEventListener(Event.COMPLETE, onComplete);
-			soundObj.addEventListener(Event.ID3, id3Handler);
-			soundObj.load(req);
+			_sound.addEventListener(ProgressEvent.PROGRESS, progressHandler);
+			_sound.addEventListener(Event.COMPLETE, onComplete);
+			_sound.addEventListener(Event.ID3, id3Handler);
+			_sound.load(req);
 			
-			positionTimer = new Timer(200);
-			positionTimer.addEventListener(TimerEvent.TIMER, getStreamInfo);
-			positionTimer.start();
+			_timer = new Timer(200);
+			_timer.addEventListener(TimerEvent.TIMER, updateView);
+			_timer.start();
 			
-			soundChannel = soundObj.play();
+			_channel = _sound.play();
+			_playing = true;
 			
 			setChanged();
 			notifyObservers(tObj);
@@ -184,7 +175,6 @@ package com.a12.modules.mediaplayback
 	
 		private function onComplete(e:Event):void
 		{
-			trace('COMPLETE');
 			var tObj = {};
 			tObj.action = 'mediaComplete';
 			setChanged();
@@ -193,7 +183,6 @@ package com.a12.modules.mediaplayback
 	
 		private function onLoad(e:Event):void
 		{
-			trace('onLoad');
 			var tObj = {};
 			tObj.action = 'onLoad';
 			setChanged();
@@ -210,18 +199,17 @@ package com.a12.modules.mediaplayback
 			
 		}
 	
-		private function getStreamInfo(e:TimerEvent):void
+		private function updateView(e:TimerEvent=null):void
 		{
-			//convert time in seconds to 00:00
 			var tObj = {};
 		
 			tObj.action = "updateView";
-		
-			tObj.time_current = Utils.convertSeconds(Math.floor(soundChannel.position/1000));
-			tObj.time_duration = Utils.convertSeconds(Math.floor(soundObj.length/1000));
-			tObj.time_remaining = Utils.convertSeconds(Math.floor(soundObj.length/1000) - Math.floor(soundChannel.position/1000));
-			tObj.time_percent = Math.floor(((soundChannel.position/1000) / Math.floor(soundObj.length/1000)) * 100);
-			tObj.loaded_percent = Math.floor((soundObj.bytesLoaded / soundObj.bytesTotal) * 100);
+			tObj.time_current = Utils.convertSeconds(Math.floor(_channel.position/1000));
+			tObj.time_duration = Utils.convertSeconds(Math.floor(_sound.length/1000));
+			tObj.time_remaining = Utils.convertSeconds(Math.floor(_sound.length/1000) - Math.floor(_channel.position/1000));
+			tObj.time_percent = Math.floor(((_channel.position/1000) / Math.floor(_sound.length/1000)) * 100);
+			tObj.loaded_percent = Math.floor((_sound.bytesLoaded / _sound.bytesTotal) * 100);
+			tObj.playing = _playing;
 				
 			setChanged();
 			notifyObservers(tObj);			

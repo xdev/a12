@@ -20,7 +20,7 @@ package com.a12.modules.mediaplayback
 		
 		function setVolume(value:Number):void;
 		
-		function getMode():String;
+		function getPlaying():Boolean;
 		
 		function getRef():MovieClip;
 		

@@ -18,22 +18,23 @@ package com.a12.modules.mediaplayback
 	
 		private var _ref:MovieClip;
 		private var _file:String;
-		private var stream_ns:NetStream;
-		private var connection_nc:NetConnection;
-		private var streamInterval:Number;
-		private var metaData:Object;		
-		private var mode:String;
+		private var _stream:NetStream;
+		private var _connection:NetConnection;
+		private var _timer:Timer;
+		private var _metaData:Object;		
+		private var _playing:Boolean;
 	
 		public function VideoModel(_ref,_file)
 		{
 			this._ref = _ref;
 			this._file = _file;
-			metaData = {};
+			_metaData = {};
+			_playing = false;
 			
-			connection_nc = new NetConnection();
-			connection_nc.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
-            connection_nc.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
-			connection_nc.connect(null);			
+			_connection = new NetConnection();
+			_connection.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
+            _connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
+			_connection.connect(null);			
 		}
 		
 		// --------------------------------------------------------------------
@@ -42,27 +43,27 @@ package com.a12.modules.mediaplayback
 		
 		public function stopStream():void
 		{
-			stream_ns.close();
+			pauseStream();
+			seekStream(0);
+			_playing = false;
 		}
 		
 		public function playStream():void
 		{
-			stream_ns.resume();
-			mode = 'pause';
-			changeStatus();
+			_stream.resume();
+			_playing = true;
 		}		
 	
 		public function pauseStream():void
 		{
-			stream_ns.pause();
-			mode = 'play';
-			changeStatus();
+			_stream.pause();
+			_playing = false;
 		}
 		
 		public function toggleStream():void
 		{
-			stream_ns.togglePause();
-			changeStatus();
+			_playing = !_playing;
+			_stream.togglePause();
 		}	
 		
 		public function streamStatus(obj):void
@@ -74,12 +75,13 @@ package com.a12.modules.mediaplayback
 	
 		public function seekStream(time:Number):void
 		{
-			stream_ns.seek(time);
+			_stream.seek(time);
+			_playing = true;
 		}
 	
 		public function seekStreamPercent(percent:Number):void
 		{
-			seekStream(Math.round(percent * metaData.duration) );
+			seekStream(percent * _metaData.duration);
 		}
 		
 		public function toggleAudio():void
@@ -91,7 +93,7 @@ package com.a12.modules.mediaplayback
 		{
 			var transform:SoundTransform = new SoundTransform();
 			transform.volume = value;
-			stream_ns.soundTransform = transform;
+			_stream.soundTransform = transform;
 		}
 		
 		public function getRef():MovieClip
@@ -99,18 +101,19 @@ package com.a12.modules.mediaplayback
 			return _ref;
 		}
 	
-		public function getMode():String
+		public function getPlaying():Boolean
 		{
-			return mode;
+			return _playing;
 		}
 	
 		public function kill():void
 		{
-			stream_ns.close();
-			stream_ns = null;
-			connection_nc = null;
-			//soundController = null;
-			clearInterval(streamInterval);
+			_stream.close();
+			_stream = null;
+			_connection = null;
+			_playing = false;
+			_timer.stop();
+			_timer = null;
 		}
 		
 		// --------------------------------------------------------------------
@@ -125,7 +128,7 @@ package com.a12.modules.mediaplayback
 		private function onMetaData(obj:Object):void
 		{
 			//should run only once!
-			if(obj.width && metaData.width == undefined){
+			if(obj.width && _metaData.width == undefined){
 				var tObj = {};
 				tObj.action = 'updateSize';
 				tObj.width =  obj.width;
@@ -139,9 +142,9 @@ package com.a12.modules.mediaplayback
 			}
 		
 			for(var i in obj){
-				metaData[i] = obj[i];			
+				_metaData[i] = obj[i];			
 				if(i == 'duration'){
-					metaData.durationObj = Utils.convertSeconds(Math.floor(obj[i]));
+					_metaData.durationObj = Utils.convertSeconds(Math.floor(obj[i]));
 				}
 			}
 		}
@@ -174,33 +177,29 @@ package com.a12.modules.mediaplayback
 	
 		private function playMedia():void
 		{
-			stream_ns = new NetStream(connection_nc);
-			stream_ns.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
-            stream_ns.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
+			_stream = new NetStream(_connection);
+			_stream.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
+            _stream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
 			
 			var clientObj = {};
 			clientObj.onMetaData = onMetaData;
 			clientObj.onCuePoint = cuePointHandler;
-			stream_ns.client = clientObj;
+			_stream.client = clientObj;
 			
-			stream_ns.play(_file);		
+			_stream.play(_file);		
 			
-			mode = 'play';	
-		
-			clearInterval(streamInterval);
-			streamInterval = setInterval(getStreamInfo,200);
+			_playing = true;	
+					
+			_timer = new Timer(200);
+			_timer.addEventListener(TimerEvent.TIMER, updateView);
+			_timer.start();
 				
 			var tObj = {};
-			tObj.stream = stream_ns;
-			tObj.mode = mode;
-		
-			//var a = Utils.createmc(_ref,"audio");
-		
-			//soundController = new Sound(a);
-			//a.attachAudio(stream_ns);
-						
+			tObj.stream = _stream;			
+			tObj.playing = _playing;
+									
 			var video:Video = new Video();
-			video.attachNetStream(stream_ns);
+			video.attachNetStream(_stream);
 			var v = _ref.addChild(video);
 			v.name = 'myvideo';
 			
@@ -209,29 +208,29 @@ package com.a12.modules.mediaplayback
 			
 		}
 	
-		private function getStreamInfo():void
+		private function updateView(e:TimerEvent=null):void
 		{
 			//convert time in seconds to 00:00
 			var tObj = {};
 		
 			tObj.action = "updateView";
-		
-			tObj.time_current = Utils.convertSeconds(Math.floor(stream_ns.time));
-			if(metaData.durationObj != undefined){
-				tObj.time_duration = metaData.durationObj;
-				tObj.time_percent = Math.floor((stream_ns.time / metaData.duration) * 100);
-				tObj.time_remaining = Utils.convertSeconds(metaData.duration - Math.floor(stream_ns.time));
+			tObj.time_current = Utils.convertSeconds(Math.floor(_stream.time));
+			if(_metaData.durationObj != undefined){
+				tObj.time_duration = _metaData.durationObj;
+				tObj.time_percent = Math.floor((_stream.time / _metaData.duration) * 100);
+				tObj.time_remaining = Utils.convertSeconds(_metaData.duration - Math.floor(_stream.time));
 				//this is specifically for flv files encoded in 3rd party tools that do not produce the 
 				//Netstream.Play.Stop command
 				//Need to add another condition that checks the playstate			
 			
-				if(Math.ceil(stream_ns.time) == Math.ceil(metaData.duration)){
+				if(Math.ceil(_stream.time) == Math.ceil(_metaData.duration)){
 					//onComplete();
 				}
 			}
 		
-			tObj.loaded_percent = Math.floor((stream_ns.bytesLoaded / stream_ns.bytesTotal) * 100);		
-		
+			tObj.loaded_percent = Math.floor((_stream.bytesLoaded / _stream.bytesTotal) * 100);		
+			tObj.playing = _playing;
+			
 			setChanged();
 			notifyObservers(tObj);
 		}
@@ -240,29 +239,6 @@ package com.a12.modules.mediaplayback
 		{
 			var tObj = {};
 			tObj.action = 'mediaComplete';
-			setChanged();
-			notifyObservers(tObj);
-		}
-	
-		private function changeStatus():void
-		{
-			var icon = '';
-			switch(true){
-				case mode == 'play':
-					mode = 'pause';
-					icon = 'play';
-				break;
-			
-				case mode == 'pause':
-					mode = 'play';
-					icon = 'pause';
-				break;
-			}
-		
-			var tObj = {};
-			tObj.mode = mode;
-			tObj.icon = icon;
-		
 			setChanged();
 			notifyObservers(tObj);
 		}
