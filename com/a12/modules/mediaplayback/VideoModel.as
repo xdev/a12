@@ -66,14 +66,7 @@ package com.a12.modules.mediaplayback
 			_playing = !_playing;
 			_stream.togglePause();
 		}	
-		
-		public function streamStatus(obj):void
-		{
-			if(obj.code == "NetStream.Play.Stop"){
-				onComplete();
-			}
-		}
-	
+			
 		public function seekStream(time:Number):void
 		{
 			_stream.seek(time);
@@ -137,7 +130,8 @@ package com.a12.modules.mediaplayback
 					
 				Utils.$(_ref,'myvideo').width = obj.width;
 				Utils.$(_ref,'myvideo').height = obj.height;
-		
+				Utils.$(_ref,'myvideo').alpha = 1.0;
+				
 				setChanged();
 				notifyObservers(tObj);
 			}
@@ -155,10 +149,15 @@ package com.a12.modules.mediaplayback
 			switch (event.info.code) {
 				case "NetConnection.Connect.Success":
 					playMedia();
-					break;
+				break;
+				
 				case "NetStream.Play.StreamNotFound":
 					//trace("Unable to locate video: " + videoURL);
-					break;
+				break;
+				
+				case "NetStream.Play.Stop":
+					onComplete();
+				break;
 			}
 		}
 		
@@ -202,6 +201,7 @@ package com.a12.modules.mediaplayback
 			var video:Video = new Video();
 			video.attachNetStream(_stream);
 			var v = _ref.addChild(video);
+			v.alpha = 0.0;			
 			v.name = 'myvideo';
 			
 			setChanged();

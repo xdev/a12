@@ -23,6 +23,9 @@ package com.a12.modules.mediaplayback
 		public var height:Number;
 		public var width:Number;
 		
+		private var _controller:CPController;
+		private var _model:Object;
+		
 		private var _originalSize:Object;
 		public var _controls:MovieClip;
 		
@@ -36,18 +39,20 @@ package com.a12.modules.mediaplayback
 		{
 			
 			super(m,c);
-			width = 320;
-			height = 240;
+			width = 640;
+			height = 360;
 			
 			_timeMode = true;
 			_soundLevelA = [0.0,0.3,0.6,1.0];
 			_soundLevel = 3;
 			_scrubberWidth = 8;
 			
-			var obj = getModel();
-			ref = obj.getRef();
+			_model = getModel();
+			_controller = CPController(getController());
 			
-			if(obj as AudioModel){
+			ref = _model.getRef();			
+			
+			if(_model as AudioModel){
 				renderUI();
 			}
 					
@@ -102,6 +107,29 @@ package com.a12.modules.mediaplayback
 			}
 			
 			if(infoObj.action == 'updateSize'){
+				
+				//
+				if(_model as VideoModel){
+					//create cover to register clicks!
+					
+					//optionally
+						mc = Utils.createmc(ref,'cover',{buttonMode:true,mouseEnabled:true});
+						Utils.drawRect(mc,infoObj.width,infoObj.height,0xFF0000,0.0);
+						mc.addEventListener(MouseEvent.CLICK,mouseHandler);
+					
+					var i = new mediaplayback_icons();
+					i.gotoAndStop('video_overlay_play');
+					mc = ref.addChild(i);					
+					mc.alpha = 0.0;
+					mc.name = 'video_overlay_play';
+					mc.buttonMode = true;
+					mc.x = infoObj.width/2;
+					mc.y = infoObj.height/2;
+					//mc.addEventListener(MouseEvent.ROLL_OVER,mouseHandler);
+					//mc.addEventListener(MouseEvent.ROLL_OUT,mouseHandler);
+					
+				}
+				
 				_originalSize = {};
 				_originalSize.height = infoObj.height;
 				_originalSize.width = infoObj.width;
@@ -113,8 +141,7 @@ package com.a12.modules.mediaplayback
 				updateView(infoObj);
 			}
 			if(infoObj.action == 'mediaComplete'){
-				mc = Utils.$(_controls,'video_play');
-				mc.gotoAndStop('video_play');
+				_controller.stop();			
 			}
 			
 		}
@@ -144,7 +171,7 @@ package com.a12.modules.mediaplayback
 			var mc = Utils.$(_controls,'audio');
 			mc.gotoAndStop('audio'+_soundLevel);
 			//controller setVolume
-			CPController(getController()).setVolume(_soundLevelA[_soundLevel]);
+			_controller.setVolume(_soundLevelA[_soundLevel]);
 		}
 		
 		private function updateView(infoObj:Object):void
@@ -188,8 +215,23 @@ package com.a12.modules.mediaplayback
 			mc = Utils.$(_controls,'video_play');
 			if(infoObj.playing){
 				mc.gotoAndStop('video_pause');
+				mc = Utils.$(ref,'video_overlay_play');
+				mc.alpha = 0.0;
+				mc.removeEventListener(MouseEvent.CLICK,mouseHandler);
+				mc.buttonMode = false;
+				mc.mouseEnabled = false;
 			}else{
+				
+				//fade in the video bizzzle
+				//Move.changeProps(MovieClip(Utils.$(ref,'video_overlay_play')),{alpha:0.75},500,'Cubic','easeOut');
+				
 				mc.gotoAndStop('video_play');
+				mc = Utils.$(ref,'video_overlay_play');
+				mc.alpha = 0.75;
+				mc.addEventListener(MouseEvent.CLICK,mouseHandler);
+				mc.buttonMode = true;
+				mc.mouseEnabled = true;
+				
 			}
 			
 			if(infoObj.loaded_percent >= 0){
@@ -207,7 +249,7 @@ package com.a12.modules.mediaplayback
 		private function trackScrubber(e:Event):void
 		{
 			var mc = Utils.$(Utils.$(_controls,'timeline'),'scrubber');
-			CPController(getController()).findSeek(mc.x / (width-95));
+			_controller.findSeek(mc.x / (width-95));
 		}
 		
 		// Consider moving this into the Controller
@@ -223,23 +265,29 @@ package com.a12.modules.mediaplayback
 			}
 			if(e.type == MouseEvent.CLICK){
 				if(mc.name == 'video_play'){
-					CPController(getController()).toggle();
+					_controller.toggle();
 				}
 				if(mc.name == 'video_start'){
-					CPController(getController()).stop();
+					_controller.stop();
 				}
 				if(mc.name == 'label'){
 					toggleTime();
 				}
-				if(mc.name == 'strip'){
-					var playing = CPController(getController()).getPlaying();
-					CPController(getController()).findSeek(mc.mouseX / (width-95));
+				if(mc.name == 'strip_back'){
+					var playing = _controller.getPlaying();					
+					_controller.findSeek(mc.mouseX / (width-95));
 					if(!playing){
-						CPController(getController()).pause();
+						_controller.pause();
 					}
 				}
 				if(mc.name == 'audio'){
-					toggleAudio();//CPController(getController()).toggleSound();
+					toggleAudio();
+				}
+				if(mc.name == 'cover'){
+					_controller.toggle();
+				}
+				if(mc.name == 'video_overlay_play'){
+					_controller.play();
 				}
 			}
 			if(e.type == MouseEvent.MOUSE_DOWN){
@@ -251,8 +299,8 @@ package com.a12.modules.mediaplayback
 				mc.startDrag(false,rect);
 				mc.dragging = true;
 				
-				mc.playing = CPController(getController()).getPlaying();
-				CPController(getController()).pause();
+				mc.playing = _controller.getPlaying();
+				_controller.pause();
 				
 				//set up special stage tracker
 				ref.stage.addEventListener(MouseEvent.MOUSE_UP,mouseHandler);
@@ -267,12 +315,12 @@ package com.a12.modules.mediaplayback
 				
 				mc.dragging = false;
 				mc.stopDrag();
-				CPController(getController()).findSeek(mc.x / (width-95));
+				_controller.findSeek(mc.x / (width-95));
 				
 				if(mc.playing == true){			
-					CPController(getController()).play();
+					_controller.play();
 				}else{
-					CPController(getController()).pause();
+					_controller.pause();
 				}
 				
 				mc.playing = null;
@@ -285,7 +333,7 @@ package com.a12.modules.mediaplayback
 			/*
 			if(e.type == MouseEvent.MOUSE_MOVE){
 				if(mc.dragging == true){
-					CPController(getController()).findSeek(mc.x / (width-95));		
+					_controller.findSeek(mc.x / (width-95));		
 				}
 			}
 			*/
@@ -296,24 +344,24 @@ package com.a12.modules.mediaplayback
 			var mc;
 			mc = Utils.$(_controls,"back");
 			mc.graphics.clear();
-			Utils.drawRect(mc,width,20,0x404040,100);
+			Utils.drawRect(mc,width,20,0x404040,1.0);
 			
 			var t = Utils.$(_controls,"timeline");
 			mc = Utils.$(t,"strip_back");
 			mc.graphics.clear();
-			Utils.drawRect(mc,width-95,8,0xCCCCCC,100);
+			Utils.drawRect(mc,width-95,8,0xCCCCCC,1.0);
 			
 			mc = Utils.$(t,"strip_hit");
 			mc.graphics.clear();
-			Utils.drawRect(mc,width-95,12,0xFF0000,0);
+			Utils.drawRect(mc,width-95,12,0xFF0000,0.0);
 			
 			mc = Utils.$(t,"strip_load");
 			mc.graphics.clear();
-			Utils.drawRect(mc,width-95,8,0xFFFFFF,100);
+			Utils.drawRect(mc,width-95,8,0xFFFFFF,1.0);
 			
 			mc = Utils.$(t,"strip_progress");
 			mc.graphics.clear();
-			Utils.drawRect(mc,width-95,8,0x808080,100);
+			Utils.drawRect(mc,width-95,8,0x808080,1.0);
 			
 			//move the label
 			mc = Utils.$(_controls,"label");
@@ -327,16 +375,18 @@ package com.a12.modules.mediaplayback
 		private function renderUI():void
 		{
 			//make video screen clickable yo
-			//_ref.addEventListener(MouseEvent.CLICK,mouseHandler);			
-			_controls = Utils.createmc(ref,"controls",{y:height});
+			var v = Utils.$(ref,'myvideo');
+			//ref.stage.addEventListener(MouseEvent.CLICK,mouseHandler);			
+			_controls = Utils.createmc(ref,"controls",{y:height-20});
 		
-			var b = Utils.createmc(_controls,"back",{alpha:0.75});
-			Utils.drawRect(b,width,20,0x404040,100);
+			var b = Utils.createmc(_controls,"back",{alpha:0.75,mouseEnabled:true});
+			Utils.drawRect(b,width,20,0x404040,1.0);
+			b.addEventListener(MouseEvent.CLICK,mouseHandler);
 			
 			var i,mc;
 			
 			//VCR stop (back to beginning)
-			i = new icons();
+			i = new mediaplayback_icons();
 			i.gotoAndStop('video_start');
 			mc = _controls.addChild(i);
 			mc.name = 'video_start';
@@ -348,7 +398,7 @@ package com.a12.modules.mediaplayback
 			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
 			
 			//play/pause
-			i = new icons();
+			i = new mediaplayback_icons();
 			i.gotoAndStop('video_play');
 			mc = _controls.addChild(i);
 			mc.name = 'video_play';
@@ -363,23 +413,23 @@ package com.a12.modules.mediaplayback
 			var t = Utils.createmc(_controls,"timeline",{x:40,y:10});
 			mc = Utils.createmc(t,"strip_back",{y:-4,_scope:this,mouseEnabled:true});
 			mc.buttonMode = true;
-			Utils.drawRect(mc,width-95,8,0xCCCCCC,100);
+			Utils.drawRect(mc,width-95,8,0xCCCCCC,1.0);
 		
 			var h = Utils.createmc(t,"strip_hit",{y:-6});
-			Utils.drawRect(h,width-95,12,0xFF0000,0);
+			Utils.drawRect(h,width-95,12,0xFF0000,0.0);
 			
 			mc.hitArea = h;
 			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
 			
 			h = Utils.createmc(t,"strip_load",{y:-4,scaleX:0.0});
-			Utils.drawRect(h,width-95,8,0xFFFFFF,100);
+			Utils.drawRect(h,width-95,8,0xFFFFFF,1.0);
 			
 			h = Utils.createmc(t,"strip_progress",{y:-4,scaleX:0.0});
-			Utils.drawRect(h,width-95,8,0x808080,100);		
+			Utils.drawRect(h,width-95,8,0x808080,1.0);		
 			
 			//scrubber
 			i = Utils.createmc(t,"scrubber",{y:-4,dragging:false,mouseEnabled:true});
-			Utils.drawRect(i,_scrubberWidth,_scrubberWidth,0x000000,100);
+			Utils.drawRect(i,_scrubberWidth,_scrubberWidth,0x000000,1.0);
 			i.buttonMode = true;
 			i.addEventListener(MouseEvent.MOUSE_DOWN,mouseHandler);
 			
@@ -393,13 +443,13 @@ package com.a12.modules.mediaplayback
 			tf.size = 10;
 			tf.color = 0xFFFFFF;
 		
-			var l = Utils.createmc(_controls,"label",{x:width-40,y:2.5,mouseEnabled:true});
-			t = Utils.makeTextfield(l,"00:00",tf,{autoSize:'right'});//
+			var l = Utils.createmc(_controls,"label",{x:width-50,y:2.5,mouseEnabled:true});
+			t = Utils.makeTextfield(l,"00:00",tf,{width:35});//autoSize:TextFieldAutoSize.RIGHT
 			l.addEventListener(MouseEvent.CLICK,mouseHandler);
 			l.buttonMode = true;
 			
 			//audio controls
-			i = new icons();
+			i = new mediaplayback_icons();
 			i.gotoAndStop('audio3');
 			mc = _controls.addChild(i);
 			mc.name = 'audio';
