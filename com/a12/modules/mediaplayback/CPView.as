@@ -64,8 +64,8 @@ package com.a12.modules.mediaplayback
 			var tW,tH;
 			
 			if(value<100){
-				tW = Math.floor((value/100) * _originalSize.width);
-				tH = Math.floor((value/100) * _originalSize.height);
+				tW = ((value/100) * _originalSize.width);
+				tH = ((value/100) * _originalSize.height);				
 			}else{
 				tW = _originalSize.width;
 				tH = _originalSize.height;
@@ -365,7 +365,7 @@ package com.a12.modules.mediaplayback
 			
 			//move the label
 			mc = Utils.$(_controls,"label");
-			mc.x = width - 40;
+			mc.x = width - 50;
 			
 			//move the audio
 			mc = Utils.$(_controls,"audio");

@@ -73,6 +73,7 @@ package com.a12.util
 							if (j == k) { // check for isMoving causes major bugs
 								//trace(motionObj.getmc() + " - conflict:" + j);
 								conflictFlag = true;
+								//trace('call Stop prop' + j);
 								objList[i].stopProp(j);
 								//if no props exist, remove obj altogether
 								var tA = objList[i].getPropList();

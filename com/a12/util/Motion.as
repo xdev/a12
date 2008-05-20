@@ -114,17 +114,21 @@ package com.a12.util
 			delete this;
 		}
 	
-		public function stopProp(prop):void
+		public function stopProp(prop:String):void
 		{
 			//trace("--M:stopProp: " + prop);
-			var len = propList.length;
-			for (var i=0; i<len; i++) {
-				//trace("currentProps: " + propList[i][0]);
+			
+			var len:int = propList.length;
+			
+			for (var i:int=0; i<len; i++) {
+				//trace("currentProps: " + propList[i][0]);				
 				if (propList[i][0] == prop) {
 					//trace("item deleted");
 					propList.splice(i,1);
 				}
 			}
+		
+			
 		}
 	
 		public function isMoving():Boolean
