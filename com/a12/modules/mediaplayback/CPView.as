@@ -134,7 +134,6 @@ package com.a12.modules.mediaplayback
 				_originalSize.height = infoObj.height;
 				_originalSize.width = infoObj.width;
 				updateSize(infoObj);
-				dispatchEvent(new CustomEvent('onUpdateSize',true,false,infoObj));
 			}
 			
 			if(infoObj.action == 'updateView'){
@@ -143,6 +142,8 @@ package com.a12.modules.mediaplayback
 			if(infoObj.action == 'mediaComplete'){
 				_controller.stop();			
 			}
+			
+			dispatchEvent(new CustomEvent(infoObj.action,true,false,infoObj));
 			
 		}
 		

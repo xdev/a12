@@ -12,7 +12,7 @@ package com.a12.modules.mediaplayback
 		private var _model;
 		public var _view:CPView;
 	
-		public function MediaPlayback(ref,file)
+		public function MediaPlayback(ref,file,hasView:Boolean=true)
 		{
 			var ext = file.substr(file.lastIndexOf('.')+1,file.length);
 			
@@ -23,9 +23,10 @@ package com.a12.modules.mediaplayback
 			if(ext == 'mp3'){
 				_model = new AudioModel(ref,file);
 			}
-							
-			_view = new CPView(_model,null);
-			_model.addObserver(_view);
+			if(hasView){				
+				_view = new CPView(_model,null);
+				_model.addObserver(_view);
+			}
 						
 		}
 		
@@ -64,6 +65,7 @@ package com.a12.modules.mediaplayback
 		public function kill():void
 		{
 			_model.kill();
+			_view.kill();
 		}
 	
 	}

@@ -6,8 +6,11 @@ package com.a12.util
 	import flash.display.*;
 	import flash.net.URLRequest;
 	import flash.events.*;
+	import flash.utils.*;
 	
-	public class LoadMovie
+	import com.a12.util.CustomEvent;
+	
+	public class LoadMovie extends Sprite
 	{
 		public var loader:Loader;
 		private var _ref:Object;
@@ -25,6 +28,7 @@ package com.a12.util
 		private function handleLoad(e:Event):void
 		{
 			_ref.addChild(loader.content);
+			dispatchEvent(new CustomEvent(Event.COMPLETE,true,false,{mc:_ref}));
 		}
 		
 	}
