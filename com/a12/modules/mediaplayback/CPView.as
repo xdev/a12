@@ -23,17 +23,17 @@ package com.a12.modules.mediaplayback
 		public var height:Number;
 		public var width:Number;
 		
-		private var _controller:CPController;
-		private var _model:Object;
+		protected var _controller:CPController;
+		protected var _model:Object;
 		
-		private var _originalSize:Object;
+		protected var _originalSize:Object;
 		public var _controls:MovieClip;
 		
-		private var _timer:Timer;
-		private var _timeMode:Boolean;
-		private var _soundLevel:Number;
-		private var _soundLevelA:Array;
-		private var _scrubberWidth:Number;
+		protected var _timer:Timer;
+		protected var _timeMode:Boolean;
+		protected var _soundLevel:Number;
+		protected var _soundLevelA:Array;
+		protected var _scrubberWidth:Number;
 
 		public function CPView(m:Observable,c:Controller)
 		{
@@ -147,7 +147,7 @@ package com.a12.modules.mediaplayback
 			
 		}
 		
-		private function updateSize(infoObj:Object):void
+		protected function updateSize(infoObj:Object):void
 		{
 			width = infoObj.width;
 			height = infoObj.height;			
@@ -175,7 +175,7 @@ package com.a12.modules.mediaplayback
 			_controller.setVolume(_soundLevelA[_soundLevel]);
 		}
 		
-		private function updateView(infoObj:Object):void
+		protected function updateView(infoObj:Object):void
 		{
 			//check the mode for display
 			var txt:String = '';
@@ -254,7 +254,7 @@ package com.a12.modules.mediaplayback
 		}
 		
 		// Consider moving this into the Controller
-		private function mouseHandler(e:MouseEvent):void
+		protected function mouseHandler(e:MouseEvent):void
 		{
 			var mc = DisplayObject(e.target);
 			
@@ -373,7 +373,7 @@ package com.a12.modules.mediaplayback
 			mc.x = width - 10;
 		}
 	
-		private function renderUI():void
+		protected function renderUI():void
 		{
 			//make video screen clickable yo
 			var v = Utils.$(ref,'myvideo');
@@ -461,6 +461,11 @@ package com.a12.modules.mediaplayback
 			mc.addEventListener(MouseEvent.ROLL_OUT,mouseHandler);
 			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
 		
+		}
+		
+		public function kill()
+		{
+			
 		}	
 
 	}
