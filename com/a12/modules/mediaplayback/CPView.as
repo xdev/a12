@@ -34,13 +34,23 @@ package com.a12.modules.mediaplayback
 		protected var _soundLevel:Number;
 		protected var _soundLevelA:Array;
 		protected var _scrubberWidth:Number;
+		
+		protected var _options:Object;
 
-		public function CPView(m:Observable,c:Controller)
+		public function CPView(m:Observable,c:Controller,options:Object)
 		{
 			
 			super(m,c);
+			
+			_options = options;
+			
 			width = 640;
 			height = 360;
+			
+			_originalSize = {};
+			_originalSize.width = width;
+			_originalSize.height = height;
+			
 			
 			_timeMode = true;
 			_soundLevelA = [0.0,0.3,0.6,1.0];
@@ -131,8 +141,8 @@ package com.a12.modules.mediaplayback
 				}
 				
 				_originalSize = {};
-				_originalSize.height = infoObj.height;
 				_originalSize.width = infoObj.width;
+				_originalSize.height = infoObj.height;				
 				updateSize(infoObj);
 			}
 			
@@ -140,6 +150,7 @@ package com.a12.modules.mediaplayback
 				updateView(infoObj);
 			}
 			if(infoObj.action == 'mediaComplete'){
+				trace('local stop, needs to not stop if playback has never begun');
 				_controller.stop();			
 			}
 			
@@ -217,10 +228,12 @@ package com.a12.modules.mediaplayback
 			if(infoObj.playing){
 				mc.gotoAndStop('video_pause');
 				mc = Utils.$(ref,'video_overlay_play');
-				mc.alpha = 0.0;
-				mc.removeEventListener(MouseEvent.CLICK,mouseHandler);
-				mc.buttonMode = false;
-				mc.mouseEnabled = false;
+				if(mc != null){
+					mc.alpha = 0.0;
+					mc.removeEventListener(MouseEvent.CLICK,mouseHandler);
+					mc.buttonMode = false;
+					mc.mouseEnabled = false;
+				}
 			}else{
 				
 				//fade in the video bizzzle
@@ -228,11 +241,13 @@ package com.a12.modules.mediaplayback
 				
 				mc.gotoAndStop('video_play');
 				mc = Utils.$(ref,'video_overlay_play');
-				mc.alpha = 0.75;
-				mc.addEventListener(MouseEvent.CLICK,mouseHandler);
-				mc.buttonMode = true;
-				mc.mouseEnabled = true;
-				mc.mouseChildren = false;
+				if(mc != null){
+					mc.alpha = 0.75;
+					mc.addEventListener(MouseEvent.CLICK,mouseHandler);
+					mc.buttonMode = true;
+					mc.mouseEnabled = true;
+					mc.mouseChildren = false;
+				}
 				
 			}
 			
@@ -343,35 +358,37 @@ package com.a12.modules.mediaplayback
 		
 		private function layoutUI():void
 		{
-			var mc;
-			mc = Utils.$(_controls,"back");
-			mc.graphics.clear();
-			Utils.drawRect(mc,width,20,0x404040,1.0);
+			if(_controls != null){
+				var mc;
+				mc = Utils.$(_controls,"back");
+				mc.graphics.clear();
+				Utils.drawRect(mc,width,20,0x404040,1.0);
 			
-			var t = Utils.$(_controls,"timeline");
-			mc = Utils.$(t,"strip_back");
-			mc.graphics.clear();
-			Utils.drawRect(mc,width-95,8,0xCCCCCC,1.0);
+				var t = Utils.$(_controls,"timeline");
+				mc = Utils.$(t,"strip_back");
+				mc.graphics.clear();
+				Utils.drawRect(mc,width-95,8,0xCCCCCC,1.0);
 			
-			mc = Utils.$(t,"strip_hit");
-			mc.graphics.clear();
-			Utils.drawRect(mc,width-95,12,0xFF0000,0.0);
+				mc = Utils.$(t,"strip_hit");
+				mc.graphics.clear();
+				Utils.drawRect(mc,width-95,12,0xFF0000,0.0);
 			
-			mc = Utils.$(t,"strip_load");
-			mc.graphics.clear();
-			Utils.drawRect(mc,width-95,8,0xFFFFFF,1.0);
+				mc = Utils.$(t,"strip_load");
+				mc.graphics.clear();
+				Utils.drawRect(mc,width-95,8,0xFFFFFF,1.0);
 			
-			mc = Utils.$(t,"strip_progress");
-			mc.graphics.clear();
-			Utils.drawRect(mc,width-95,8,0x808080,1.0);
+				mc = Utils.$(t,"strip_progress");
+				mc.graphics.clear();
+				Utils.drawRect(mc,width-95,8,0x808080,1.0);
 			
-			//move the label
-			mc = Utils.$(_controls,"label");
-			mc.x = width - 50;
+				//move the label
+				mc = Utils.$(_controls,"label");
+				mc.x = width - 50;
 			
-			//move the audio
-			mc = Utils.$(_controls,"audio");
-			mc.x = width - 10;
+				//move the audio
+				mc = Utils.$(_controls,"audio");
+				mc.x = width - 10;
+			}
 		}
 	
 		protected function renderUI():void

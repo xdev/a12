@@ -17,14 +17,14 @@ package com.a12.modules.mediaplayback
 			var ext = file.substr(file.lastIndexOf('.')+1,file.length);
 			
 			if(ext == 'mp4' || ext == 'mov' || ext == 'm4v' || ext == 'flv'){
-				_model = new VideoModel(ref,file);
+				_model = new VideoModel(ref,file,options);
 			}
 		
 			if(ext == 'mp3'){
-				_model = new AudioModel(ref,file);
+				_model = new AudioModel(ref,file,options);
 			}
 			if(options.hasView != false){				
-				_view = new CPView(_model,null);
+				_view = new CPView(_model,null,options);
 				_model.addObserver(_view);
 			}
 						
