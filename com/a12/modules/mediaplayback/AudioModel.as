@@ -28,11 +28,13 @@ package com.a12.modules.mediaplayback
 				
 		private var _playing:Boolean;		
 		private var _position:Number;
+		private var _options:Object;
 	
-		public function AudioModel(_ref,_file)
+		public function AudioModel(_ref,_file,_options:Object=null)
 		{
 			this._ref = _ref;
 			this._file = _file;
+			this._options = _options;
 			_metaData = {};
 			_playing = false;
 			_volume = 1.0;	
@@ -110,6 +112,11 @@ package com.a12.modules.mediaplayback
 			_volume = value;
 			_setVolume();
 		}
+		
+		public function setBuffer(value:Number):void
+		{
+			
+		}
 	
 		public function getRef():MovieClip
 		{
@@ -160,6 +167,11 @@ package com.a12.modules.mediaplayback
 			_sound.addEventListener(ProgressEvent.PROGRESS, progressHandler);
 			_sound.addEventListener(Event.COMPLETE, onComplete);
 			_sound.addEventListener(Event.ID3, id3Handler);
+			
+			/*
+			new SoundLoaderContext(_bufferTime,true)
+			*/
+			
 			_sound.load(req);
 			
 			_timer = new Timer(20);

@@ -232,6 +232,7 @@ package com.a12.modules.mediaplayback
 				mc.addEventListener(MouseEvent.CLICK,mouseHandler);
 				mc.buttonMode = true;
 				mc.mouseEnabled = true;
+				mc.mouseChildren = false;
 				
 			}
 			

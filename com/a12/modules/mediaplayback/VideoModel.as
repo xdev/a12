@@ -23,11 +23,13 @@ package com.a12.modules.mediaplayback
 		private var _timer:Timer;
 		private var _metaData:Object;		
 		private var _playing:Boolean;
+		private var _options:Object;
 	
-		public function VideoModel(_ref,_file)
+		public function VideoModel(_ref,_file,_options:Object=null)
 		{
 			this._ref = _ref;
 			this._file = _file;
+			this._options = _options;
 			_metaData = {};
 			_playing = false;
 			
@@ -88,6 +90,11 @@ package com.a12.modules.mediaplayback
 			var transform:SoundTransform = new SoundTransform();
 			transform.volume = value;
 			_stream.soundTransform = transform;
+		}
+		
+		public function setBuffer(value:Number):void
+		{
+			_stream.bufferTime = value;
 		}
 		
 		public function getRef():MovieClip
@@ -181,6 +188,11 @@ package com.a12.modules.mediaplayback
 			_stream.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
             _stream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
 			
+			//check buffer time son
+			if(_options.buffer != undefined){
+				setBuffer(_options.buffer);
+			}
+			
 			var clientObj = {};
 			clientObj.onMetaData = onMetaData;
 			clientObj.onCuePoint = cuePointHandler;
@@ -206,6 +218,13 @@ package com.a12.modules.mediaplayback
 			
 			setChanged();
 			notifyObservers(tObj);
+			
+			
+			
+			if(_options.paused == true){
+				trace('in here');
+				stopStream();
+			}
 			
 		}
 	

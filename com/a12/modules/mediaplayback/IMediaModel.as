@@ -21,9 +21,11 @@ package com.a12.modules.mediaplayback
 		
 		function setVolume(value:Number):void;
 		
+		function setBuffer(value:Number):void;
+		
 		function getPlaying():Boolean;
 		
-		function getRef():MovieClip;
+		function getRef():MovieClip;		
 		
 		function kill():void;
 		
