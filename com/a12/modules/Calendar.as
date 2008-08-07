@@ -94,7 +94,7 @@ package com.a12.modules
 			isNaN(month) ? month = _month : month = month;
 		
 			var tempDate = new Date();
-			tempDate.setYear(year);
+			tempDate.setFullYear(year);
 			tempDate.setMonth(month);
 			tempDate.setDate(1);
 		
@@ -172,7 +172,7 @@ package com.a12.modules
 			isNaN(day) ? day = _day : day = day;
 		
 			var tempDate = new Date();
-			tempDate.setYear(year);
+			tempDate.setFullYear(year);
 			tempDate.setMonth(month);
 			tempDate.setDate(day);
 		
