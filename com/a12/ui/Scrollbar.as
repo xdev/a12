@@ -75,6 +75,10 @@ package com.a12.ui
 			
 		}
 		*/
+		public function onKill():void
+		{
+			clearInterval(scrollInterval);
+		}
 		//CLASS METHODS
 		protected function build():void
 		{
@@ -102,7 +106,7 @@ package com.a12.ui
 			mc.addEventListener(MouseEvent.ROLL_OVER,handleMouse,false,0,true);
 			mc.addEventListener(MouseEvent.ROLL_OUT,handleMouse,false,0,true);
 			mc.addEventListener(MouseEvent.MOUSE_DOWN,handleMouse,false,0,true);
-			mc.addEventListener(MouseEvent.MOUSE_UP,handleMouse,false,0,true);
+			//mc.addEventListener(MouseEvent.MOUSE_UP,handleMouse,false,0,true);
 
 		
 		}
@@ -146,12 +150,26 @@ package com.a12.ui
 					clearInterval(scrollInterval);
 					scrollInterval = setInterval(processScroll,30);
 					
+					ref.stage.addEventListener(MouseEvent.MOUSE_UP,handleMouseStage,false,0,true);
+					
 				}
+				/*
 				if(e.type == MouseEvent.MOUSE_UP){
 					mc.stopDrag();
 					//this._scope.broadcaster.broadcastMessage("onNipRelease");
 					clearInterval(scrollInterval);
-				}				
+				}
+				*/				
+			}
+		}
+		
+		private function handleMouseStage(e:MouseEvent):void
+		{
+			if(e.type == MouseEvent.MOUSE_UP){
+				var mc = Utils.$(ref,'nip');
+				mc.stopDrag();
+				clearInterval(scrollInterval);
+				ref.stage.removeEventListener(MouseEvent.MOUSE_UP,handleMouseStage,false);
 			}
 		}
 		
