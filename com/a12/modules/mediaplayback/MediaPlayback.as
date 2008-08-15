@@ -62,6 +62,11 @@ package com.a12.modules.mediaplayback
 			_model.playStream();
 		}
 		
+		public function toggle():void
+		{
+			_model.toggleStream();
+		}
+		
 		public function kill():void
 		{
 			_model.kill();
