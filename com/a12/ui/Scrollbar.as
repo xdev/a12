@@ -58,23 +58,42 @@ package com.a12.ui
 
 		}
 		
-		/*
+		
 		//API METHODS
-		public function getValue():Object
+		public override function getValue():Object
 		{
-			return {};
+			var tObj = processScroll();
+			return tObj.percent;
 		}
 		
-		public function setValue(value:Object):void
+		public override function setValue(value:Object):void
 		{
-			
+			var mc = Utils.$(ref,'nip');
+			mc.y = (Number(value)/100) * (_options.barH-_options.nipH);
+			processScroll();
 		}
 		
-		public function reset():void
+		public override function reset():void
 		{
-			
+			setValue(0);
 		}
-		*/
+		
+		public function setEnabled(value:Boolean):void
+		{
+			var mc;
+			if(value){
+				mc = Utils.$(ref,'back');
+				mc.mouseEnabled = true;
+				mc = Utils.$(ref,'nip');
+				mc.mouseEnabled = true;
+			}else{
+				mc = Utils.$(ref,'back');
+				mc.mouseEnabled = false;
+				mc = Utils.$(ref,'nip');
+				mc.mouseEnabled = false;
+			}
+		}
+		
 		public function onKill():void
 		{
 			clearInterval(scrollInterval);
@@ -125,6 +144,21 @@ package com.a12.ui
 			Utils.drawRect(mc,_options.nipW,_options.nipH,_options.clr_nip,1.0);
 		}
 		
+ 		public function setHeight(value:Number):void
+		{
+			var tObj = processScroll();
+			//update prop
+			_options.barH = value;
+			
+			//redraw
+			renderBar();
+			
+			//reposition nip if necessary
+			var mc = Utils.$(ref,'nip');
+			mc.y = (tObj.percent/100) * (_options.barH-_options.nipH);
+			
+		}
+		
 		protected function handleMouse(e:MouseEvent):void
 		{
 			var mc = e.currentTarget;
@@ -147,9 +181,9 @@ package com.a12.ui
 					//this.startDrag(false,tObj.left,tObj.top,tObj.right,tObj.bottom);
 
 					//this._scope.broadcaster.broadcastMessage("onNipPress");
-					clearInterval(scrollInterval);
-					scrollInterval = setInterval(processScroll,30);
-					
+					//clearInterval(scrollInterval);
+					//scrollInterval = setInterval(processScroll,30);
+					ref.stage.addEventListener(MouseEvent.MOUSE_MOVE,handleMouseStage,false,0,true);
 					ref.stage.addEventListener(MouseEvent.MOUSE_UP,handleMouseStage,false,0,true);
 					
 				}
@@ -165,10 +199,14 @@ package com.a12.ui
 		
 		private function handleMouseStage(e:MouseEvent):void
 		{
+			if(e.type == MouseEvent.MOUSE_MOVE){
+				processScroll();
+			}
 			if(e.type == MouseEvent.MOUSE_UP){
 				var mc = Utils.$(ref,'nip');
 				mc.stopDrag();
-				clearInterval(scrollInterval);
+				//clearInterval(scrollInterval);
+				ref.stage.removeEventListener(MouseEvent.MOUSE_MOVE,handleMouseStage,false);
 				ref.stage.removeEventListener(MouseEvent.MOUSE_UP,handleMouseStage,false);
 			}
 		}
