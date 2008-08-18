@@ -4,14 +4,20 @@ package com.a12.modules.mediaplayback
 {
 
 	import flash.display.MovieClip;
-	import flash.utils.*;
-	import flash.events.*;
-    import flash.media.*;
+	import flash.utils.Timer;
+	import flash.events.Event;
+	import flash.events.NetStatusEvent;
+	import flash.events.TimerEvent;
+	import flash.events.SecurityErrorEvent;
+	import flash.events.AsyncErrorEvent;
+	import flash.media.Video;
+    import flash.media.SoundTransform;
     import flash.net.NetConnection;
     import flash.net.NetStream;
+	
 	import com.a12.pattern.observer.Observable;
 	import com.a12.modules.mediaplayback.*;
-	import com.a12.util.*;
+	import com.a12.util.Utils;
 
 	public class VideoModel extends Observable implements IMediaModel
 	{

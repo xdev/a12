@@ -2,7 +2,7 @@
 
 package com.a12.util
 {
-	import flash.events.*;
+	import flash.events.Event;
 	
 	public class CustomEvent extends Event
 	{

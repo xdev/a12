@@ -4,14 +4,19 @@ package com.a12.modules.mediaplayback
 {
 	
 	import flash.display.MovieClip;
-	import flash.utils.*;
-	import flash.net.*;
-	import flash.media.*;
-	import flash.events.*;
+	import flash.utils.Timer;
+	import flash.net.URLRequest;
+	import flash.media.Sound;
+	import flash.media.SoundChannel;
+	import flash.media.SoundTransform;
+	import flash.media.SoundLoaderContext;
+	import flash.events.Event;
+	import flash.events.TimerEvent;
+	import flash.events.ProgressEvent;
 
 	import com.a12.pattern.observer.Observable;
 	import com.a12.modules.mediaplayback.*;
-	import com.a12.util.*;
+	import com.a12.util.Utils;
 
 	public class AudioModel extends Observable implements IMediaModel
 	{

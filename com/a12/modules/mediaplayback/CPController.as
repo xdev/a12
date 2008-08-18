@@ -5,9 +5,6 @@ package com.a12.modules.mediaplayback
 
 	import com.a12.pattern.observer.*;
 	import com.a12.pattern.mvc.*;
-
-	import com.a12.util.*;
-
 	import com.a12.modules.mediaplayback.*;
 
 	public class CPController extends AbstractController

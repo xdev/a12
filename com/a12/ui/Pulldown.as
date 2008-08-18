@@ -1,16 +1,15 @@
 package com.a12.ui
 {
-	import flash.display.*;
-	import flash.events.*;
-	import flash.utils.*;
+	import flash.display.MovieClip;
+	import flash.events.MouseEvent;
 
-	import com.a12.util.*;
+	import com.a12.util.Util;
+	import com.a12.util.CustomEvent;
 	import com.a12.ui.UIElement;
 	import com.a12.ui.IUI;
 	import com.a12.ui.Scrollbar;
 
 	import com.gs.TweenLite;		
-	
 	
 	public class Pulldown extends UIElement
 	{
@@ -76,7 +75,7 @@ package com.a12.ui
 		
 		private function mouseHandler(e:Event)
 		{
-			var mc = DisplayObject(e.target);
+			var mc = e.currentTarget;
 			
 			if(mc.name == 'controls'){
 			
@@ -153,12 +152,6 @@ package com.a12.ui
 				but.addEventListener(MouseEvent.CLICK,mouseHandler);
 			}
 		}
-		
-		private function test()
-		{
-			dispatchEvent(new CustomEvent('onBuild',true,true,{foo:false,bar:true}));
-		}
-		
 		
 	}
 	

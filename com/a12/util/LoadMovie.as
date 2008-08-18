@@ -3,10 +3,10 @@
 package com.a12.util
 {
 	
-	import flash.display.*;
-	import flash.net.URLRequest;
-	import flash.events.*;
-	import flash.utils.*;
+	import flash.display.Sprite;
+	import flash.display.Loader;
+	import flash.net.URLRequest;	
+	import flash.events.Event;
 	
 	import com.a12.util.CustomEvent;
 	

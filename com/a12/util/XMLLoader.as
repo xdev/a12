@@ -2,9 +2,9 @@
 
 package com.a12.util
 {
-	import flash.display.*;
-	import flash.net.*;
-	import flash.events.*;
+	import flash.net.URLLoader;
+	import flash.net.URLRequest;
+	import flash.events.Event;
 	
 	public class XMLLoader
 	{

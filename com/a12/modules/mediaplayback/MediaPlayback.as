@@ -3,9 +3,10 @@
 package com.a12.modules.mediaplayback
 {
 
-	import com.a12.pattern.observer.*;
-	import com.a12.modules.mediaplayback.*;
 	import flash.display.Sprite;
+	
+	import com.a12.pattern.observer.*;
+	import com.a12.modules.mediaplayback.*;	
 
 	dynamic public class MediaPlayback extends Sprite
 	{

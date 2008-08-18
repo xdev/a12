@@ -3,18 +3,23 @@
 package com.a12.modules.mediaplayback
 {
 	
-	import flash.display.*;
-	import flash.text.*;
-	import flash.utils.*;
-	import flash.events.*;
+	import flash.display.Sprite;
+	import flash.display.MovieClip;
+	import flash.text.TextFormat;
+	import flash.utils.Timer;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
 	
 	import com.a12.pattern.observer.*;
 	import com.a12.pattern.mvc.*;
-
 	import com.a12.modules.mediaplayback.*;
 
-	import com.a12.util.*;
+	import com.a12.util.CustomEvent;
+	import com.a12.util.Utils;
+	import com.a12.util.LoadMovie;
+	
+	import com.gs.TweenLite;
 
 	public class CPView extends AbstractView
 	{
@@ -261,6 +266,20 @@ package com.a12.modules.mediaplayback
 				mc.scaleX = infoObj.time_percent / 100;
 			}
 			
+			
+			mc = Utils.$(ref,'still');
+			if(mc){
+			
+				if(infoObj.playing){
+					TweenLite.to(MovieClip(mc),0.2,{alpha:0.0});
+				}
+			
+				if(!infoObj.playing && infoObj.time_percent === 0){
+					TweenLite.to(MovieClip(mc),0.5,{alpha:1.0});
+				}
+			
+			}
+			
 		}
 		
 		private function trackScrubber(e:Event):void
@@ -272,7 +291,7 @@ package com.a12.modules.mediaplayback
 		// Consider moving this into the Controller
 		protected function mouseHandler(e:MouseEvent):void
 		{
-			var mc = DisplayObject(e.target);
+			var mc = e.currentTarget;
 			
 			if(e.type == MouseEvent.ROLL_OVER){
 				
@@ -478,7 +497,26 @@ package com.a12.modules.mediaplayback
 			mc.addEventListener(MouseEvent.ROLL_OVER,mouseHandler);
 			mc.addEventListener(MouseEvent.ROLL_OUT,mouseHandler);
 			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
+			
+			//create still frame
+			if(_options.still != undefined){
+				
+				mc = Utils.createmc(ref,'still',{alpha:0.0});
+				var movie = new LoadMovie(mc,_options.still);
+				movie.loader.contentLoaderInfo.addEventListener(Event.COMPLETE,revealStill);
+				
+				_controller.stop();
+				
+				//sort depth
+				ref.setChildIndex(mc,ref.numChildren-3);
+			}
 		
+		}
+		
+		private function revealStill(e:Event=null):void
+		{
+			var mc = Utils.$(ref,'still');
+			TweenLite.to(MovieClip(mc),0.5,{alpha:1.0});
 		}
 		
 		public function kill()
