@@ -517,6 +517,8 @@ package com.a12.modules.mediaplayback
 		{
 			var mc = Utils.$(ref,'still');
 			TweenLite.to(MovieClip(mc),0.5,{alpha:1.0});
+			//psudeo event
+			dispatchEvent(new CustomEvent('updateSize',true,false));
 		}
 		
 		public function kill()
