@@ -199,11 +199,15 @@ package com.a12.modules.mediaplayback
 			switch(_timeMode)
 			{
 				case true:
-					txt = '-' + Utils.padZero(infoObj.time_remaining.minutes) + ':' + Utils.padZero(Math.ceil(infoObj.time_remaining.seconds));
+					if(infoObj.time_remaining){
+						txt = '-' + Utils.padZero(infoObj.time_remaining.minutes) + ':' + Utils.padZero(Math.ceil(infoObj.time_remaining.seconds));
+					}
 				break;
 				
 				case false:
-					txt = Utils.padZero(infoObj.time_current.minutes) + ':' + Utils.padZero(infoObj.time_current.seconds);
+					if(infoObj.time_current){
+						txt = Utils.padZero(infoObj.time_current.minutes) + ':' + Utils.padZero(infoObj.time_current.seconds);
+					}
 				break;
 				/*
 				case 'progress':
@@ -213,59 +217,66 @@ package com.a12.modules.mediaplayback
 				*/
 			}
 			
-			var l = Utils.$(_controls,'label');
-			var tf = Utils.$(l,'displayText');
-			tf.text = txt;
+			if(_controls){
+				if(Utils.$(_controls,'label')){
+					var l = Utils.$(_controls,'label');
+					var tf = Utils.$(l,'displayText');
+					tf.text = txt;
+				}
 					
-			var factor:Number = (width-95) / 100;
+				var factor:Number = (width-95) / 100;
 			
-			var mc;
+				var mc;
 				
-			//if dragging false
-			if(infoObj.time_percent != undefined){
-				mc = Utils.$(Utils.$(_controls,'timeline'),'scrubber');
-				if(mc.dragging == false){
-					mc.x = infoObj.time_percent * ((width-95)-_scrubberWidth) / 100;
-				}
-			}
-			
-			mc = Utils.$(_controls,'video_play');
-			if(infoObj.playing){
-				mc.gotoAndStop('video_pause');
-				mc = Utils.$(ref,'video_overlay_play');
-				if(mc != null){
-					mc.alpha = 0.0;
-					mc.removeEventListener(MouseEvent.CLICK,mouseHandler);
-					mc.buttonMode = false;
-					mc.mouseEnabled = false;
-				}
-			}else{
-				
-				//fade in the video bizzzle
-				//Move.changeProps(MovieClip(Utils.$(ref,'video_overlay_play')),{alpha:0.75},500,'Cubic','easeOut');
-				
-				mc.gotoAndStop('video_play');
-				mc = Utils.$(ref,'video_overlay_play');
-				if(mc != null){
-					mc.alpha = 0.75;
-					mc.addEventListener(MouseEvent.CLICK,mouseHandler);
-					mc.buttonMode = true;
-					mc.mouseEnabled = true;
-					mc.mouseChildren = false;
+				//if dragging false
+				if(infoObj.time_percent != undefined){
+					mc = Utils.$(Utils.$(_controls,'timeline'),'scrubber');
+					if(mc.dragging == false){
+						mc.x = infoObj.time_percent * ((width-95)-_scrubberWidth) / 100;
+					}
 				}
 				
-			}
+				if(Utils.$(_controls,'video_play')){
+					mc = Utils.$(_controls,'video_play');
+					if(infoObj.playing){
+						mc.gotoAndStop('video_pause');
+						mc = Utils.$(ref,'video_overlay_play');
+						if(mc != null){
+							mc.alpha = 0.0;
+							mc.removeEventListener(MouseEvent.CLICK,mouseHandler);
+							mc.buttonMode = false;
+							mc.mouseEnabled = false;
+						}
+					}else{
+				
+						//fade in the video bizzzle
+						//Move.changeProps(MovieClip(Utils.$(ref,'video_overlay_play')),{alpha:0.75},500,'Cubic','easeOut');
+				
+						mc.gotoAndStop('video_play');
+						mc = Utils.$(ref,'video_overlay_play');
+						if(mc != null){
+							mc.alpha = 0.75;
+							mc.addEventListener(MouseEvent.CLICK,mouseHandler);
+							mc.buttonMode = true;
+							mc.mouseEnabled = true;
+							mc.mouseChildren = false;
+						}
+				
+					}
+				}
 			
-			if(infoObj.loaded_percent >= 0){
-				mc = Utils.$(Utils.$(_controls,'timeline'),'strip_load');
-				mc.scaleX = infoObj.loaded_percent / 100;
-			}
+				if(infoObj.loaded_percent >= 0){
+					mc = Utils.$(Utils.$(_controls,'timeline'),'strip_load');
+					mc.scaleX = infoObj.loaded_percent / 100;
+				}
 			
-			if(infoObj.time_percent >= 0){
-				mc = Utils.$(Utils.$(_controls,'timeline'),'strip_progress');
-				mc.scaleX = infoObj.time_percent / 100;
-			}
+				if(infoObj.time_percent >= 0){
+					mc = Utils.$(Utils.$(_controls,'timeline'),'strip_progress');
+					mc.scaleX = infoObj.time_percent / 100;
+				}
 			
+			}
+		
 			
 			mc = Utils.$(ref,'still');
 			if(mc){
