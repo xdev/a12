@@ -1,10 +1,9 @@
-/* $Id$ */
-
 package com.a12.modules.mediaplayback
 {
 	
 	import flash.display.Sprite;
 	import flash.display.MovieClip;
+	import flash.text.TextField;
 	import flash.text.TextFormat;
 	import flash.utils.Timer;
 	import flash.events.Event;
@@ -219,9 +218,7 @@ package com.a12.modules.mediaplayback
 			
 			if(_controls){
 				if(Utils.$(_controls,'label')){
-					var l = Utils.$(_controls,'label');
-					var tf = Utils.$(l,'displayText');
-					tf.text = txt;
+					TextField(Utils.$(_controls,'label.displayText')).text = txt;
 				}
 					
 				var factor:Number = (width-95) / 100;
@@ -230,7 +227,7 @@ package com.a12.modules.mediaplayback
 				
 				//if dragging false
 				if(infoObj.time_percent != undefined){
-					mc = Utils.$(Utils.$(_controls,'timeline'),'scrubber');
+					mc = Utils.$(_controls,'timeline.scrubber');
 					if(mc.dragging == false){
 						mc.x = infoObj.time_percent * ((width-95)-_scrubberWidth) / 100;
 					}
@@ -266,12 +263,12 @@ package com.a12.modules.mediaplayback
 				}
 			
 				if(infoObj.loaded_percent >= 0){
-					mc = Utils.$(Utils.$(_controls,'timeline'),'strip_load');
+					mc = Utils.$(_controls,'timeline.strip_load');
 					mc.scaleX = infoObj.loaded_percent / 100;
 				}
 			
 				if(infoObj.time_percent >= 0){
-					mc = Utils.$(Utils.$(_controls,'timeline'),'strip_progress');
+					mc = Utils.$(_controls,'timeline.strip_progress');
 					mc.scaleX = infoObj.time_percent / 100;
 				}
 			
@@ -295,7 +292,7 @@ package com.a12.modules.mediaplayback
 		
 		private function trackScrubber(e:Event):void
 		{
-			var mc = Utils.$(Utils.$(_controls,'timeline'),'scrubber');
+			var mc = Utils.$(_controls,'timeline.scrubber');
 			_controller.findSeek(mc.x / (width-95));
 		}
 		
@@ -357,8 +354,7 @@ package com.a12.modules.mediaplayback
 			}
 			if(e.type == MouseEvent.MOUSE_UP){
 				
-				mc = Utils.$(Utils.$(_controls,'timeline'),'scrubber');
-				//mc = Utils.findChild(_controls,['timeline','strip','scrubber']);
+				mc = Utils.$(_controls,'timeline.scrubber');
 				
 				mc.dragging = false;
 				mc.stopDrag();

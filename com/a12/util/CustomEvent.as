@@ -1,5 +1,3 @@
-/* $Id */
-
 package com.a12.util
 {
 	import flash.events.Event;

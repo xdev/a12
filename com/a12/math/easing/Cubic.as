@@ -1,5 +1,3 @@
-/* $Id$ */
-
 package com.a12.math.easing
 {
 	public class Cubic {

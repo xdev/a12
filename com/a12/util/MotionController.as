@@ -1,5 +1,3 @@
-/* $Id$ */
-
 package com.a12.util
 {
 	import com.a12.util.Motion;

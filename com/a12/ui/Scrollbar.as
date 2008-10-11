@@ -139,7 +139,7 @@ package com.a12.ui
 
 		public function renderNip()
 		{
-			var mc = Utils.$(Utils.$(ref,'nip'),'back');
+			var mc = Utils.$(ref,'nip.back');
 			mc.graphics.clear();
 			Utils.drawRect(mc,_options.nipW,_options.nipH,_options.clr_nip,1.0);
 		}
