@@ -146,7 +146,7 @@ package com.a12.ui
 		
  		public function setHeight(value:Number):void
 		{
-			var tObj = processScroll();
+			var tObj = processScroll(false);
 			//update prop
 			_options.barH = value;
 			
@@ -256,7 +256,7 @@ package com.a12.ui
 			processScroll();
 		}
 		
-		public function processScroll()
+		public function processScroll(dispatch:Boolean=true)
 		{
 			var perc:Number;
 			var mc = Utils.$(ref,'nip');
@@ -273,8 +273,9 @@ package com.a12.ui
 			tObj.clip = ref;
 			tObj.x = mc.x;
 			tObj.y = mc.y;
-			
-			dispatchEvent(new CustomEvent('onScroll',true,false,tObj));
+			if(dispatch){
+				dispatchEvent(new CustomEvent('onScroll',true,false,tObj));
+			}
 
 			lastPercent = perc;
 

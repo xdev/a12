@@ -24,7 +24,7 @@ package com.a12.util
 		
 		private function handleLoad(e:Event):void
 		{
-			result.apply(obj, [loader.data]);
+			result.apply(obj, [new XML(loader.data)]);
 		}			
 	}	
 }

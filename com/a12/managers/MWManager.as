@@ -81,10 +81,10 @@ package com.a12.managers
 	
 		private function process(e:Event):void
 		{
-			applyCallback(loader.data);	
+			applyCallback(new XML(loader.data));	
 		}
 	
-		private function applyCallback(xml):void
+		private function applyCallback(xml:XML):void
 		{
 			debug(xml);
 			var args = _callback.args;
