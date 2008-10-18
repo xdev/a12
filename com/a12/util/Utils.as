@@ -245,17 +245,18 @@
 		public static function makeTextfield(mc:Object, display:String, format:TextFormat, props:Object = null):TextField
 		{
 			var tf = new TextField();
+			mc.addChild(tf);
 			
 			var tObj = {
 				name:'displayText',
 				mouseEnabled:false,
-				selectable:false,
+				selectable:false,								
 				width:20,
 				height:10,
 				embedFonts:true,
 				wordWrap:true,
-				autoSize:TextFieldAutoSize.LEFT
-								
+				multiline:true,
+				autoSize:TextFieldAutoSize.LEFT								
 				};
 			
 			for(var i in tObj){
@@ -266,6 +267,9 @@
 				tf[j] = props[j];
 			}
 			
+			if(tf.selectable == true){
+				tf.mouseEnabled = true;
+			}
 			
 			tf.text = display;
 			tf.htmlText = display;
@@ -274,7 +278,7 @@
 				tf.defaultTextFormat = format;
 				tf.setTextFormat(format);
 			}
-			mc.addChild(tf);
+			
 			return tf;
 		}
 		
