@@ -5,6 +5,7 @@
 	import flash.display.MovieClip;
 	import flash.display.DisplayObject;
 	import flash.geom.ColorTransform;
+	import flash.geom.Matrix;
 	import flash.text.TextFormat;
 	import flash.text.TextField;
 	import flash.text.StyleSheet;
@@ -179,6 +180,42 @@
 			mc.graphics.drawRect(x,h-stroke,w,stroke);
 			mc.graphics.drawRect(x,stroke,stroke,h-(stroke*2));
 			
+			mc.graphics.endFill();
+		}
+		
+		/*
+
+		Function: drawGradient
+
+		Basic gradient drawing in a filled rectangle
+
+		Parameters:
+
+			mc:MovieClip - movieclip
+			w:Number - width
+			h:Number - height
+			props:Object - object containing all necessary and optional gradient properties
+
+		*/
+
+		public static function drawGradient(mc:MovieClip, w:Number, h:Number, props:Object ):void
+		{
+			var x,y,fillType,alphas,colors,ratios,matrix,rot;
+			
+			(props.x == undefined) ? x = 0 : x = props.x;
+			(props.y == undefined) ? y = 0 : y = props.y;
+			(props.fillType == undefined) ? fillType = "linear" : fillType = props.fillType;
+			(props.alphas == undefined) ? alphas = [1.0,1.0] : alphas = props.alphas;
+			(props.ratios == undefined) ? ratios = [0,255] : ratios = props.ratios;
+			(props.rot == undefined) ? rot = 0 : rot = props.rot;
+			
+			colors = props.colors;
+			matrix = new Matrix();
+			matrix.createGradientBox(w,h,(Math.PI/180)*rot,0,0);
+			
+			mc.graphics.moveTo(x, y);
+			mc.graphics.beginGradientFill(fillType, colors, alphas, ratios, matrix);
+			mc.graphics.drawRect(x,y,w,h);
 			mc.graphics.endFill();
 		}
 		
