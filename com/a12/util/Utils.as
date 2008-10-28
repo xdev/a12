@@ -321,6 +321,28 @@
 		
 		/*
 
+		Function: shuffle
+
+		Used as a array sorting function for randomization, could use improvement
+
+		Parameters:
+
+			a - a
+			b - b
+
+		Returns: 
+
+			randomized array
+
+		*/
+
+		public static function shuffle(a:Object, b:Object):Object
+		{
+			return Math.floor(Math.random()*2);
+		}
+		
+		/*
+
 		Function: convertSeconds
 
 		Creates an object with minutes and seconds properties from a number of seconds
