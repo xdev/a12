@@ -18,7 +18,7 @@ package com.a12.modules.mediaplayback
 	import com.a12.util.Utils;
 	import com.a12.util.LoadMovie;
 	
-	import com.gs.TweenLite;
+	import gs.TweenLite;
 
 	public class CPView extends AbstractView
 	{

@@ -9,7 +9,7 @@ package com.a12.ui
 	import com.a12.ui.IUI;
 	import com.a12.ui.Scrollbar;
 
-	import com.gs.TweenLite;		
+	import gs.TweenLite;		
 	
 	public class Pulldown extends UIElement
 	{

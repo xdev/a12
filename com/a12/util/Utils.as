@@ -11,6 +11,9 @@
 	import flash.text.StyleSheet;
 	import flash.text.TextFieldAutoSize;
 	
+	import flash.utils.setInterval;
+	import flash.utils.clearInterval;
+	
 	public class Utils
 	{
 	
@@ -116,6 +119,35 @@
 			}
 		}
 		*/
+		
+		/*
+
+		Function: delay
+
+		Wrapper for setTimeout, a one time setInterval
+
+		Parameters:
+
+			obj - object
+			method - method
+			t - delay in milliseconds
+			args - array of arguments to pass on
+
+		*/
+
+		public static function delay(obj:Object, method:Object, t:Number, args:Array=null):Number
+		{
+			var intID:Number;
+			// var intID = setInterval(execDelay, t, [this, obj, t, args]); // ALT DESIGN - IN PROGRESS - SEE execDelay
+			intID = setInterval(function() {
+				method.apply(obj, args);
+				clearInterval(intID);
+			}, t);
+			
+			return intID;
+		}
+	
+		
 		/*
 
 		Function: changeColor
