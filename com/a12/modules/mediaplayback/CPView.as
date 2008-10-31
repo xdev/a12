@@ -487,6 +487,10 @@ package com.a12.modules.mediaplayback
 			tf.font = "Akzidenz Grotesk";
 			tf.size = 10;
 			tf.color = 0xFFFFFF;
+			
+			if(_options.tf != undefined){
+				tf = _options.tf;
+			}
 		
 			var l = Utils.createmc(_controls,"label",{x:width-50,y:2.5,mouseEnabled:true});
 			t = Utils.makeTextfield(l,"00:00",tf,{width:35});//autoSize:TextFieldAutoSize.RIGHT
@@ -525,7 +529,7 @@ package com.a12.modules.mediaplayback
 			var mc = Utils.$(ref,'still');
 			TweenLite.to(MovieClip(mc),0.5,{alpha:1.0});
 			//psudeo event
-			dispatchEvent(new CustomEvent('updateSize',true,false));
+			dispatchEvent(new CustomEvent('updateSize',true,false,{mc:ref}));
 		}
 		
 		public function kill()

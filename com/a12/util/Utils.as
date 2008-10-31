@@ -42,6 +42,18 @@
 	
 		public static function createmc(mc:Object, name:String, objProps:Object = null):MovieClip
 		{
+			/*
+			if(objProps != undefined){
+				if(objProps.overwrite != undefined && objProps.overwrite != false){
+				 != false){
+				
+			}
+			*/
+			
+			if(Utils.$(mc,name)){
+				mc.removeChild(Utils.$(mc,name));
+			}
+			
 			var sp = new MovieClip();
 			sp.name = name;
 			
