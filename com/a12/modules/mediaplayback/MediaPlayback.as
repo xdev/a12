@@ -13,7 +13,7 @@ package com.a12.modules.mediaplayback
 	
 		public function MediaPlayback(ref,file,options:Object=null)
 		{
-			var ext = file.substr(file.lastIndexOf('.')+1,file.length);
+			var ext = file.substr(file.lastIndexOf('.')+1,file.length).toLowerCase();
 			
 			if(ext == 'mp4' || ext == 'mov' || ext == 'm4v' || ext == 'flv'){
 				_model = new VideoModel(ref,file,options);

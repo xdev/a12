@@ -2,6 +2,7 @@ package com.a12.ui
 {
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
+	import flash.events.Event;
 	
 	import flash.geom.Rectangle;
 	
@@ -104,7 +105,7 @@ package com.a12.ui
 			var mc = Utils.createmc(ref,"back");
 
 			mc = Utils.createmc(ref,"nip");
-			Utils.createmc(mc,"back");
+			//Utils.createmc(mc,"back");
 
 			if(_options.mode == "vertical"){
 				mc.y = _options.offsetH;
@@ -139,7 +140,7 @@ package com.a12.ui
 
 		public function renderNip()
 		{
-			var mc = Utils.$(ref,'nip.back');
+			var mc = Utils.$(ref,'nip');
 			mc.graphics.clear();
 			Utils.drawRect(mc,_options.nipW,_options.nipH,_options.clr_nip,1.0);
 		}
@@ -186,6 +187,8 @@ package com.a12.ui
 					ref.stage.addEventListener(MouseEvent.MOUSE_MOVE,handleMouseStage,false,0,true);
 					ref.stage.addEventListener(MouseEvent.MOUSE_UP,handleMouseStage,false,0,true);
 					
+					
+					
 				}
 				/*
 				if(e.type == MouseEvent.MOUSE_UP){
@@ -195,6 +198,7 @@ package com.a12.ui
 				}
 				*/				
 			}
+			e.stopPropagation();
 		}
 		
 		private function handleMouseStage(e:MouseEvent):void
@@ -209,6 +213,7 @@ package com.a12.ui
 				ref.stage.removeEventListener(MouseEvent.MOUSE_MOVE,handleMouseStage,false);
 				ref.stage.removeEventListener(MouseEvent.MOUSE_UP,handleMouseStage,false);
 			}
+			e.stopPropagation();
 		}
 		
 		public function shiftScroll(delta)
