@@ -20,7 +20,7 @@ package com.a12.ui
 		public var lastPercent:Number;
 		//protected var _options:Object;
 		protected var scrollInterval:Number;
-		
+		protected var state:Boolean;
 	
 		public function Scrollbar(mc:MovieClip,_options:Object=null)
 		{
@@ -36,6 +36,7 @@ package com.a12.ui
 			//super and merge
 			super(mc,_options,dObj);
 			
+			state = true;
 			/*
 			_options = new Object();
 			var i;
@@ -87,12 +88,19 @@ package com.a12.ui
 				mc.mouseEnabled = true;
 				mc = Utils.$(ref,'nip');
 				mc.mouseEnabled = true;
+				state = true;
 			}else{
 				mc = Utils.$(ref,'back');
 				mc.mouseEnabled = false;
 				mc = Utils.$(ref,'nip');
 				mc.mouseEnabled = false;
+				state = false;
 			}
+		}
+		
+		public function getState():Boolean
+		{
+			return state;
 		}
 		
 		public function onKill():void
