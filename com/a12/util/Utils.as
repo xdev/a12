@@ -213,6 +213,24 @@
 			mc.graphics.endFill();
 		
 		}
+				
+		public static function drawShearedRect(mc:MovieClip, w:Number, h:Number, shear:Number, rgb:Number, alpha:Number = 100, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
+		{
+			//we could calculate this in degrees instead of pixels slope y=mx+b
+			mc.graphics.moveTo(x, y);
+			mc.graphics.beginFill(rgb, alpha);
+			if(lineStyle != null){
+				mc.graphics.lineStyle(lineStyle[0], lineStyle[1], lineStyle[2]);
+			}
+			mc.graphics.moveTo(x+shear,y);
+			mc.graphics.lineTo(x+shear+w, y);
+			mc.graphics.lineTo(x+w, y+h);
+			mc.graphics.lineTo(x, y+h);
+			mc.graphics.lineTo(x+shear, y);
+			//mc.graphics.drawRect(x,y,w,h);
+			mc.graphics.endFill();
+		
+		}
 		
 		public static function drawPunchedRect(mc:MovieClip, w:Number, h:Number, stroke:Number, rgb:Number, alpha:Number = 100, x:Number = 0, y:Number = 0):void
 		{
