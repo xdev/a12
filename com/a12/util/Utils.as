@@ -17,6 +17,77 @@
 	public class Utils
 	{
 	
+		public static function align(itemsA:Array,mode:String,bounds:Object,process:Boolean=true):Array
+		{
+			
+			//assume item max is inside bounds for now
+			
+			//per item, optional bounding box override
+			var x:Number,y:Number,mc;
+			var width:Number,height:Number;
+			var imax = itemsA.length;
+			var item;
+			for(var i:int=0;i<imax;i++){
+				item = itemsA[i];
+				mc = item.obj;
+				
+				item.x = mc.x;
+				item.y = mc.y;
+				x = item.x;
+				y = item.y;
+				
+				width = mc.width;
+				if(item.width != undefined){
+					width = item.width;
+				}
+				height = mc.height;
+				if(item.height != undefined){
+					height = item.height;
+				}
+														
+				switch(mode){
+				
+					case 'HL':
+						x = 0;
+					break;
+					
+					case 'HC':
+						x = bounds.width/2 - width/2;
+					break;
+					
+					case 'HR':
+						x = bounds.width - width;
+					break;
+					
+					case 'VT':
+					
+					break;
+					
+					case 'VC':
+					
+					break;
+					
+					case 'VB':
+					
+					break;
+					
+				}
+				
+				if(process){
+					mc.x = x;
+					mc.y = y;
+				}
+				
+				//update itemsA
+				item.x = x;
+				item.y = y;
+				
+			}
+			
+			return itemsA;		
+			
+		}
+	
 		/*
 
 		Function: createmc
