@@ -5,6 +5,7 @@ package com.a12.util
 	import flash.display.Loader;
 	import flash.net.URLRequest;	
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	
 	import com.a12.util.CustomEvent;
 	
@@ -21,6 +22,12 @@ package com.a12.util
 			var url:URLRequest = new URLRequest(asset);
 			loader.load(url);
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,handleLoad);
+			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,handleError);
+		}
+		
+		private function handleError(e:IOErrorEvent):void
+		{
+			
 		}
 		
 		private function handleLoad(e:Event):void
