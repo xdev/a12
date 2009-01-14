@@ -226,7 +226,6 @@ package com.a12.modules.mediaplayback
 			
 			
 			if(_options.paused == true){
-				trace('in here');
 				stopStream();
 			}
 			

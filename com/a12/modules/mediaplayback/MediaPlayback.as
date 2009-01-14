@@ -8,7 +8,7 @@ package com.a12.modules.mediaplayback
 
 	dynamic public class MediaPlayback extends Sprite
 	{
-		private var _model;
+		public var _model;
 		public var _view:CPView;
 	
 		public function MediaPlayback(ref,file,options:Object=null)

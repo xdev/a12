@@ -119,6 +119,9 @@ package com.a12.modules.mediaplayback
 			
 			
 			}
+			if(infoObj.action == 'onTransportChange'){
+				
+			}
 			
 			if(infoObj.action == 'updateSize'){
 				

@@ -11,11 +11,14 @@ package com.a12.modules.mediaplayback
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	import flash.events.ProgressEvent;
-
+	
 	import com.a12.pattern.observer.Observable;
 	import com.a12.modules.mediaplayback.*;
 	import com.a12.util.Utils;
+	import com.a12.util.CustomEvent;
 
+	import flash.events.EventDispatcher;
+	
 	public class AudioModel extends Observable implements IMediaModel
 	{
 	
@@ -32,6 +35,8 @@ package com.a12.modules.mediaplayback
 		private var _playing:Boolean;		
 		private var _position:Number;
 		private var _options:Object;
+		
+		public var b:EventDispatcher = new EventDispatcher();
 	
 		public function AudioModel(_ref,_file,_options:Object=null)
 		{
@@ -56,6 +61,7 @@ package com.a12.modules.mediaplayback
 			_playing = false;	
 			_channel.stop();
 			updateView();
+			dispatchPlaybackStatus(false);
 		}
 		
 		public function playStream():void
@@ -65,6 +71,7 @@ package com.a12.modules.mediaplayback
 			_setVolume();
 			_playing = true;
 			updateView();
+			dispatchPlaybackStatus(true);
 		}
 		
 		public function pauseStream():void
@@ -74,6 +81,7 @@ package com.a12.modules.mediaplayback
 					_position = _channel.position;
 					_channel.stop();
 					_playing = false;
+					dispatchPlaybackStatus(false);
 				break;
 			
 				case _playing == false:
@@ -81,6 +89,7 @@ package com.a12.modules.mediaplayback
 					_channel = _sound.play(_position);
 					_playing = true;
 					_setVolume();
+					dispatchPlaybackStatus(true);
 				break;
 			}
 			updateView();
@@ -186,6 +195,10 @@ package com.a12.modules.mediaplayback
 			
 			setChanged();
 			notifyObservers(tObj);
+			
+			if(_options.paused == true){
+				stopStream();
+			}
 		}
 	
 		private function onComplete(e:Event):void
@@ -212,6 +225,19 @@ package com.a12.modules.mediaplayback
 		private function id3Handler(e:Event):void
 		{
 			
+		}
+		
+		private function dispatchPlaybackStatus(mode:Boolean):void
+		{
+			/*
+			var tObj = {};
+			tObj.action = 'onTransportChange';
+			tObj.mode = mode;
+			tObj.file = _file;
+			setChanged();
+			notifyObservers(tObj);
+			*/
+			b.dispatchEvent(new CustomEvent('onTransportChange',true,false,{mode:mode,file:_file}));
 		}
 	
 		private function updateView(e:TimerEvent=null):void
