@@ -8,6 +8,7 @@ package com.a12.modules.mediaplayback
 	import flash.events.TimerEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.events.AsyncErrorEvent;
+	import flash.events.EventDispatcher;
 	import flash.media.Video;
     import flash.media.SoundTransform;
     import flash.net.NetConnection;
@@ -16,6 +17,7 @@ package com.a12.modules.mediaplayback
 	import com.a12.pattern.observer.Observable;
 	import com.a12.modules.mediaplayback.*;
 	import com.a12.util.Utils;
+	import com.a12.util.CustomEvent;
 
 	public class VideoModel extends Observable implements IMediaModel
 	{
@@ -28,6 +30,8 @@ package com.a12.modules.mediaplayback
 		private var _metaData:Object;		
 		private var _playing:Boolean;
 		private var _options:Object;
+		
+		public var b:EventDispatcher = new EventDispatcher();
 	
 		public function VideoModel(_ref,_file,_options:Object=null)
 		{
@@ -53,18 +57,21 @@ package com.a12.modules.mediaplayback
 			pauseStream();
 			seekStream(0);
 			_playing = false;
+			dispatchPlaybackStatus(false);
 		}
 		
 		public function playStream():void
 		{
 			_stream.resume();
 			_playing = true;
+			dispatchPlaybackStatus(true);
 		}		
 	
 		public function pauseStream():void
 		{
 			_stream.pause();
 			_playing = false;
+			dispatchPlaybackStatus(false);
 		}
 		
 		public function toggleStream():void
@@ -128,6 +135,19 @@ package com.a12.modules.mediaplayback
 		private function cuePointHandler(obj:Object):void
 		{
 			
+		}
+		
+		private function dispatchPlaybackStatus(mode:Boolean):void
+		{
+			/*
+			var tObj = {};
+			tObj.action = 'onTransportChange';
+			tObj.mode = mode;
+			tObj.file = _file;
+			setChanged();
+			notifyObservers(tObj);
+			*/
+			b.dispatchEvent(new CustomEvent('onTransportChange',true,false,{mode:mode,file:_file}));
 		}
 		
 		private function onMetaData(obj:Object):void
