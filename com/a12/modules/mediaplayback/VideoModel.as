@@ -76,8 +76,14 @@ package com.a12.modules.mediaplayback
 		
 		public function toggleStream():void
 		{
-			_playing = !_playing;
+			_playing = !_playing;			
 			_stream.togglePause();
+			//is there an event listener to for this
+			if(_playing){
+				dispatchPlaybackStatus(true);
+			}else{
+				dispatchPlaybackStatus(false);
+			}
 		}	
 			
 		public function seekStream(time:Number):void
@@ -243,7 +249,7 @@ package com.a12.modules.mediaplayback
 			setChanged();
 			notifyObservers(tObj);
 			
-			
+			dispatchPlaybackStatus(true);
 			
 			if(_options.paused == true){
 				stopStream();
