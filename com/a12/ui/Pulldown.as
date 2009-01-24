@@ -73,7 +73,7 @@ package com.a12.ui
 			
 		}
 		
-		private function mouseHandler(e:Event)
+		private function mouseHandler(e:MouseEvent)
 		{
 			var mc = e.currentTarget;
 			

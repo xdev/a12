@@ -28,6 +28,10 @@ package com.a12.ui
 		}
 		
 		/* Interface */
+		public function getRef():MovieClip
+		{
+			return ref;
+		}		
 		
 		public function getValue():Object
 		{
