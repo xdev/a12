@@ -4,6 +4,7 @@ package com.a12.ui
 	import flash.display.DisplayObject;
 	import flash.events.MouseEvent;
 	import flash.events.FocusEvent;
+	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.text.TextFormat;
 	import flash.text.TextField;
@@ -18,9 +19,10 @@ package com.a12.ui
 	
 	public class Pulldown extends UIElement
 	{
-		
+		protected var _container:MovieClip;
 		private var _dMax:int;
 		private var _open:Boolean;
+		private var _parented:Boolean;
 		private var stagePulldown:DisplayObject; 
 				
 		public function Pulldown(mc:MovieClip,options:Object)
@@ -32,7 +34,7 @@ package com.a12.ui
 			
 			//set default object			
 			var dObj:Object = {
-				mode:'local',
+				mode:'stage',
 				labelDefault:'',
 				width:200,
 				rowHeight:20,
@@ -46,6 +48,11 @@ package com.a12.ui
 			super(mc,options,dObj);
 			//build
 			_open = false;
+			_parented = true;
+			//this is what will story
+			_container = Utils.createmc(ref,'container');
+			
+			ref.addEventListener(Event.REMOVED_FROM_STAGE,handleRemoved,false,10,true);
 			
 			buildElement();
 		}
@@ -64,7 +71,7 @@ package com.a12.ui
 			//find value
 			for(var i:int = 0;i<_options.data.length;i++){
 				if(_options.data[i].value == value){
-					TextField(Utils.$(ref,'controls.label.displayText')).text = String(_options.data[i].name);
+					TextField(Utils.$(_container,'controls.label.displayText')).text = String(_options.data[i].name);
 					break;
 				}
 			}
@@ -98,7 +105,8 @@ package com.a12.ui
 		{
 			//controls
 			//y:-_options.rowHeight
-			var controls = Utils.createmc(ref,"controls",{buttonMode:true,mouseEnabled:true});
+			var controls = Utils.createmc(_container,"controls",{buttonMode:true,mouseEnabled:true});
+			
 			var mc;
 			//back
 			mc = Utils.createmc(controls,"back");
@@ -111,28 +119,55 @@ package com.a12.ui
 			//arrows
 			
 			//set up mouse handler for controls ehh
-			controls.addEventListener(MouseEvent.CLICK,handleMouse,false,0,true);
+			
 			
 			//var t = setTimeout(test,1000);
 			
 			/*
-				tf.addEventListener(FocusEvent.FOCUS_IN,handleFocus,false,0,true);
-				tf.addEventListener(FocusEvent.FOCUS_OUT,handleFocus,false,0,true);
+			tf.addEventListener(FocusEvent.FOCUS_IN,handleFocus,false,0,true);
+			tf.addEventListener(FocusEvent.FOCUS_OUT,handleFocus,false,0,true);
 			*/
 			
 			buildOptions();
 			
+			controls.addEventListener(MouseEvent.CLICK,handleMouse,false,0,true);
+			
 			//showOptions();
 			
+		}
+		
+		private function handleRemoved(e:Event):void
+		{
+			if(_options.mode == 'stage' && !_parented){
+				ref.stage.removeChild(_container);
+			}
 		}
 		
 		protected function handleMouse(e:MouseEvent):void
 		{
 			var mc = e.currentTarget;
 			
+			if(e.type == MouseEvent.MOUSE_DOWN){
+				trace('pulldown:mouse down');
+				if(e.currentTarget == ref.stage){
+					ref.stage.removeEventListener(MouseEvent.MOUSE_DOWN,handleMouse,false);
+					hideOptions();
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					var controls = Utils.$(_container,'controls');
+					if(!controls.willTrigger(MouseEvent.CLICK)){
+						trace('add back');
+						controls.addEventListener(MouseEvent.CLICK,handleMouse,false,0,true);
+					}
+					
+					return;
+				}
+			}
+			
 			if(mc.name == 'controls'){
 			
 				if(e.type == MouseEvent.CLICK){
+					trace('was a click');
 					toggleOptions();
 				}
 				
@@ -140,10 +175,8 @@ package com.a12.ui
 				
 				//regular item
 				if(e.type == MouseEvent.CLICK){
-					
 					setValue(mc.value);
 					hideOptions();					
-					
 				}				
 				
 			}
@@ -164,21 +197,28 @@ package com.a12.ui
 		{
 			if(_options.mode == 'local'){
 				//animate the height of the mask
-				TweenLite.to(Utils.$(ref,"options_mask"),0.3,{height:_dMax*_options.rowHeight});
+				TweenLite.to(Utils.$(_container,"options_mask"),0.3,{height:_dMax*_options.rowHeight});
 				//animate the position of the options
-				TweenLite.to(Utils.$(ref,"options"),0.3,{y:_options.rowHeight});
+				TweenLite.to(Utils.$(_container,"options"),0.3,{y:_options.rowHeight});
 			}
 			
 			if(_options.mode == 'stage'){
-				stagePulldown = ref.stage.addChild(ref);
+				_container = MovieClip(ref.stage.addChild(_container));
 				var p:Point = ref.localToGlobal(new Point());
-				stagePulldown.x = p.x;
-				stagePulldown.y = p.y + _options.rowHeight;
+				_container.x = p.x;
+				_container.y = p.y;
 				
 				//animate the height of the mask
-				TweenLite.to(Utils.$(stagePulldown,"options_mask"),0.3,{height:_dMax*_options.rowHeight});
+				TweenLite.to(Utils.$(_container,"options_mask"),0.3,{height:_dMax*_options.rowHeight});
 				//animate the position of the options
-				TweenLite.to(Utils.$(stagePulldown,"options"),0.3,{y:_options.rowHeight});
+				TweenLite.to(Utils.$(_container,"options"),0.3,{y:_options.rowHeight});
+				
+				if(!ref.stage.willTrigger(MouseEvent.MOUSE_DOWN)){
+					ref.stage.addEventListener(MouseEvent.MOUSE_DOWN,handleMouse,false,0,true);
+					var controls = Utils.$(_container,'controls');
+					controls.removeEventListener(MouseEvent.CLICK,handleMouse,false);		
+				}
+				_parented = false;
 								
 			}
 			
@@ -191,27 +231,27 @@ package com.a12.ui
 		{
 			if(_options.mode == 'local'){
 				//animate the height of the mask
-				TweenLite.to(Utils.$(ref,"options_mask"),0.3,{height:0});
+				TweenLite.to(Utils.$(_container,"options_mask"),0.3,{height:0});
 				//animate the position of the options
-				TweenLite.to(Utils.$(ref,"options"),0.3,{y:-(_options.rowHeight * _dMax)});
+				TweenLite.to(Utils.$(_container,"options"),0.3,{y:-(_options.rowHeight * _dMax)});
 			}
 			
 			if(_options.mode == 'stage'){
 				
 				//suck back// setInterval - repartent YO
 				//animate the height of the mask
-				TweenLite.to(Utils.$(stagePulldown,"options_mask"),0.3,{height:0});
+				TweenLite.to(Utils.$(_container,"options_mask"),0.3,{height:0});
 				//animate the position of the options
-				TweenLite.to(Utils.$(stagePulldown,"options"),0.3,{y:-(_options.rowHeight * _dMax)});
+				TweenLite.to(Utils.$(_container,"options"),0.3,{y:-(_options.rowHeight * _dMax)});
 				
 				Utils.delay(this,reparent,400);
 				
 				/*
-				var opt = Utils.$(ref.stage,'options');
+				var opt = Utils.$(_container.stage,'options');
 				
 				if(opt){
-					var nopt = ref.addChild(opt);
-					//nopt.mask = Utils.$(ref,'options_mask');
+					var nopt = _container.addChild(opt);
+					//nopt.mask = Utils.$(_container,'options_mask');
 				}
 				*/
 			}
@@ -223,19 +263,20 @@ package com.a12.ui
 		
 		private function reparent():void
 		{
-			var bla = addChild(stagePulldown);
-			trace(bla);
-			
+			_container = MovieClip(ref.addChild(_container));
+			_container.x = 0;
+			_container.y = 0;
+			_parented = true;
 		}
 		
 		private function buildOptions():void
 		{
-			var options = Utils.createmc(ref,"options",{y:_options.rowHeight});
+			var options = Utils.createmc(_container,"options",{y:_options.rowHeight});
 			
 			
 			
 			//create mask
-			var mask = Utils.createmc(ref,"options_mask",{y:_options.rowHeight});
+			var mask = Utils.createmc(_container,"options_mask",{y:_options.rowHeight});
 			Utils.drawRect(mask,_options.width,_options.rowHeight,1.0);
 			
 			options.mask = mask;
