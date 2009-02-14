@@ -14,6 +14,8 @@ package com.a12.ui
 	import com.a12.ui.UIElement;
 	import com.a12.ui.IUI;
 	import com.a12.ui.Scrollbar;
+	
+	import com.carlcalderon.arthropod.Debug;
 
 	import gs.TweenLite;		
 	
@@ -58,7 +60,6 @@ package com.a12.ui
 		}
 		
 		/* Interface */
-		
 		public override function getValue():Object
 		{
 			return _value;
@@ -69,6 +70,8 @@ package com.a12.ui
 			_value = value;
 			
 			//find value
+			trace(value);
+			
 			for(var i:int = 0;i<_options.data.length;i++){
 				if(_options.data[i].value == value){
 					TextField(Utils.$(_container,'controls.label.displayText')).text = String(_options.data[i].name);
@@ -81,18 +84,6 @@ package com.a12.ui
 		public override function reset():void
 		{
 			
-		}
-		
-		private function handleFocus(e:FocusEvent):void
-		{
-			/*
-			if(e.type == FocusEvent.FOCUS_IN){
-				setFocus(true);
-			}
-			if(e.type == FocusEvent.FOCUS_OUT){
-				setFocus(false);
-			}
-			*/
 		}
 		
 		public function setFocus(mode:Boolean):void
@@ -145,44 +136,60 @@ package com.a12.ui
 		
 		protected function handleMouse(e:MouseEvent):void
 		{
-			var mc = e.currentTarget;
+			Debug.object(e);
 			
-			if(e.type == MouseEvent.MOUSE_DOWN){
-				trace('pulldown:mouse down');
-				if(e.currentTarget == ref.stage){
-					ref.stage.removeEventListener(MouseEvent.MOUSE_DOWN,handleMouse,false);
-					hideOptions();
-					e.stopImmediatePropagation();
-					e.preventDefault();
-					var controls = Utils.$(_container,'controls');
-					if(!controls.willTrigger(MouseEvent.CLICK)){
-						trace('add back');
-						controls.addEventListener(MouseEvent.CLICK,handleMouse,false,0,true);
-					}
+			switch(true)
+			{
+				case _open == false:
 					
-					return;
-				}
-			}
-			
-			if(mc.name == 'controls'){
-			
-				if(e.type == MouseEvent.CLICK){
-					trace('was a click');
-					toggleOptions();
-				}
+					if(e.currentTarget == Utils.$(_container,'controls')){
+						showOptions();
+					}
 				
-			}else{
+				break;
 				
-				//regular item
-				if(e.type == MouseEvent.CLICK){
-					setValue(mc.value);
-					hideOptions();					
-				}				
+				case _open == true:
+					
+					if(e.type == MouseEvent.CLICK){
+						
+						//check if the target is controls
+						if(e.currentTarget == Utils.$(_container,'controls')){
+							hideOptions();
+							return;
+						}
+						
+						//is it one of the options
+						if(e.currentTarget.parent == Utils.$(_container,'options')){
+							setValue(e.currentTarget.value);
+							hideOptions();
+							return;							
+						}
+						
+						//is it outside this element - this is from the stage handler
+						if(!_container.hitTestPoint(mouseX,mouseY)){
+							hideOptions();
+						}
+					
+					}
+				
+				break;				
 				
 			}
 			
 		}
-		
+
+		private function handleFocus(e:FocusEvent):void
+		{
+			/*
+			if(e.type == FocusEvent.FOCUS_IN){
+				setFocus(true);
+			}
+			if(e.type == FocusEvent.FOCUS_OUT){
+				setFocus(false);
+			}
+			*/
+		}
+
 		protected function toggleOptions():void
 		{
 			_open = !_open;
@@ -213,10 +220,10 @@ package com.a12.ui
 				//animate the position of the options
 				TweenLite.to(Utils.$(_container,"options"),0.3,{y:_options.rowHeight});
 				
-				if(!ref.stage.willTrigger(MouseEvent.MOUSE_DOWN)){
-					ref.stage.addEventListener(MouseEvent.MOUSE_DOWN,handleMouse,false,0,true);
-					var controls = Utils.$(_container,'controls');
-					controls.removeEventListener(MouseEvent.CLICK,handleMouse,false);		
+				if(!ref.stage.willTrigger(MouseEvent.CLICK)){
+					ref.stage.addEventListener(MouseEvent.CLICK,handleMouse,false,0,true);
+					//var controls = Utils.$(_container,'controls');
+					//controls.removeEventListener(MouseEvent.CLICK,handleMouse,false);		
 				}
 				_parented = false;
 								
@@ -254,6 +261,8 @@ package com.a12.ui
 					//nopt.mask = Utils.$(_container,'options_mask');
 				}
 				*/
+				
+				ref.stage.removeEventListener(MouseEvent.CLICK,handleMouse,false);
 			}
 			
 			_open = false;
