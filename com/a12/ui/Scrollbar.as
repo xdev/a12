@@ -206,7 +206,8 @@ package com.a12.ui
 				}
 				*/				
 			}
-			e.stopPropagation();
+			//not the best idea
+			//e.stopPropagation();
 		}
 		
 		private function handleMouseStage(e:MouseEvent):void

@@ -25,7 +25,8 @@ package com.a12.ui
 		private var _dMax:int;
 		private var _open:Boolean;
 		private var _parented:Boolean;
-		private var stagePulldown:DisplayObject; 
+		private var stagePulldown:DisplayObject;
+		protected var _dir:int;
 				
 		public function Pulldown(mc:MovieClip,options:Object)
 		{
@@ -78,6 +79,16 @@ package com.a12.ui
 					break;
 				}
 			}
+			
+			dispatchEvent(new CustomEvent('onChange',true,false,{obj:this}));
+			/*
+			if(getValue() != _valueVirgin){
+				dispatchEvent(new CustomEvent('onChange',true,false,{obj:this}));
+			}else{
+				dispatchEvent(new CustomEvent('onReset',true,false,{obj:this}));				
+			}
+			*/		
+			
 			
 		}
 		
@@ -136,7 +147,8 @@ package com.a12.ui
 		
 		protected function handleMouse(e:MouseEvent):void
 		{
-			Debug.object(e);
+			Debug.log('handleMouse' + e.type + e.currentTarget);
+			//Debug.object(e);
 			
 			switch(true)
 			{
@@ -144,17 +156,31 @@ package com.a12.ui
 					
 					if(e.currentTarget == Utils.$(_container,'controls')){
 						showOptions();
+						//e.stopImmediatePropagation();
 					}
 				
 				break;
 				
 				case _open == true:
 					
-					if(e.type == MouseEvent.CLICK){
+					if(e.type == MouseEvent.MOUSE_DOWN){
 						
+						//straight from CS3 component
+						if (! contains(e.target as DisplayObject) && !_container.contains(e.target as DisplayObject)) {
+							Debug.log('WHAT UP');
+							hideOptions();
+							//e.stopImmediatePropagation();
+							return;
+							
+						}
+					
+					}
+					
+					if(e.type == MouseEvent.CLICK){	
 						//check if the target is controls
 						if(e.currentTarget == Utils.$(_container,'controls')){
 							hideOptions();
+							//e.stopImmediatePropagation();
 							return;
 						}
 						
@@ -162,12 +188,14 @@ package com.a12.ui
 						if(e.currentTarget.parent == Utils.$(_container,'options')){
 							setValue(e.currentTarget.value);
 							hideOptions();
+							//e.stopImmediatePropagation();
 							return;							
 						}
 						
 						//is it outside this element - this is from the stage handler
 						if(!_container.hitTestPoint(mouseX,mouseY)){
 							hideOptions();
+							//e.stopImmediatePropagation();
 						}
 					
 					}
@@ -210,21 +238,44 @@ package com.a12.ui
 			}
 			
 			if(_options.mode == 'stage'){
+				ref.addEventListener(Event.ENTER_FRAME, addCloseListener, false, 0, true);
+				
 				_container = MovieClip(ref.stage.addChild(_container));
 				var p:Point = ref.localToGlobal(new Point());
 				_container.x = p.x;
 				_container.y = p.y;
 				
-				//animate the height of the mask
-				TweenLite.to(Utils.$(_container,"options_mask"),0.3,{height:_dMax*_options.rowHeight});
-				//animate the position of the options
-				TweenLite.to(Utils.$(_container,"options"),0.3,{y:_options.rowHeight});
+				//evalutate the position to stage height - open down
+				if(ref.stage.stageHeight - (p.y + ((_dMax+1)*_options.rowHeight)) > 0){				
+					//animate the height of the mask
+					TweenLite.to(Utils.$(_container,"options_mask"),0.3,{height:_dMax*_options.rowHeight});
+					//animate the position of the options
+					TweenLite.to(Utils.$(_container,"options"),0.3,{y:_options.rowHeight});
+					_dir = 1;
 				
+				}else{
+					//open up
+					var yPos = -_dMax*_options.rowHeight;
+					
+					//animate the height of the mask
+					TweenLite.to(Utils.$(_container,"options_mask"),0.3,{y:yPos,height:_dMax*_options.rowHeight});
+					//animate the position of the options
+					Utils.$(_container,"options").y = -_options.rowHeight*2;
+					TweenLite.to(Utils.$(_container,"options"),0.3,{y:yPos});
+					_dir = -1;					
+					
+				}
+				
+				//
+				
+				
+				/*
 				if(!ref.stage.willTrigger(MouseEvent.CLICK)){
 					ref.stage.addEventListener(MouseEvent.CLICK,handleMouse,false,0,true);
 					//var controls = Utils.$(_container,'controls');
 					//controls.removeEventListener(MouseEvent.CLICK,handleMouse,false);		
 				}
+				*/
 				_parented = false;
 								
 			}
@@ -234,11 +285,19 @@ package com.a12.ui
 			setFocus(true);
 		}
 		
+		private function addCloseListener(e:Event):void
+		{
+			ref.removeEventListener(Event.ENTER_FRAME, addCloseListener);
+			if (!_open) { return; }
+			ref.stage.addEventListener(MouseEvent.MOUSE_DOWN, handleMouse, false, 0, true);
+			Debug.log('added');
+		}
+		
 		protected function hideOptions():void
 		{
 			if(_options.mode == 'local'){
 				//animate the height of the mask
-				TweenLite.to(Utils.$(_container,"options_mask"),0.3,{height:0});
+				TweenLite.to(Utils.$(_container,"options_mask"),0.3,{y:_options.rowHeight,height:0});
 				//animate the position of the options
 				TweenLite.to(Utils.$(_container,"options"),0.3,{y:-(_options.rowHeight * _dMax)});
 			}
@@ -247,7 +306,7 @@ package com.a12.ui
 				
 				//suck back// setInterval - repartent YO
 				//animate the height of the mask
-				TweenLite.to(Utils.$(_container,"options_mask"),0.3,{height:0});
+				TweenLite.to(Utils.$(_container,"options_mask"),0.3,{y:_options.rowHeight,height:0});
 				//animate the position of the options
 				TweenLite.to(Utils.$(_container,"options"),0.3,{y:-(_options.rowHeight * _dMax)});
 				
@@ -261,8 +320,8 @@ package com.a12.ui
 					//nopt.mask = Utils.$(_container,'options_mask');
 				}
 				*/
-				
-				ref.stage.removeEventListener(MouseEvent.CLICK,handleMouse,false);
+				Debug.log('remove stage click');
+				ref.stage.removeEventListener(MouseEvent.MOUSE_DOWN,handleMouse,false);
 			}
 			
 			_open = false;
