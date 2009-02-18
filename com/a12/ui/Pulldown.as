@@ -147,7 +147,7 @@ package com.a12.ui
 		
 		protected function handleMouse(e:MouseEvent):void
 		{
-			Debug.log('handleMouse' + e.type + e.currentTarget);
+			//Debug.log('handleMouse' + e.type + e.currentTarget);
 			//Debug.object(e);
 			
 			switch(true)
@@ -167,7 +167,7 @@ package com.a12.ui
 						
 						//straight from CS3 component
 						if (! contains(e.target as DisplayObject) && !_container.contains(e.target as DisplayObject)) {
-							Debug.log('WHAT UP');
+							//Debug.log('WHAT UP');
 							hideOptions();
 							//e.stopImmediatePropagation();
 							return;
@@ -290,7 +290,7 @@ package com.a12.ui
 			ref.removeEventListener(Event.ENTER_FRAME, addCloseListener);
 			if (!_open) { return; }
 			ref.stage.addEventListener(MouseEvent.MOUSE_DOWN, handleMouse, false, 0, true);
-			Debug.log('added');
+			//Debug.log('added');
 		}
 		
 		protected function hideOptions():void
@@ -320,7 +320,7 @@ package com.a12.ui
 					//nopt.mask = Utils.$(_container,'options_mask');
 				}
 				*/
-				Debug.log('remove stage click');
+				//Debug.log('remove stage click');
 				ref.stage.removeEventListener(MouseEvent.MOUSE_DOWN,handleMouse,false);
 			}
 			

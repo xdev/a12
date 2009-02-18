@@ -272,7 +272,7 @@
 	
 	
 		*/
-		public static function drawRect(mc:MovieClip, w:Number, h:Number, rgb:Number, alpha:Number = 100, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
+		public static function drawRect(mc:MovieClip, w:Number, h:Number, rgb:Number, alpha:Number = 1.0, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
 		{
 		
 			mc.graphics.moveTo(x, y);
@@ -285,7 +285,7 @@
 		
 		}
 				
-		public static function drawShearedRect(mc:MovieClip, w:Number, h:Number, shear:Number, rgb:Number, alpha:Number = 100, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
+		public static function drawShearedRect(mc:MovieClip, w:Number, h:Number, shear:Number, rgb:Number, alpha:Number = 1.0, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
 		{
 			//we could calculate this in degrees instead of pixels slope y=mx+b
 			mc.graphics.moveTo(x, y);
@@ -303,7 +303,7 @@
 		
 		}
 		
-		public static function drawPunchedRect(mc:MovieClip, w:Number, h:Number, stroke:Number, rgb:Number, alpha:Number = 100, x:Number = 0, y:Number = 0):void
+		public static function drawPunchedRect(mc:MovieClip, w:Number, h:Number, stroke:Number, rgb:Number, alpha:Number = 1.0, x:Number = 0, y:Number = 0):void
 		{
 			mc.graphics.moveTo(x, y);
 			mc.graphics.beginFill(rgb, alpha);
@@ -368,7 +368,7 @@
 	
 	
 		*/
-		public static function drawCircle(mc:MovieClip, rgb:Number, alpha:Number = 100, radius:Number = 10, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
+		public static function drawCircle(mc:MovieClip, rgb:Number, alpha:Number = 1.0, radius:Number = 10, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
 		{
 		
 			//mc.graphics.moveTo(x, y);
@@ -399,7 +399,7 @@
 	
 	
 		*/
-		public static function drawRoundRect(mc:MovieClip, w:Number, h:Number, rgb:Number, alpha:Number = 100, radius:Number = 10, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
+		public static function drawRoundRect(mc:MovieClip, w:Number, h:Number, rgb:Number, alpha:Number = 1.0, radius:Number = 10, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
 		{
 		
 			mc.graphics.moveTo(x, y);
