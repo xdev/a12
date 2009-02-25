@@ -1,23 +1,20 @@
 package com.a12.modules.mediaplayback
 {
 	
+	import com.a12.pattern.observer.Observable;
+	import com.a12.util.CustomEvent;
+	import com.a12.util.Utils;
+	
 	import flash.display.MovieClip;
-	import flash.utils.Timer;
-	import flash.net.URLRequest;
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	import flash.events.ProgressEvent;
+	import flash.events.TimerEvent;
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
-	import flash.media.SoundLoaderContext;
-	import flash.events.Event;
-	import flash.events.TimerEvent;
-	import flash.events.ProgressEvent;
-	
-	import com.a12.pattern.observer.Observable;
-	import com.a12.modules.mediaplayback.*;
-	import com.a12.util.Utils;
-	import com.a12.util.CustomEvent;
-
-	import flash.events.EventDispatcher;
+	import flash.net.URLRequest;
+	import flash.utils.Timer;
 	
 	public class AudioModel extends Observable implements IMediaModel
 	{
@@ -38,7 +35,7 @@ package com.a12.modules.mediaplayback
 		
 		public var b:EventDispatcher = new EventDispatcher();
 	
-		public function AudioModel(_ref,_file,_options:Object=null)
+		public function AudioModel(_ref:MovieClip,_file:String,_options:Object=null)
 		{
 			this._ref = _ref;
 			this._file = _file;
@@ -153,14 +150,14 @@ package com.a12.modules.mediaplayback
 		// --------------------------------------------------------------------
 		// Class Methods
 		// --------------------------------------------------------------------
-		private function _setVolume()
+		private function _setVolume():void
 		{
 			var transform:SoundTransform = new SoundTransform();
 			transform.volume = _volume;
 			_channel.soundTransform = transform;
 		}
 		
-		private function streamStatus(obj):void
+		private function streamStatus(obj:Object):void
 		{
 			trace(obj.code);
 		}
@@ -169,7 +166,7 @@ package com.a12.modules.mediaplayback
 		{
 			_metaData = {};		
 		
-			var tObj = {};		
+			var tObj:Object = {};		
 			Utils.createmc(_ref,"audio",20001);
 		
 			_sound = new Sound();
@@ -203,18 +200,14 @@ package com.a12.modules.mediaplayback
 	
 		private function onComplete(e:Event):void
 		{
-			var tObj = {};
-			tObj.action = 'mediaComplete';
 			setChanged();
-			notifyObservers(tObj);
+			notifyObservers({action:'mediaComplete'});
 		}
 	
 		private function onLoad(e:Event):void
 		{
-			var tObj = {};
-			tObj.action = 'onLoad';
 			setChanged();
-			notifyObservers(tObj);
+			notifyObservers({action:'onLoad'});
 		}
 		
 		private function progressHandler(e:Event):void
@@ -242,7 +235,7 @@ package com.a12.modules.mediaplayback
 	
 		private function updateView(e:TimerEvent=null):void
 		{
-			var tObj = {};
+			var tObj:Object = {};
 		
 			tObj.action = "updateView";
 			tObj.time_current = Utils.convertSeconds(Math.floor(_channel.position/1000));

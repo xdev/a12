@@ -1,23 +1,21 @@
 package com.a12.modules.mediaplayback
 {
 
+	import com.a12.pattern.observer.Observable;
+	import com.a12.util.CustomEvent;
+	import com.a12.util.Utils;
+	
 	import flash.display.MovieClip;
-	import flash.utils.Timer;
-	import flash.events.Event;
-	import flash.events.NetStatusEvent;
-	import flash.events.TimerEvent;
-	import flash.events.SecurityErrorEvent;
 	import flash.events.AsyncErrorEvent;
 	import flash.events.EventDispatcher;
+	import flash.events.NetStatusEvent;
+	import flash.events.SecurityErrorEvent;
+	import flash.events.TimerEvent;
+	import flash.media.SoundTransform;
 	import flash.media.Video;
-    import flash.media.SoundTransform;
-    import flash.net.NetConnection;
-    import flash.net.NetStream;
-	
-	import com.a12.pattern.observer.Observable;
-	import com.a12.modules.mediaplayback.*;
-	import com.a12.util.Utils;
-	import com.a12.util.CustomEvent;
+	import flash.net.NetConnection;
+	import flash.net.NetStream;
+	import flash.utils.Timer;
 
 	public class VideoModel extends Observable implements IMediaModel
 	{
@@ -33,7 +31,7 @@ package com.a12.modules.mediaplayback
 		
 		public var b:EventDispatcher = new EventDispatcher();
 	
-		public function VideoModel(_ref,_file,_options:Object=null)
+		public function VideoModel(_ref:MovieClip,_file:String,_options:Object=null)
 		{
 			this._ref = _ref;
 			this._file = _file;
@@ -160,7 +158,7 @@ package com.a12.modules.mediaplayback
 		{
 			//should run only once!
 			if(obj.width && _metaData.width == undefined){
-				var tObj = {};
+				var tObj:Object = {};
 				tObj.action = 'updateSize';
 				tObj.width =  obj.width;
 				tObj.height = obj.height;
@@ -173,7 +171,7 @@ package com.a12.modules.mediaplayback
 				notifyObservers(tObj);
 			}
 		
-			for(var i in obj){
+			for(var i:Object in obj){
 				_metaData[i] = obj[i];			
 				if(i == 'duration'){
 					_metaData.durationObj = Utils.convertSeconds(Math.floor(obj[i]));
@@ -223,7 +221,7 @@ package com.a12.modules.mediaplayback
 				setBuffer(_options.buffer);
 			}
 			
-			var clientObj = {};
+			var clientObj:Object = {};
 			clientObj.onMetaData = onMetaData;
 			clientObj.onCuePoint = cuePointHandler;
 			_stream.client = clientObj;
@@ -236,13 +234,13 @@ package com.a12.modules.mediaplayback
 			_timer.addEventListener(TimerEvent.TIMER, updateView);
 			_timer.start();
 				
-			var tObj = {};
+			var tObj:Object = {};
 			tObj.stream = _stream;			
 			tObj.playing = _playing;
 									
 			var video:Video = new Video();
 			video.attachNetStream(_stream);
-			var v = _ref.addChild(video);
+			var v:MovieClip = MovieClip(_ref.addChild(video));
 			v.alpha = 0.0;			
 			v.name = 'myvideo';
 			
@@ -260,7 +258,7 @@ package com.a12.modules.mediaplayback
 		private function updateView(e:TimerEvent=null):void
 		{
 			//convert time in seconds to 00:00
-			var tObj = {};
+			var tObj:Object = {};
 		
 			tObj.action = "updateView";
 			tObj.time_current = Utils.convertSeconds(Math.floor(_stream.time));
@@ -286,10 +284,8 @@ package com.a12.modules.mediaplayback
 	
 		private function onComplete():void
 		{
-			var tObj = {};
-			tObj.action = 'mediaComplete';
 			setChanged();
-			notifyObservers(tObj);
+			notifyObservers({action:'mediaComplete'});
 		}
 	
 	}

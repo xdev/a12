@@ -18,11 +18,11 @@ package com.a12.ui
 			_options = {};
 			_value = 'bla';
 			
-			for(var i in dObj){
+			for(var i:Object in dObj){
 				_options[i] = dObj[i];
 			}			
 			
-			for(var j in iObj){
+			for(var j:Object in iObj){
 				_options[j] = iObj[j];
 			}			
 		}

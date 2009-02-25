@@ -1,18 +1,15 @@
 ﻿package com.a12.util
 {
 
-	import flash.display.Sprite;
-	import flash.display.MovieClip;
 	import flash.display.DisplayObject;
+	import flash.display.MovieClip;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
-	import flash.text.TextFormat;
 	import flash.text.TextField;
-	import flash.text.StyleSheet;
 	import flash.text.TextFieldAutoSize;
-	
-	import flash.utils.setInterval;
+	import flash.text.TextFormat;
 	import flash.utils.clearInterval;
+	import flash.utils.setInterval;
 	
 	public class Utils
 	{
@@ -23,10 +20,10 @@
 			//assume item max is inside bounds for now
 			
 			//per item, optional bounding box override
-			var x:Number,y:Number,mc;
+			var x:Number,y:Number,mc:MovieClip;
 			var width:Number,height:Number;
-			var imax = itemsA.length;
-			var item;
+			var imax:int = itemsA.length;
+			var item:Object;
 			for(var i:int=0;i<imax;i++){
 				item = itemsA[i];
 				mc = item.obj;
@@ -125,16 +122,16 @@
 				mc.removeChild(Utils.$(mc,name));
 			}
 			
-			var sp = new MovieClip();
+			var sp:MovieClip = new MovieClip();
 			sp.name = name;
 			
-			var tObj = {mouseEnabled:false};
+			var tObj:Object = {mouseEnabled:false};
 			
-			for(var i in tObj){
+			for(var i:Object in tObj){
 				sp[i] = tObj[i];
 			}			
 			
-			for(var j in objProps){
+			for(var j:Object in objProps){
 				sp[j] = objProps[j];
 			}
 		
@@ -144,12 +141,12 @@
 		
 		public static function $(parent:Object,children:String,delimeter:String='.'):DisplayObject
 		{
-			var obj = null;
+			var obj:Object = null;
 			var tA:Array = children.split(delimeter);			
-			var found = false;
-			var i = 0;
-			var a1=parent;
-			var a2=tA[i];
+			var found:Boolean = false;
+			var i:int = 0;
+			var a1:Object = parent;
+			var a2:Object = tA[i];
 			
 			while(!found){
 				obj = DisplayObject(a1.getChildByName(a2));
@@ -162,7 +159,7 @@
 				}
 			}
 			
-			return obj;
+			return DisplayObject(obj);
 		}
 		
 		/*
@@ -222,7 +219,7 @@
 		{
 			var intID:Number;
 			// var intID = setInterval(execDelay, t, [this, obj, t, args]); // ALT DESIGN - IN PROGRESS - SEE execDelay
-			intID = setInterval(function() {
+			intID = setInterval(function():void {
 				method.apply(obj, args);
 				clearInterval(intID);
 			}, t);
@@ -333,7 +330,7 @@
 
 		public static function drawGradient(mc:MovieClip, w:Number, h:Number, props:Object ):void
 		{
-			var x,y,fillType,alphas,colors,ratios,matrix,rot;
+			var x:int,y:int,fillType:String,alphas:Array,colors:Array,ratios:Array,matrix:Matrix,rot:int;
 			
 			(props.x == undefined) ? x = 0 : x = props.x;
 			(props.y == undefined) ? y = 0 : y = props.y;
@@ -414,10 +411,10 @@
 		
 		public static function makeTextfield(mc:Object, display:String, format:TextFormat, props:Object = null):TextField
 		{
-			var tf = new TextField();
+			var tf:TextField = new TextField();
 			mc.addChild(tf);
 			
-			var tObj = {
+			var tObj:Object = {
 				name:'displayText',
 				mouseEnabled:false,
 				selectable:false,								
@@ -429,11 +426,11 @@
 				autoSize:TextFieldAutoSize.LEFT								
 				};
 			
-			for(var i in tObj){
+			for(var i:Object in tObj){
 				tf[i] = tObj[i];
 			}			
 			
-			for(var j in props){
+			for(var j:Object in props){
 				tf[j] = props[j];
 			}
 			
@@ -444,7 +441,7 @@
 			tf.text = display;
 			tf.htmlText = display;
 			
-			if(tf.styleSheet == undefined){
+			if(!tf.styleSheet){
 				tf.defaultTextFormat = format;
 				tf.setTextFormat(format);
 			}
@@ -498,7 +495,7 @@
 
 		public static function convertSeconds(time:Number):Object
 		{
-			var tObj = {};
+			var tObj:Object = {};
 
 			if((time / 60) > 1){
 				tObj.minutes = Math.floor(time/60);
@@ -542,8 +539,8 @@
 		{
 			//need to handle way to toggle on off Math functions (ceil,floor)
 			
-			var scale = 100;
-			var scaleObj = {};
+			var scale:Number = 100;
+			var scaleObj:Object = {};
 			
 			//scale from 0 to n, non-proportionally
 			if(scaleMode == 'fill'){
@@ -614,7 +611,7 @@
 	
 		public static function getPositionByOffset(ind:Number,len:Number,offset:Number):Number
 		{
-			var t = ind+offset;
+			var t:int = ind+offset;
 		
 			switch(true)
 			{

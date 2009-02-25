@@ -1,22 +1,17 @@
 package com.a12.ui
 {
-	import flash.display.MovieClip;
-	import flash.display.DisplayObject;
-	import flash.events.MouseEvent;
-	import flash.events.FocusEvent;
-	import flash.events.Event;
-	import flash.geom.Point;
-	import flash.text.TextFormat;
-	import flash.text.TextField;
-
-	import com.a12.util.Utils;
 	import com.a12.util.CustomEvent;
-	import com.a12.ui.UIElement;
-	import com.a12.ui.IUI;
-	import com.a12.ui.Scrollbar;
+	import com.a12.util.Utils;
 	
-	import com.carlcalderon.arthropod.Debug;
-
+	import flash.display.DisplayObject;
+	import flash.display.MovieClip;
+	import flash.events.Event;
+	import flash.events.FocusEvent;
+	import flash.events.MouseEvent;
+	import flash.geom.Point;
+	import flash.text.TextField;
+	import flash.text.TextFormat;
+	
 	import gs.TweenLite;		
 	
 	public class Pulldown extends UIElement
@@ -31,7 +26,7 @@ package com.a12.ui
 		public function Pulldown(mc:MovieClip,options:Object)
 		{
 			//make a default tf
-			var tf = new TextFormat();
+			var tf:TextFormat = new TextFormat();
 			tf.font = 'Arial';
 			tf.size = 12;
 			
@@ -107,9 +102,9 @@ package com.a12.ui
 		{
 			//controls
 			//y:-_options.rowHeight
-			var controls = Utils.createmc(_container,"controls",{buttonMode:true,mouseEnabled:true});
+			var controls:MovieClip = Utils.createmc(_container,"controls",{buttonMode:true,mouseEnabled:true});
 			
-			var mc;
+			var mc:MovieClip;
 			//back
 			mc = Utils.createmc(controls,"back");
 			Utils.drawRect(mc,_options.width,_options.rowHeight,_options.clr_primary,1.0);
@@ -255,7 +250,7 @@ package com.a12.ui
 				
 				}else{
 					//open up
-					var yPos = -_dMax*_options.rowHeight;
+					var yPos:int = -_dMax*_options.rowHeight;
 					
 					//animate the height of the mask
 					TweenLite.to(Utils.$(_container,"options_mask"),0.3,{y:yPos,height:_dMax*_options.rowHeight});
@@ -339,12 +334,12 @@ package com.a12.ui
 		
 		private function buildOptions():void
 		{
-			var options = Utils.createmc(_container,"options",{y:_options.rowHeight});
+			var options:MovieClip = Utils.createmc(_container,"options",{y:_options.rowHeight});
 			
 			
 			
 			//create mask
-			var mask = Utils.createmc(_container,"options_mask",{y:_options.rowHeight});
+			var mask:MovieClip = Utils.createmc(_container,"options_mask",{y:_options.rowHeight});
 			Utils.drawRect(mask,_options.width,_options.rowHeight,1.0);
 			
 			options.mask = mask;
@@ -356,7 +351,7 @@ package com.a12.ui
 			
 			options.y = -(_options.rowHeight * _dMax);
 			
-			var mc, but;
+			var mc:MovieClip, but:MovieClip;
 			for(var i:int=0;i<_dMax;i++){
 				but = Utils.createmc(options,"row"+i,{y:i*_options.rowHeight,mouseEnabled:true,buttonMode:true,id:i,value:_options.data[i].value});
 				

@@ -1,17 +1,12 @@
 package com.a12.ui
 {
-	import flash.display.MovieClip;
-	import flash.events.MouseEvent;
-	import flash.events.Event;
-	
-	import flash.geom.Rectangle;
-	
-	import flash.utils.setInterval;
-	import flash.utils.clearInterval;
-	
 	import com.a12.util.CustomEvent;
 	import com.a12.util.Utils;
-	import com.a12.ui.UIElement;
+	
+	import flash.display.MovieClip;
+	import flash.events.MouseEvent;
+	import flash.geom.Rectangle;
+	import flash.utils.clearInterval;
 	
 	public class Scrollbar extends UIElement
 	{	
@@ -25,7 +20,7 @@ package com.a12.ui
 		public function Scrollbar(mc:MovieClip,_options:Object=null)
 		{
 			//var dObj:Object = {label:'PullDown Test',width:200,rowHeight:20};
-			var dObj = 
+			var dObj:Object = 
 			{ 
 				mode			: 'vertical',
 				offsetH			: 0,
@@ -64,14 +59,13 @@ package com.a12.ui
 		//API METHODS
 		public override function getValue():Object
 		{
-			var tObj = processScroll();
+			var tObj:Object = processScroll();
 			return tObj.percent;
 		}
 		
 		public override function setValue(value:Object):void
 		{
-			var mc = Utils.$(ref,'nip');
-			mc.y = (Number(value)/100) * (_options.barH-_options.nipH);
+			Utils.$(ref,'nip').y = (Number(value)/100) * (_options.barH-_options.nipH);
 			processScroll();
 		}
 		
@@ -82,17 +76,17 @@ package com.a12.ui
 		
 		public function setEnabled(value:Boolean):void
 		{
-			var mc;
+			var mc:MovieClip;
 			if(value){
-				mc = Utils.$(ref,'back');
+				mc = MovieClip(Utils.$(ref,'back'));
 				mc.mouseEnabled = true;
-				mc = Utils.$(ref,'nip');
+				mc = MovieClip(Utils.$(ref,'nip'));
 				mc.mouseEnabled = true;
 				state = true;
 			}else{
-				mc = Utils.$(ref,'back');
+				mc = MovieClip(Utils.$(ref,'back'));
 				mc.mouseEnabled = false;
-				mc = Utils.$(ref,'nip');
+				mc = MovieClip(Utils.$(ref,'nip'));
 				mc.mouseEnabled = false;
 				state = false;
 			}
@@ -110,7 +104,7 @@ package com.a12.ui
 		//CLASS METHODS
 		protected function build():void
 		{
-			var mc = Utils.createmc(ref,"back");
+			var mc:MovieClip = Utils.createmc(ref,"back");
 
 			mc = Utils.createmc(ref,"nip");
 			//Utils.createmc(mc,"back");
@@ -122,13 +116,13 @@ package com.a12.ui
 			renderBar();
 			renderNip();
 
-			mc = Utils.$(ref,'back');
+			mc = MovieClip(Utils.$(ref,'back'));
 			mc.mouseEnabled = true;
 			mc.addEventListener(MouseEvent.ROLL_OVER,handleMouse,false,0,true);
 			mc.addEventListener(MouseEvent.ROLL_OUT,handleMouse,false,0,true);
 			mc.addEventListener(MouseEvent.CLICK,handleMouse,false,0,true);
 		
-			mc = Utils.$(ref,'nip');
+			mc = MovieClip(Utils.$(ref,'nip'));
 			mc.mouseEnabled = true;
 			mc.buttonMode = true;
 			mc.addEventListener(MouseEvent.ROLL_OVER,handleMouse,false,0,true);
@@ -139,23 +133,23 @@ package com.a12.ui
 		
 		}
 		
-		public function renderBar()
+		public function renderBar():void
 		{
-			var mc = Utils.$(ref,'back');
+			var mc:MovieClip = MovieClip(Utils.$(ref,'back'));
 			mc.graphics.clear();
 			Utils.drawRect(mc,_options.barW,_options.barH,_options.clr_bar,1.0);
 		}
 
-		public function renderNip()
+		public function renderNip():void
 		{
-			var mc = Utils.$(ref,'nip');
+			var mc:MovieClip = MovieClip(Utils.$(ref,'nip'));
 			mc.graphics.clear();
 			Utils.drawRect(mc,_options.nipW,_options.nipH,_options.clr_nip,1.0);
 		}
 		
  		public function setHeight(value:Number):void
 		{
-			var tObj = processScroll(false);
+			var tObj:Object = processScroll(false);
 			//update prop
 			_options.barH = value;
 			
@@ -163,14 +157,13 @@ package com.a12.ui
 			renderBar();
 			
 			//reposition nip if necessary
-			var mc = Utils.$(ref,'nip');
-			mc.y = (tObj.percent/100) * (_options.barH-_options.nipH);
+			Utils.$(ref,'nip').y = (tObj.percent/100) * (_options.barH-_options.nipH);
 			
 		}
 		
 		protected function handleMouse(e:MouseEvent):void
 		{
-			var mc = e.currentTarget;
+			var mc:MovieClip = MovieClip(e.currentTarget);
 			//broadcast out event - for subclassing?
 			if(mc.name == 'back'){
 				if(e.type == MouseEvent.CLICK){
@@ -185,7 +178,7 @@ package com.a12.ui
 			if(mc.name == 'nip'){
 				if(e.type == MouseEvent.MOUSE_DOWN){
 					
-					var tObj = getDragLimits();
+					var tObj:Object = getDragLimits();
 					mc.startDrag(false,new Rectangle(0,tObj.top,0,tObj.bottom));
 					//this.startDrag(false,tObj.left,tObj.top,tObj.right,tObj.bottom);
 
@@ -216,8 +209,7 @@ package com.a12.ui
 				processScroll();
 			}
 			if(e.type == MouseEvent.MOUSE_UP){
-				var mc = Utils.$(ref,'nip');
-				mc.stopDrag();
+				MovieClip(Utils.$(ref,'nip')).stopDrag();
 				//clearInterval(scrollInterval);
 				ref.stage.removeEventListener(MouseEvent.MOUSE_MOVE,handleMouseStage,false);
 				ref.stage.removeEventListener(MouseEvent.MOUSE_UP,handleMouseStage,false);
@@ -225,11 +217,11 @@ package com.a12.ui
 			e.stopPropagation();
 		}
 		
-		public function shiftScroll(delta)
+		public function shiftScroll(delta:int):void
 		{
-			var mc = Utils.$(ref,'nip');
+			var mc:MovieClip = MovieClip(Utils.$(ref,'nip'));
 			if(_options.mode == 'vertical'){
-				var tY = mc.y + delta;
+				var tY:int = mc.y + delta;
 
 				switch(true)
 				{
@@ -248,7 +240,7 @@ package com.a12.ui
 
 			}
 			if(_options.mode == 'horizontal'){
-				var tX = mc.x + delta;
+				var tX:int = mc.x + delta;
 
 				switch(true)
 				{
@@ -270,10 +262,10 @@ package com.a12.ui
 			processScroll();
 		}
 		
-		public function processScroll(dispatch:Boolean=true)
+		public function processScroll(dispatch:Boolean=true):Object
 		{
 			var perc:Number;
-			var mc = Utils.$(ref,'nip');
+			var mc:MovieClip = MovieClip(Utils.$(ref,'nip'));
 			if(_options.mode == "vertical"){
 				perc = (((mc.y - _options.offsetH) / (_options.barH-_options.nipH - (_options.offsetH * 2))) * 100);
 			}
@@ -281,7 +273,7 @@ package com.a12.ui
 				perc = (((mc.x) / (_options.barW-_options.nipW)) * 100);
 			}
 
-			var tObj = {};
+			var tObj:Object = {};
 
 			tObj.percent = perc;
 			tObj.clip = ref;
@@ -300,7 +292,7 @@ package com.a12.ui
 		
 		private function getDragLimits():Object
 		{
-			var tObj = {};
+			var tObj:Object = {};
 
 			if(_options.mode == "vertical"){
 				tObj.left = 0;
