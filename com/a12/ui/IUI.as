@@ -1,7 +1,7 @@
 package com.a12.ui
 {
 	
-	interface IUI
+	internal interface IUI
 	{
 	
 		function getValue():Object;
