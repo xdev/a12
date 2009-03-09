@@ -110,13 +110,6 @@
 	
 		public static function createmc(mc:Object, name:String, objProps:Object = null):MovieClip
 		{
-			/*
-			if(objProps != undefined){
-				if(objProps.overwrite != undefined && objProps.overwrite != false){
-				 != false){
-				
-			}
-			*/
 			
 			if(Utils.$(mc,name)){
 				mc.removeChild(Utils.$(mc,name));
@@ -125,7 +118,7 @@
 			var sp:MovieClip = new MovieClip();
 			sp.name = name;
 			
-			var tObj:Object = {mouseEnabled:false};
+			var tObj:Object = {mouseEnabled:false,focusRect:false};
 			
 			for(var i:Object in tObj){
 				sp[i] = tObj[i];
