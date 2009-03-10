@@ -8,6 +8,7 @@
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
+	import flash.utils.ByteArray;
 	import flash.utils.clearInterval;
 	import flash.utils.setInterval;
 	
@@ -153,6 +154,15 @@
 			}
 			
 			return DisplayObject(obj);
+		}
+		
+		//http://www.kirupa.com/forum/showthread.php?p=1897368
+		public static function clone(source:Object):* 
+		{
+		    var copier:ByteArray = new ByteArray();
+		    copier.writeObject(source);
+		    copier.position = 0;
+		    return(copier.readObject());
 		}
 		
 		/*
