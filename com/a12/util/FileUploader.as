@@ -13,12 +13,20 @@ package com.a12.util
 		private var queueA:Array;
 		private var _url:URLRequest;
 		private var fileReference:FileReference;
+		private var transferProgress:Number;
+		private var transferTotal:Number;
 		
 		public function FileUploader(url:String,fileA:Array)
 		{
 			_url = new URLRequest(url);
 			transferA = [];
 			queueA = fileA;
+			
+			transferTotal = 0;
+			transferProgress = 0;
+			for(var i:int=0;i<queueA.length;i++){
+				transferTotal += queueA[i].size;
+			}
 			
 			uploadFile();
 			
@@ -34,7 +42,18 @@ package com.a12.util
 				
 		private function handleProgress(e:ProgressEvent):void
 		{
-			dispatchEvent(new CustomEvent('onFileUploadProgress',true,false,{obj:e.target}));
+			
+			var p:Number = e.bytesLoaded / e.bytesTotal;
+			var obj:Object = {};
+			
+			obj.filePercent = p;
+			obj.file = e.target;
+			obj.queueTotal = transferTotal;
+			obj.queuePercent = (transferProgress + e.bytesLoaded) / transferTotal; 
+			obj.queueProgress = transferProgress + e.bytesLoaded;
+			
+			dispatchEvent(new CustomEvent('onFileUploadProgress',true,false,obj));
+			
 		}
 		
 		private function handleComplete(e:Event):void
@@ -43,6 +62,7 @@ package com.a12.util
 			var complete:Boolean = false;
 			if(queueA.length > 0){
 				transferA.push(queueA.shift());
+				transferProgress += transferA[transferA.length-1].size;
 				if(queueA.length == 0){
 					complete = true;	
 				}
