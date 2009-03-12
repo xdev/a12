@@ -2,6 +2,7 @@ package com.a12.util
 {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.DataEvent;
 	import flash.events.ProgressEvent;
 	import flash.net.FileReference;
 	import flash.net.URLRequest;
@@ -15,6 +16,7 @@ package com.a12.util
 		private var fileReference:FileReference;
 		private var transferProgress:Number;
 		private var transferTotal:Number;
+		private var expectsData:Boolean;
 		
 		public function FileUploader(url:String,fileA:Array)
 		{
@@ -25,7 +27,7 @@ package com.a12.util
 			transferTotal = 0;
 			transferProgress = 0;
 			for(var i:int=0;i<queueA.length;i++){
-				transferTotal += queueA[i].size;
+				transferTotal += queueA[i].file.size;
 			}
 			
 			uploadFile();
@@ -34,11 +36,20 @@ package com.a12.util
 		
 		public function uploadFile():void
 		{
-			fileReference = queueA[0];
+			
+			fileReference = queueA[0].file;
 			fileReference.upload(_url);
 			fileReference.addEventListener(ProgressEvent.PROGRESS,handleProgress,false,0,true);
 			fileReference.addEventListener(Event.COMPLETE,handleComplete,false,0,true);
+			if(queueA[0].data){
+				expectsData = true;
+				fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,handleData,false,0,true);
+			}else{
+				expectsData = false;	
+			}
 		}
+		
+		
 				
 		private function handleProgress(e:ProgressEvent):void
 		{
@@ -56,12 +67,18 @@ package com.a12.util
 			
 		}
 		
-		private function handleComplete(e:Event):void
+		private function handleData(e:DataEvent):void
 		{
-			dispatchEvent(new CustomEvent('onFileUploadComplete',true,false,{obj:e.target}));
+			advanceQueue(e,e.data);
+			//var strData:String = StringUtil.trim(e.data);
+ 			//var vars:URLVariables = new URLVariables(strData);
+		}
+		
+		private function advanceQueue(e:*,data:*=null):void
+		{
 			var complete:Boolean = false;
 			if(queueA.length > 0){
-				transferA.push(queueA.shift());
+				transferA.push({file:queueA.shift(),data:data});
 				transferProgress += transferA[transferA.length-1].size;
 				if(queueA.length == 0){
 					complete = true;	
@@ -71,9 +88,17 @@ package com.a12.util
 			}
 			
 			if(complete){
-				dispatchEvent(new CustomEvent('onComplete',true,false,{obj:e.target}));
+				dispatchEvent(new CustomEvent('onComplete',true,false,{fileA:transferA}));
 			}else{
 				uploadFile();	
+			}
+		}
+		
+		private function handleComplete(e:Event):void
+		{
+			dispatchEvent(new CustomEvent('onFileUploadComplete',true,false,{obj:e.target}));
+			if(!expectsData){
+				advanceQueue(e);				
 			}
 			
 		}
