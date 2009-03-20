@@ -38,7 +38,7 @@ package com.a12.modules.mediaplayback
 		
 		protected var _options:Object;
 		
-		private var mediaplayback_icons:Object;
+		private var icons:Object;
 
 		public function CPView(m:Observable,c:Controller,options:Object)
 		{
@@ -46,6 +46,8 @@ package com.a12.modules.mediaplayback
 			super(m,c);
 			
 			_options = options;
+			
+			icons = options.icons;
 			
 			width = 640;
 			height = 360;
@@ -135,7 +137,7 @@ package com.a12.modules.mediaplayback
 						Utils.drawRect(mc,infoObj.width,infoObj.height,0xFF0000,0.0);
 						mc.addEventListener(MouseEvent.CLICK,mouseHandler);
 					
-					var i:MovieClip = new mediaplayback_icons();
+					var i:MovieClip = new icons();
 					i.gotoAndStop('video_overlay_play');
 					mc = MovieClip(ref.addChild(i));					
 					mc.alpha = 0.0;
@@ -433,7 +435,7 @@ package com.a12.modules.mediaplayback
 			var i:MovieClip,mc:MovieClip;
 			
 			//VCR stop (back to beginning)
-			i = new mediaplayback_icons();
+			i = new icons();
 			i.gotoAndStop('video_start');
 			mc = MovieClip(_controls.addChild(i));
 			mc.name = 'video_start';
@@ -445,7 +447,7 @@ package com.a12.modules.mediaplayback
 			mc.addEventListener(MouseEvent.CLICK,mouseHandler);
 			
 			//play/pause
-			i = new mediaplayback_icons();
+			i = new icons();
 			i.gotoAndStop('video_play');
 			mc = MovieClip(_controls.addChild(i));
 			mc.name = 'video_play';
@@ -500,7 +502,7 @@ package com.a12.modules.mediaplayback
 			l.buttonMode = true;
 			
 			//audio controls
-			i = new mediaplayback_icons();
+			i = new icons();
 			i.gotoAndStop('audio3');
 			mc = MovieClip(_controls.addChild(i));
 			mc.name = 'audio';
