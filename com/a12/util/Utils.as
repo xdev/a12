@@ -3,6 +3,7 @@
 
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
+	import flash.events.Event;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.text.TextField;
@@ -163,6 +164,27 @@
 		    copier.writeObject(source);
 		    copier.position = 0;
 		    return(copier.readObject());
+		}
+		
+		public static function handleMovieClipPlayback(e:Event):void
+		{
+			var mc:MovieClip = MovieClip(e.target);
+			var i:int;
+			for(i=0;i<mc.currentLabels.length;i++){
+				if(mc.currentLabels[i].frame == mc.currentFrame){
+					if(mc.currentLabel == 'stop' || mc.currentLabel == 'pause'){
+						mc.stop();
+						mc.removeEventListener(Event.ENTER_FRAME, Utils.handleMovieClipPlayback);
+					}
+					break;
+				}
+			}
+		}
+		
+		public static function playClip(mc:MovieClip):void
+		{
+			mc.play();
+			mc.addEventListener(Event.ENTER_FRAME, Utils.handleMovieClipPlayback);
 		}
 		
 		/*
