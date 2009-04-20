@@ -33,7 +33,8 @@ package com.a12.util
 		private function handleLoad(e:Event):void
 		{
 			_ref.addChild(loader.content);
-			dispatchEvent(new CustomEvent(Event.COMPLETE,true,false,{mc:_ref}));
+			dispatchEvent(new CustomEvent(Event.COMPLETE,true,false,{mc:_ref,content:loader.content}));
+			loader = null;
 		}
 		
 	}

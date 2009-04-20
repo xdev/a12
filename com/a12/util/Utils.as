@@ -3,6 +3,7 @@
 
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
@@ -134,7 +135,7 @@
 			return sp;
 		}
 		
-		public static function $(parent:Object,children:String,delimeter:String='.'):DisplayObject
+		public static function $(parent:Object,children:String,delimeter:String='.'):*
 		{
 			var obj:Object = null;
 			var tA:Array = children.split(delimeter);			
@@ -153,8 +154,16 @@
 					found = true;
 				}
 			}
+			obj = DisplayObject(obj);
 			
-			return DisplayObject(obj);
+			if(obj is Sprite){
+				obj = Sprite(obj);
+			}
+			if(obj is MovieClip){
+				obj = MovieClip(obj);	
+			}
+			
+			return obj;
 		}
 		
 		//http://www.kirupa.com/forum/showthread.php?p=1897368
