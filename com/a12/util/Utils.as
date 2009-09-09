@@ -5,6 +5,7 @@
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.system.Capabilities;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.text.TextField;
@@ -16,7 +17,14 @@
 	
 	public class Utils
 	{
-	
+				
+		//http://www.adobe.com/devnet/flashmediaserver/articles/dynstream_advanced_pt3.html
+		public function getFlashPlayerMajorVersion():Number
+		{
+			var fpVersionStr:String = Capabilities.version;
+			return Number( fpVersionStr.split(" ")[1].split(",", 1) );
+		}
+		
 		public static function align(itemsA:Array,mode:String,bounds:Object,process:Boolean=true):Array
 		{
 			
@@ -183,7 +191,7 @@
 				if(mc.currentLabels[i].frame == mc.currentFrame){
 					if(mc.currentLabel == 'stop' || mc.currentLabel == 'pause'){
 						mc.stop();
-						mc.removeEventListener(Event.ENTER_FRAME, Utils.handleMovieClipPlayback);
+						mc.removeEventListener(Event.ENTER_FRAME, Utils.handleMovieClipPlayback,false);
 					}
 					break;
 				}
@@ -193,7 +201,7 @@
 		public static function playClip(mc:MovieClip):void
 		{
 			mc.play();
-			mc.addEventListener(Event.ENTER_FRAME, Utils.handleMovieClipPlayback);
+			mc.addEventListener(Event.ENTER_FRAME, Utils.handleMovieClipPlayback,false,0,true);
 		}
 		
 		/*

@@ -3,7 +3,7 @@ package com.a12.modules
 
 	public class Calendar
 	{
-	
+		public var _date:Date;
 		public var _month:Number;
 		public var _year:Number;
 		public var _day:Number;
@@ -11,15 +11,14 @@ package com.a12.modules
 		public var _monthDays:Array;
 		private var _monthNames:Object = {};
 		private var _monthNamesShort:Object = {};
-		private var _dayNames:Object = {};
+		private var _dayNames:Object = {};		
 	
 		public function Calendar(year:Number=NaN, month:Number=NaN, day:Number=NaN, lang:String="en")
 		{
-		
-			var today:Date = new Date();
-			isNaN(year) ? _year = today.getFullYear() : _year = year;
-			isNaN(month) ? _month = today.getMonth() : _month = month;
-			isNaN(day) ? _day = today.getDate() : _day = day;
+			_date = new Date();
+			isNaN(year) ? _year = _date.getFullYear() : _year = year;
+			isNaN(month) ? _month = _date.getMonth() : _month = month;
+			isNaN(day) ? _day = _date.getDate() : _day = day;
 			_lang = lang;
 		
 			_monthNames.en = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -29,18 +28,25 @@ package com.a12.modules
 			_dayNames.es = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
 		
 		}
-	
+		
+		//getter/setters - do we still need them?
+		public function get dateObj():Date
+		{
+			return _date;
+		}
+		
 		public function set year(year:Number):void
 		{
 			_year = year;
 		}
+		
 		public function get year():Number
 		{
 			return _year;
 		}
 	
 		public function get year2():Number
-		{	
+		{
 			var t:String = _year.toString();
 			return Number(t.substr(2,2));
 		}
@@ -49,6 +55,7 @@ package com.a12.modules
 		{
 			_month = month;
 		}
+		
 		public function get month():Number
 		{
 			return _month;
@@ -58,6 +65,7 @@ package com.a12.modules
 		{
 			_day = day;
 		}
+		
 		public function get day():Number
 		{
 			return _day;
@@ -67,11 +75,13 @@ package com.a12.modules
 		{
 			_lang = lang;
 		}
+		
 		public function get lang() : String
 		{
 			return _lang;
 		}
-	
+		
+		//interface
 		public function getDaysInMonth(year:Number=NaN, month:Number=NaN):Number
 		{
 			isNaN(year) ? year = _year : year = year;
@@ -85,9 +95,33 @@ package com.a12.modules
 			}
 			return _monthDays[month];
 		}
-	
+		
+		/*
+		
+		public static function ChangeTimezone(dt:Date, timezone:Number):Date {
+					var blnIsDST:Boolean = (dt.getTimezoneOffset() < new Date(2000, 0, 1).getTimezoneOffset());
+					dt.minutes += dt.getTimezoneOffset();
+					dt.minutes -= timezone * 60;
+					dt.minutes += blnIsDST ? 60 : 0;
+
+					return dt;
+				}
+		
+		public static function GetDaysInMonth(month:uint, year:int = -1):uint {
+					if (year == -1) {
+						year = new Date().fullYear;
+					}
+
+					if (month == 11) {
+						return new Date(year, 0, 0).date;
+					}
+
+					return new Date(year, month + 1, 0).date;
+				}
+		*/
+		
 		public function getFirstDayInMonth(year:Number=NaN, month:Number=NaN):Number
-		{	
+		{
 			isNaN(year) ? year = _year : year = year;
 			isNaN(month) ? month = _month : month = month;
 		
@@ -98,10 +132,10 @@ package com.a12.modules
 		
 			return tempDate.getDay();
 		}
-	
+		
+		//should really use calendar math with constants			
 		public function advanceMonth(direction:Number):void
 		{
-			//trace('advanceMonth ' + direction);
 			if ((_month == 11) && (direction == 1)) {
 				_year++;
 				_month = 0;
@@ -112,8 +146,7 @@ package com.a12.modules
 			}
 			else {
 				_month = _month + direction;
-			}	
-	
+			}
 		}
 	
 		public function isInMonth(dateTime:String, year:Number=NaN, month:Number=NaN):Boolean
