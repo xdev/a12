@@ -13,12 +13,12 @@ package com.a12.util
 		{
 	
 			//iterate through the obj and get field objects , values and validation states
-			var errorData = [];
+			var errorData:Array = [];
 		
-			for(var i=0; i<formData.length; i++){
+			for(var i:int=0; i<formData.length; i++){
 			
-				var obj = formData[i];
-				var tV = validateField(obj);
+				var obj:Object = formData[i];
+				var tV:Object = validateField(obj);
 						
 				if(tV.valid == true){
 			
@@ -35,7 +35,7 @@ package com.a12.util
 	
 		public function validateField(obj:Object):Object
 		{			
-			var mode = obj.mode;
+			var mode:String = obj.mode;
 				
 			if(mode == 'empty'){
 				return vEmpty(obj);
@@ -57,8 +57,8 @@ package com.a12.util
 		{
 			
 			//check boundary range? 
-			var value = obj.value;
-			var tObj = {};
+			var value:* = obj.value;
+			var tObj:Object = {};
 			
 			if(!isNaN(value)){
 				tObj.valid = true;
@@ -73,8 +73,8 @@ package com.a12.util
 	
 		private function vEmpty(obj:Object):Object
 		{
-			var value = obj.value;
-			var tObj = {};
+			var value:* = obj.value;
+			var tObj:Object = {};
 				
 			if(value != '' && value != undefined && value != null){
 				tObj.valid = true;			
@@ -88,8 +88,8 @@ package com.a12.util
 	
 		private function vEmail(obj:Object):Object
 		{
-			var value = obj.value;
-			var tObj = {};
+			var value:* = obj.value;
+			var tObj:Object = {};
 			
 			var pattern:RegExp = /([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}/;
 			if(pattern.test(value)){
