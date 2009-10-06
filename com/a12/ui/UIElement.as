@@ -16,7 +16,7 @@ package com.a12.ui
 		{
 			ref = mc;
 			_options = {};
-			_value = 'bla';
+			_value = null;
 			
 			for(var i:Object in dObj){
 				_options[i] = dObj[i];
