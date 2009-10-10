@@ -65,7 +65,12 @@ package com.a12.ui
 		
 		public override function setValue(value:Object):void
 		{
-			Utils.$(ref,'nip').y = (Number(value)/100) * (_options.barH-_options.nipH);
+			if(_options.mode == 'vertical'){
+				Utils.$(ref,'nip').y = (Number(value)/100) * (_options.barH-_options.nipH);
+			}
+			if(_options.mode == 'horizontal'){
+				Utils.$(ref,'nip').x = (Number(value)/100) * (_options.barW-_options.nipW);
+			}
 			processScroll();
 		}
 		
@@ -147,18 +152,32 @@ package com.a12.ui
 			Utils.drawRect(mc,_options.nipW,_options.nipH,_options.clr_nip,1.0);
 		}
 		
+		public function setWidth(value:Number):void
+		{
+			var tObj:Object = processScroll(false);
+			
+			if(_options.mode == 'horizontal'){
+				//update prop
+				_options.barW = value;
+				//redraw
+				renderBar();
+				//reposition nip if necessary
+				Utils.$(ref,'nip').x = (tObj.percent/100) * (_options.barW-_options.nipW);
+			}
+		}
+		
  		public function setHeight(value:Number):void
 		{
 			var tObj:Object = processScroll(false);
-			//update prop
-			_options.barH = value;
 			
-			//redraw
-			renderBar();
-			
-			//reposition nip if necessary
-			Utils.$(ref,'nip').y = (tObj.percent/100) * (_options.barH-_options.nipH);
-			
+			if(_options.mode == 'vertical'){
+				//update prop
+				_options.barH = value;
+				//redraw
+				renderBar();
+				//reposition nip if necessary
+				Utils.$(ref,'nip').y = (tObj.percent/100) * (_options.barH-_options.nipH);
+			}
 		}
 		
 		protected function handleMouse(e:MouseEvent):void
@@ -179,7 +198,7 @@ package com.a12.ui
 				if(e.type == MouseEvent.MOUSE_DOWN){
 					
 					var tObj:Object = getDragLimits();
-					mc.startDrag(false,new Rectangle(0,tObj.top,0,tObj.bottom));
+					mc.startDrag(false,new Rectangle(tObj.left,tObj.top,tObj.right,tObj.bottom));
 					//this.startDrag(false,tObj.left,tObj.top,tObj.right,tObj.bottom);
 
 					//this._scope.broadcaster.broadcastMessage("onNipPress");
@@ -266,11 +285,14 @@ package com.a12.ui
 		{
 			var perc:Number;
 			var mc:MovieClip = MovieClip(Utils.$(ref,'nip'));
-			if(_options.mode == "vertical"){
+			if(_options.mode == 'vertical'){
 				perc = (((mc.y - _options.offsetH) / (_options.barH-_options.nipH - (_options.offsetH * 2))) * 100);
 			}
-			if(_options.mode == "horizontal"){
+			if(_options.mode == 'horizontal'){
 				perc = (((mc.x) / (_options.barW-_options.nipW)) * 100);
+			}
+			if(isNaN(perc)){
+				perc = 0;
 			}
 
 			var tObj:Object = {};
@@ -294,7 +316,7 @@ package com.a12.ui
 		{
 			var tObj:Object = {};
 
-			if(_options.mode == "vertical"){
+			if(_options.mode == 'vertical'){
 				tObj.left = 0;
 				tObj.right = 0;
 				tObj.top = 0;
@@ -304,7 +326,7 @@ package com.a12.ui
 					tObj.bottom = _options.barH - _options.nipH - _options.offsetH;
 				}
 			}
-			if(_options.mode == "horizontal"){
+			if(_options.mode == 'horizontal'){
 				tObj.left = 0;
 				tObj.right = _options.barW - _options.nipW;
 				tObj.top = 0;
