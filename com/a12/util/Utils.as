@@ -129,7 +129,7 @@
 			var sp:MovieClip = new MovieClip();
 			sp.name = name;
 			
-			var tObj:Object = {mouseEnabled:false,focusRect:false};
+			var tObj:Object = {mouseEnabled:false,focusRect:false,tabEnabled:false};
 			
 			for(var i:Object in tObj){
 				sp[i] = tObj[i];

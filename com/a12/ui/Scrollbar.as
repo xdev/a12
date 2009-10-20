@@ -7,54 +7,37 @@ package com.a12.ui
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
 	import flash.utils.clearInterval;
+	import flash.utils.setInterval;
 	
 	public class Scrollbar extends UIElement
 	{	
 		
-		
 		public var lastPercent:Number;
-		//protected var _options:Object;
 		protected var scrollInterval:Number;
 		protected var state:Boolean;
+		private var dragOrigin:Object;
 	
 		public function Scrollbar(mc:MovieClip,_options:Object=null)
 		{
-			//var dObj:Object = {label:'PullDown Test',width:200,rowHeight:20};
 			var dObj:Object = 
 			{ 
 				mode			: 'vertical',
 				offsetH			: 0,
 				barW			: 20,
 				nipW			: 20,
-				nipH			: 100			
+				nipH			: 100,
+				dragMode		: 'drag',//time is only needed for AIR, where the events exceed the bounds of the window
+				dragRate		: 100 //Interval at which position is calculated when time and mouse position
 			};
-			//super and merge
-			super(mc,_options,dObj);
 			
+			super(mc,_options,dObj);
 			state = true;
-			/*
-			_options = new Object();
-			var i;
-			for(i in __options){
-				_options[i] = __options[i];
-			}*/
-
-			/*
-			i = null;
-
-			for(i in defaultObj){
-				if(_options[i] == undefined){
-					_options[i] = defaultObj[i];
-				}
-			}
-			*/
-
+			dragOrigin = null;
 			lastPercent = 0;
 			
 			build();
 
 		}
-		
 		
 		//API METHODS
 		public override function getValue():Object
@@ -183,7 +166,6 @@ package com.a12.ui
 		protected function handleMouse(e:MouseEvent):void
 		{
 			var mc:MovieClip = MovieClip(e.currentTarget);
-			//broadcast out event - for subclassing?
 			if(mc.name == 'back'){
 				if(e.type == MouseEvent.CLICK){
 					if(_options.mode == 'vertical'){
@@ -197,39 +179,78 @@ package com.a12.ui
 			if(mc.name == 'nip'){
 				if(e.type == MouseEvent.MOUSE_DOWN){
 					
-					var tObj:Object = getDragLimits();
-					mc.startDrag(false,new Rectangle(tObj.left,tObj.top,tObj.right,tObj.bottom));
-					//this.startDrag(false,tObj.left,tObj.top,tObj.right,tObj.bottom);
-
-					//this._scope.broadcaster.broadcastMessage("onNipPress");
-					//clearInterval(scrollInterval);
-					//scrollInterval = setInterval(processScroll,30);
-					ref.stage.addEventListener(MouseEvent.MOUSE_MOVE,handleMouseStage,false,0,true);
-					ref.stage.addEventListener(MouseEvent.MOUSE_UP,handleMouseStage,false,0,true);
+					if(_options.dragMode == 'drag'){
+						var tObj:Object = getDragLimits();
+						mc.startDrag(false,new Rectangle(tObj.left,tObj.top,tObj.right,tObj.bottom));
+					}
+					if(_options.dragMode == 'time'){
+						dragOrigin = {x:mc.mouseX,y:mc.mouseY};
+						clearInterval(scrollInterval);
+						scrollInterval = setInterval(positionNip,_options.dragRate);
+						positionNip();
+					}
 					
-					
-					
+					ref.stage.addEventListener(MouseEvent.MOUSE_MOVE,handleMouseStage,false,100,true);		
+					ref.stage.addEventListener(MouseEvent.MOUSE_UP,handleMouseStage,false,100,true);					
 				}
-				/*
-				if(e.type == MouseEvent.MOUSE_UP){
-					mc.stopDrag();
-					//this._scope.broadcaster.broadcastMessage("onNipRelease");
-					clearInterval(scrollInterval);
-				}
-				*/				
 			}
-			//not the best idea
-			//e.stopPropagation();
+		}
+		
+		private function positionNip():void
+		{
+			var mc:MovieClip = Utils.$(ref,'nip');
+			var xPos:int = mc.x;
+			var yPos:int = mc.y;
+			if(_options.mode == 'vertical'){
+				switch(true){
+					case ref.mouseY < dragOrigin.y:
+						yPos = 0;
+					break;
+					
+					case ref.mouseY > _options.barH - _options.nipH + dragOrigin.y:
+						yPos = _options.barH - _options.nipH;
+					break;
+					
+					default:
+						yPos = ref.mouseY - dragOrigin.y;
+					break;
+				}
+			}
+			if(_options.mode == 'horizontal'){
+				switch(true){
+					case ref.mouseX < dragOrigin.x:
+						xPos = 0;
+					break;
+					
+					case ref.mouseX > _options.barW - _options.nipW + dragOrigin.x:
+						xPos = _options.barW - _options.nipW;
+					break;
+					
+					default:
+						xPos = ref.mouseX - dragOrigin.x;
+					break;
+				}
+			}
+			
+			mc.x = xPos;
+			mc.y = yPos;			
+			processScroll();
+			
 		}
 		
 		private function handleMouseStage(e:MouseEvent):void
 		{
 			if(e.type == MouseEvent.MOUSE_MOVE){
-				processScroll();
+				if(_options.dragMode == 'drag'){
+					processScroll();
+				}
+				if(_options.dragMode == 'time'){
+					positionNip();
+				}	
 			}
 			if(e.type == MouseEvent.MOUSE_UP){
 				MovieClip(Utils.$(ref,'nip')).stopDrag();
-				//clearInterval(scrollInterval);
+				clearInterval(scrollInterval);
 				ref.stage.removeEventListener(MouseEvent.MOUSE_MOVE,handleMouseStage,false);
 				ref.stage.removeEventListener(MouseEvent.MOUSE_UP,handleMouseStage,false);
 			}
@@ -311,7 +332,6 @@ package com.a12.ui
 
 		}
 		
-		
 		private function getDragLimits():Object
 		{
 			var tObj:Object = {};
@@ -335,10 +355,6 @@ package com.a12.ui
 
 			return tObj;
 		}
-		
-		
-		
-		
 		
 	}
 	
