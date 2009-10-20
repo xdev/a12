@@ -9,9 +9,9 @@ package com.a12.modules
 		public var _day:Number;
 		public var _lang:String;
 		public var _monthDays:Array;
-		private var _monthNames:Object = {};
-		private var _monthNamesShort:Object = {};
-		private var _dayNames:Object = {};		
+		public var _monthNames:Object = {};
+		public var _monthNamesShort:Object = {};
+		public var _dayNames:Object = {};		
 	
 		public function Calendar(year:Number=NaN, month:Number=NaN, day:Number=NaN, lang:String="en")
 		{
