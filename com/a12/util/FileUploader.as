@@ -28,15 +28,11 @@ package com.a12.util
 			transferProgress = 0;
 			for(var i:int=0;i<queueA.length;i++){
 				transferTotal += queueA[i].file.size;
-			}
-			
-			uploadFile();
-			
+			}			
 		}
 		
 		public function uploadFile():void
 		{
-			
 			fileReference = queueA[0].file;
 			fileReference.upload(_url);
 			fileReference.addEventListener(ProgressEvent.PROGRESS,handleProgress,false,0,true);
@@ -47,13 +43,10 @@ package com.a12.util
 			}else{
 				expectsData = false;	
 			}
-		}
-		
-		
+		}		
 				
 		private function handleProgress(e:ProgressEvent):void
 		{
-			
 			var p:Number = e.bytesLoaded / e.bytesTotal;
 			var obj:Object = {};
 			
@@ -64,14 +57,11 @@ package com.a12.util
 			obj.queueProgress = transferProgress + e.bytesLoaded;
 			
 			dispatchEvent(new CustomEvent('onFileUploadProgress',true,false,obj));
-			
 		}
 		
 		private function handleData(e:DataEvent):void
 		{
 			advanceQueue(e,e.data);
-			//var strData:String = StringUtil.trim(e.data);
- 			//var vars:URLVariables = new URLVariables(strData);
 		}
 		
 		private function advanceQueue(e:*,data:*=null):void
@@ -90,7 +80,7 @@ package com.a12.util
 			if(complete){
 				dispatchEvent(new CustomEvent('onComplete',true,false,{fileA:transferA}));
 			}else{
-				uploadFile();	
+				uploadFile();
 			}
 		}
 		
