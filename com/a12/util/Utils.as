@@ -118,7 +118,7 @@
 			MovieClip reference	
 	
 		*/
-	
+		
 		public static function createmc(mc:Object, name:String, objProps:Object = null):MovieClip
 		{
 			
@@ -127,9 +127,7 @@
 			}
 			
 			var sp:MovieClip = new MovieClip();
-			sp.name = name;
-			
-			var tObj:Object = {mouseEnabled:false,focusRect:false,tabEnabled:false};
+			var tObj:Object = {name:name,mouseEnabled:false,focusRect:false,tabEnabled:false};
 			
 			for(var i:Object in tObj){
 				sp[i] = tObj[i];
@@ -141,6 +139,13 @@
 		
 			mc.addChild(sp);
 			return sp;
+		}
+		
+		public static function addProps(mc:MovieClip,props:Object):void
+		{
+			for(var j:Object in props){
+				mc[j] = props[j];
+			}
 		}
 		
 		public static function $(parent:Object,children:String,delimeter:String='.'):*
