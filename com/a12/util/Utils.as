@@ -459,6 +459,7 @@
 			var tObj:Object = {
 				name:'displayText',
 				mouseEnabled:false,
+				mouseWheelEnabled:false,
 				selectable:false,								
 				width:20,
 				height:10,
