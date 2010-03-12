@@ -253,6 +253,7 @@ package com.a12.ui
 				clearInterval(scrollInterval);
 				ref.stage.removeEventListener(MouseEvent.MOUSE_MOVE,handleMouseStage,false);
 				ref.stage.removeEventListener(MouseEvent.MOUSE_UP,handleMouseStage,false);
+				dispatchEvent(new CustomEvent('onNipRelease', true, false, {}));
 			}
 			e.stopPropagation();
 		}
