@@ -471,7 +471,8 @@
 				embedFonts:true,
 				wordWrap:true,
 				multiline:true,
-				autoSize:TextFieldAutoSize.LEFT								
+				autoSize:TextFieldAutoSize.LEFT,
+				condenseWhite:false								
 				};
 			
 			for(var i:Object in tObj){
