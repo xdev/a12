@@ -249,7 +249,7 @@ package com.a12.managers
 					}
 										
 		    		removeWindow(window, i);
-		    		break;	
+		    		break;
 		    	}	
 		    }
 		    
@@ -268,7 +268,7 @@ package com.a12.managers
 		
 		protected function handleClosing(event:Event):void
 		{
-						
+			dispatchEvent(new CustomEvent('onWindowClose', true, false, { window: event.target }));			
 		}
 		
 		private function onActivate(event:Event):void
