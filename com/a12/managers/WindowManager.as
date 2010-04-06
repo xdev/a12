@@ -194,8 +194,10 @@ package com.a12.managers
 			for(var i:int=0;i<windowA.length;i++){
 				var ts:Stage = windowA[i].window.stage;
 				if(ts == Stage(event.currentTarget)){
-					windowA[i].mainClass.setSize(NativeApplication.nativeApplication.activeWindow.stage.stageWidth, NativeApplication.nativeApplication.activeWindow.stage.stageHeight);
-					break;
+					if(NativeApplication.nativeApplication.activeWindow.stage == ts){
+						windowA[i].mainClass.setSize(NativeApplication.nativeApplication.activeWindow.stage.stageWidth, NativeApplication.nativeApplication.activeWindow.stage.stageHeight);
+						break;
+					}
 				}				
 			}
 		}
@@ -274,7 +276,9 @@ package com.a12.managers
 		private function onActivate(event:Event):void
 		{ 
 			var obj:Object = _getWindow(NativeWindow(event.target));
-			obj.mainClass.setSize(NativeApplication.nativeApplication.activeWindow.stage.stageWidth, NativeApplication.nativeApplication.activeWindow.stage.stageHeight);
+			if(NativeApplication.nativeApplication.activeWindow.stage == obj.window.stage){
+				obj.mainClass.setSize(NativeApplication.nativeApplication.activeWindow.stage.stageWidth, NativeApplication.nativeApplication.activeWindow.stage.stageHeight);
+			}
 			//TODO: Make optional
 			//dispatchStatusChange(e, true);
 		}
