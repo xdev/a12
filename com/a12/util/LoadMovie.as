@@ -22,7 +22,7 @@ package com.a12.util
 			loader = new Loader();
 			var url:URLRequest = new URLRequest(asset);
 			
-			loader.load(url,context);			
+			loader.load(url,context);
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,handleLoad);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,handleError);
 		}
@@ -34,8 +34,8 @@ package com.a12.util
 		
 		private function handleLoad(e:Event):void
 		{
-			_ref.addChild(loader.content);
-			dispatchEvent(new CustomEvent(Event.COMPLETE,true,false,{mc:_ref,content:loader.content}));
+			_ref.addChild(loader);
+			dispatchEvent(new CustomEvent(Event.COMPLETE,true,false,{mc:_ref,loader:loader}));
 			loader = null;
 		}
 		
