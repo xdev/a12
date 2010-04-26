@@ -1,6 +1,5 @@
 ﻿package com.a12.util
 {
-
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
@@ -8,6 +7,7 @@
 	import flash.system.Capabilities;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
+	import flash.geom.Point;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
@@ -17,22 +17,26 @@
 	
 	public class Utils
 	{
-				
 		//http://www.adobe.com/devnet/flashmediaserver/articles/dynstream_advanced_pt3.html
 		public function getFlashPlayerMajorVersion():Number
 		{
 			var fpVersionStr:String = Capabilities.version;
-			return Number( fpVersionStr.split(" ")[1].split(",", 1) );
+			return Number(fpVersionStr.split(" ")[1].split(",", 1));
 		}
 		
-		public static function align(itemsA:Array,mode:String,bounds:Object,process:Boolean=true):Array
+		//http://agitatedobserver.com/snippet-easy-globaltolocal-in-as3/
+		public static function localToLocal(from:MovieClip, to:MovieClip):Point
 		{
-			
+			return to.globalToLocal(from.localToGlobal(new Point()));
+		}
+		
+		public static function align(itemsA:Array, mode:String, bounds:Object, process:Boolean=true):Array
+		{
 			//assume item max is inside bounds for now
 			
 			//per item, optional bounding box override
-			var x:Number,y:Number,mc:MovieClip;
-			var width:Number,height:Number;
+			var x:Number, y:Number, mc:MovieClip;
+			var width:Number, height:Number;
 			var imax:int = itemsA.length;
 			var item:Object;
 			for(var i:int=0;i<imax;i++){
@@ -52,7 +56,7 @@
 				if(item.height != undefined){
 					height = item.height;
 				}
-														
+				
 				switch(mode){
 				
 					case 'HL':
@@ -92,7 +96,7 @@
 				
 			}
 			
-			return itemsA;		
+			return itemsA;
 			
 		}
 	
@@ -127,11 +131,11 @@
 			}
 			
 			var sp:MovieClip = new MovieClip();
-			var tObj:Object = {name:name,mouseEnabled:false,focusRect:false,tabEnabled:false};
+			var tObj:Object = { name:name, mouseEnabled:false, focusRect:false, tabEnabled:false };
 			
 			for(var i:Object in tObj){
 				sp[i] = tObj[i];
-			}			
+			}
 			
 			for(var j:Object in objProps){
 				sp[j] = objProps[j];
@@ -141,17 +145,17 @@
 			return sp;
 		}
 		
-		public static function addProps(mc:MovieClip,props:Object):void
+		public static function addProps(mc:MovieClip, props:Object):void
 		{
 			for(var j:Object in props){
 				mc[j] = props[j];
 			}
 		}
 		
-		public static function $(parent:Object,children:String,delimeter:String='.'):*
+		public static function $(parent:Object, children:String, delimeter:String='.'):*
 		{
 			var obj:Object = null;
-			var tA:Array = children.split(delimeter);			
+			var tA:Array = children.split(delimeter);
 			var found:Boolean = false;
 			var i:int = 0;
 			var a1:Object = parent;
@@ -162,7 +166,7 @@
 				if(i<tA.length-1){
 					i++;
 					a1 = obj;
-					a2 = tA[i];					
+					a2 = tA[i];
 				}else{
 					found = true;
 				}
@@ -173,7 +177,7 @@
 				obj = Sprite(obj);
 			}
 			if(obj is MovieClip){
-				obj = MovieClip(obj);	
+				obj = MovieClip(obj);
 			}
 			
 			return obj;
@@ -182,21 +186,21 @@
 		//http://www.kirupa.com/forum/showthread.php?p=1897368
 		public static function clone(source:Object):* 
 		{
-		    var copier:ByteArray = new ByteArray();
-		    copier.writeObject(source);
-		    copier.position = 0;
-		    return(copier.readObject());
+			var copier:ByteArray = new ByteArray();
+			copier.writeObject(source);
+			copier.position = 0;
+			return(copier.readObject());
 		}
 		
-		public static function handleMovieClipPlayback(e:Event):void
+		public static function handleMovieClipPlayback(event:Event):void
 		{
-			var mc:MovieClip = MovieClip(e.target);
+			var mc:MovieClip = event.target as MovieClip;
 			var i:int;
 			for(i=0;i<mc.currentLabels.length;i++){
 				if(mc.currentLabels[i].frame == mc.currentFrame){
 					if(mc.currentLabel == 'stop' || mc.currentLabel == 'pause'){
 						mc.stop();
-						mc.removeEventListener(Event.ENTER_FRAME, Utils.handleMovieClipPlayback,false);
+						mc.removeEventListener(Event.ENTER_FRAME, Utils.handleMovieClipPlayback, false);
 					}
 					break;
 				}
@@ -206,46 +210,9 @@
 		public static function playClip(mc:MovieClip):void
 		{
 			mc.play();
-			mc.addEventListener(Event.ENTER_FRAME, Utils.handleMovieClipPlayback,false,0,true);
+			mc.addEventListener(Event.ENTER_FRAME, Utils.handleMovieClipPlayback, false, 0, true);
 		}
 		
-		/*
-
-		Function: changeProps
-
-		Basic animation function, can handle any number of properties but only applies basic ease out
-
-		Parameters:
-
-			mc - movieclip
-			objProps - object of properties and their target values
-			easing - a number controlling the ease out rate (4) is common
-
-		*/
-		/*
-		public static function changeProps(mc:MovieClip, objProps:Object, easing:Number) : void
-		{
-
-			// need to subcontract easing formulas
-			// need to change to time based rather than frame based
-
-			mc.onEnterFrame = function() {
-				var done = true;
-				for (var prop in objProps) {
-					this[prop] = (this[prop] - ((this[prop] - objProps[prop]) / easing));
-					if ((Math.abs(this[prop] - objProps[prop]) > 1)) { // ***this test needs to be improved
-						done = false;
-					}
-				}
-				if (done == true) {
-					for (var prop in objProps) {
-						this[prop] = objProps[prop];
-					}				
-					delete this.onEnterFrame;
-				}
-			}
-		}
-		*/
 		
 		/*
 
@@ -296,7 +263,7 @@
 		{
 			var colorTransform:ColorTransform = mc.transform.colorTransform;
 			colorTransform.color = rgb;
-			mc.transform.colorTransform = colorTransform;			
+			mc.transform.colorTransform = colorTransform;
 		}
 		
 		/*
@@ -328,7 +295,7 @@
 			mc.graphics.endFill();
 		
 		}
-				
+		
 		public static function drawShearedRect(mc:MovieClip, w:Number, h:Number, shear:Number, rgb:Number, alpha:Number = 1.0, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
 		{
 			//we could calculate this in degrees instead of pixels slope y=mx+b
@@ -337,7 +304,7 @@
 			if(lineStyle != null){
 				mc.graphics.lineStyle(lineStyle[0], lineStyle[1], lineStyle[2]);
 			}
-			mc.graphics.moveTo(x+shear,y);
+			mc.graphics.moveTo(x+shear, y);
 			mc.graphics.lineTo(x+shear+w, y);
 			mc.graphics.lineTo(x+w, y+h);
 			mc.graphics.lineTo(x, y+h);
@@ -352,10 +319,10 @@
 			mc.graphics.moveTo(x, y);
 			mc.graphics.beginFill(rgb, alpha);
 			
-			mc.graphics.drawRect(x,y,w,stroke);
-			mc.graphics.drawRect(w-stroke,y+stroke,stroke,h-(stroke*2));
-			mc.graphics.drawRect(x,h-stroke,w,stroke);
-			mc.graphics.drawRect(x,stroke,stroke,h-(stroke*2));
+			mc.graphics.drawRect(x, y, w, stroke);
+			mc.graphics.drawRect(w-stroke, y+stroke, stroke, h-(stroke*2));
+			mc.graphics.drawRect(x, h-stroke, w, stroke);
+			mc.graphics.drawRect(x, stroke, stroke, h-(stroke*2));
 			
 			mc.graphics.endFill();
 		}
@@ -372,12 +339,12 @@
 			w:Number - width
 			h:Number - height
 			props:Object - object containing all necessary and optional gradient properties
-
+			
 		*/
-
+		
 		public static function drawGradient(mc:MovieClip, w:Number, h:Number, props:Object ):void
 		{
-			var x:int,y:int,fillType:String,alphas:Array,colors:Array,ratios:Array,matrix:Matrix,rot:int;
+			var x:int, y:int, fillType:String, alphas:Array, colors:Array, ratios:Array, matrix:Matrix, rot:int;
 			
 			(props.x == undefined) ? x = 0 : x = props.x;
 			(props.y == undefined) ? y = 0 : y = props.y;
@@ -388,11 +355,11 @@
 			
 			colors = props.colors;
 			matrix = new Matrix();
-			matrix.createGradientBox(w,h,(Math.PI/180)*rot,0,0);
+			matrix.createGradientBox(w, h, (Math.PI/180)*rot, 0, 0);
 			
 			mc.graphics.moveTo(x, y);
 			mc.graphics.beginGradientFill(fillType, colors, alphas, ratios, matrix);
-			mc.graphics.drawRect(x,y,w,h);
+			mc.graphics.drawRect(x, y, w, h);
 			mc.graphics.endFill();
 		}
 		
@@ -404,7 +371,7 @@
 	
 		Parameters:
 	
-			mc - MovieClip			
+			mc - MovieClip
 			rgb - fill color
 			alpha - fill alpha
 			radius - 
@@ -445,13 +412,12 @@
 		*/
 		public static function drawRoundRect(mc:MovieClip, w:Number, h:Number, rgb:Number, alpha:Number = 1.0, radius:Number = 10, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
 		{
-		
 			mc.graphics.moveTo(x, y);
 			mc.graphics.beginFill(rgb, alpha);
 			if(lineStyle != null){
 				mc.graphics.lineStyle(lineStyle[0], lineStyle[1], lineStyle[2]);
 			}
-			mc.graphics.drawRoundRect(x,y,w,h,radius,radius);
+			mc.graphics.drawRoundRect(x, y, w, h, radius, radius);
 			mc.graphics.endFill();
 		
 		}
@@ -465,19 +431,19 @@
 				name:'displayText',
 				mouseEnabled:false,
 				mouseWheelEnabled:false,
-				selectable:false,								
+				selectable:false,
 				width:20,
 				height:10,
 				embedFonts:true,
 				wordWrap:true,
 				multiline:true,
 				autoSize:TextFieldAutoSize.LEFT,
-				condenseWhite:false								
+				condenseWhite:false
 				};
 			
 			for(var i:Object in tObj){
 				tf[i] = tObj[i];
-			}			
+			}
 			
 			for(var j:Object in props){
 				tf[j] = props[j];
@@ -548,14 +514,12 @@
 
 			if((time / 60) > 1){
 				tObj.minutes = Math.floor(time/60);
-				tObj.seconds = time%60;			
+				tObj.seconds = time%60;
 			}else{
 				tObj.minutes = 0;
 				tObj.seconds = time;
 			}
-
 			return tObj;
-
 		}
 		
 		/*
@@ -581,10 +545,9 @@
 			}else{
 				return String(num);
 			}
-
 		}
 		
-		public static function getScale(objWidth:Number,objHeight:Number,contWidth:Number,contHeight:Number,scaleMode:String='scale',max:Number=undefined):Object
+		public static function getScale(objWidth:Number, objHeight:Number, contWidth:Number, contHeight:Number, scaleMode:String='scale', max:Number=undefined):Object
 		{
 			//need to handle way to toggle on off Math functions (ceil,floor)
 			
@@ -658,25 +621,27 @@
 	
 		*/
 	
-		public static function getPositionByOffset(ind:Number,len:Number,offset:Number):Number
+		public static function getPositionByOffset(ind:Number, len:Number, offset:Number):Number
 		{
 			var t:int = ind+offset;
-		
+			
 			switch(true)
 			{
 				case (t < 0) && (offset<1):
-					t = (len)-Math.abs(t);
+					return (len)-Math.abs(t);
 				break;
-		
+				
 				case (t > (len-1)) && (offset>-1):
-					t = t-len;
+					return t-len;
 				break;
-		
+				
+				default:
+					return t;
+				break;
+				
 			}
-		
-			return t;
 		}
-	
+		
 		/* 
 	
 		Function: toRadians
@@ -692,7 +657,7 @@
 			radians
 	
 		*/
-	
+		
 		public static function toRadians(deg:Number):Number
 		{
 			return deg * Math.PI/180;
