@@ -422,11 +422,9 @@
 		
 		}
 		
-		public static function makeTextfield(mc:Object, display:String, format:TextFormat, props:Object = null):TextField
+		public static function createTextField(display:String, format:TextFormat, props:Object = null):TextField
 		{
 			var tf:TextField = new TextField();
-			mc.addChild(tf);
-			
 			var tObj:Object = {
 				name:'displayText',
 				mouseEnabled:false,
@@ -439,7 +437,7 @@
 				multiline:true,
 				autoSize:TextFieldAutoSize.LEFT,
 				condenseWhite:false
-				};
+			};
 			
 			for(var i:Object in tObj){
 				tf[i] = tObj[i];
@@ -457,10 +455,20 @@
 			tf.htmlText = display;
 			
 			if(!tf.styleSheet){
+				if(!format){
+					format = new TextFormat();
+				}
 				tf.defaultTextFormat = format;
 				tf.setTextFormat(format);
 			}
 			
+			return tf;
+		}
+		
+		public static function makeTextfield(mc:Object, display:String, format:TextFormat, props:Object = null):TextField
+		{
+			var tf:TextField = Utils.createTextField(display, format, props);
+			mc.addChild(tf);
 			return tf;
 		}
 		
