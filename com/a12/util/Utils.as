@@ -3,6 +3,7 @@
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
+	import flash.display.Graphics;
 	import flash.events.Event;
 	import flash.system.Capabilities;
 	import flash.geom.ColorTransform;
@@ -296,6 +297,118 @@
 		
 		}
 		
+		static public function drawRoundPath(g:Graphics, points:Vector.<Object>, radius:Number = 20, closePath:Boolean = false):void
+		{
+			// code by Philippe / http://philippe.elsass.me
+			var count:int = points.length;
+			if (count < 2) return;  
+			if (closePath && count < 3) return;
+			
+			var p0:Point = points[0].p;
+			var p1:Point = points[1].p;
+			var p2:Point;
+			var pp0:Point;
+			var pp2:Point;
+			
+			var last:Point;
+			if (!closePath) {
+				g.moveTo(p0.x, p0.y);
+				last = points[count - 1].p;
+			}
+			
+			var n:int = (closePath) ? count + 1 : count - 1;
+			
+			for (var i:int = 1; i < n; i++) {
+				p2 = points[(i + 1) % count].p;
+				radius = points[(i+1) % count].r;
+				
+				var v0:Point = p0.subtract(p1);
+				var v2:Point = p2.subtract(p1);
+				var r:Number = Math.max(1, Math.min(radius,
+				Math.min(v0.length / 2, v2.length / 2)));
+				v0.normalize(r);
+				v2.normalize(r);
+				pp0 = p1.add(v0);
+				pp2 = p1.add(v2);
+				if (i == 1 && closePath) {
+					g.moveTo(pp0.x, pp0.y);
+					last = pp0;
+				} else {
+					g.lineTo(pp0.x, pp0.y);
+				}
+
+				g.curveTo(p1.x, p1.y, pp2.x, pp2.y);
+				p0 = p1;  
+				p1 = p2;  
+			}  
+			
+			g.lineTo(last.x, last.y);
+		}  
+		/*
+		public static function drawBorderedRect(mc:MovieClip, w:Number, h:Number, rgb:Number, alpha:Number, borders:Array, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
+		{
+			var a:Point;
+			var b:Point;
+			var c:Point;
+			var ba:Point;
+			var ap:Point;
+			var bc:Point;
+			var cp:Point;
+			
+			mc.graphics.beginFill(rgb, alpha);
+			if(lineStyle != null){
+				mc.graphics.lineStyle(lineStyle[0], lineStyle[1], lineStyle[2]);
+			}
+			var rad:Number = 10;
+			if(borders[0]){
+				rad = borders[0];
+				a = Point(0, rad);
+				b = Point(0, 0);
+				c = Point(rad, 0);
+				ba = Point = a.subtract(b);
+				ba = ba.normalize(rad);
+				ap = b.add(ba);
+				bc = c.subtract(b);
+				bc = bc.normalize(rad);
+				cp = b.add(bc);
+				
+				mc.graphics.moveTo(a.x, a.y);
+				mc.graphics.lineTo(ap.x, ap.y);
+				mc.graphics.curveTo(b.x, b.y, cp.x, cp.y);
+				mc.graphics.lineTo(c.x, c.y);
+			}else{
+				mc.graphics.moveTo(0, 0);
+			}
+			if(borders[1]){
+				rad = borders[1];
+				mc.graphics.lineTo(w-rad, 0);
+				mc.graphics.curveTo(w, rad, w, 0);
+			}else{
+				mc.graphics.lineTo(w, 0);
+			}
+			if(borders[2]){
+				rad = borders[2];
+				mc.graphics.lineTo(w, h-rad);
+				mc.graphics.curveTo(w-rad, h, w, h);
+			}else{
+				mc.graphics.lineTo(w, h);
+			}
+			if(borders[3]){
+				rad = borders[3];
+				mc.graphics.lineTo(rad, h);
+				mc.graphics.curveTo(0, h-rad, 0, h);
+			}else{
+				mc.graphics.lineTo(0, h);
+			}
+			if(borders[0]){
+				rad = borders[0];
+				mc.graphics.lineTo(0, rad);
+			}else{
+				mc.graphics.lineTo(0, 0);
+			}
+			mc.graphics.endFill();
+		}
+		*/
 		public static function drawShearedRect(mc:MovieClip, w:Number, h:Number, shear:Number, rgb:Number, alpha:Number = 1.0, lineStyle:Array = null, x:Number = 0, y:Number = 0):void
 		{
 			//we could calculate this in degrees instead of pixels slope y=mx+b
