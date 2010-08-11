@@ -297,7 +297,7 @@
 		
 		}
 		
-		static public function drawRoundPath(g:Graphics, points:Vector.<Object>, radius:Number = 20, closePath:Boolean = false):void
+		static public function drawRoundPath(g:Graphics, points:Vector.<Object>, closePath:Boolean = false):void
 		{
 			// code by Philippe / http://philippe.elsass.me
 			var count:int = points.length;
@@ -320,7 +320,7 @@
 			
 			for (var i:int = 1; i < n; i++) {
 				p2 = points[(i + 1) % count].p;
-				radius = points[(i+1) % count].r;
+				var radius:int = points[(i+1) % count].r;
 				
 				var v0:Point = p0.subtract(p1);
 				var v2:Point = p2.subtract(p1);
